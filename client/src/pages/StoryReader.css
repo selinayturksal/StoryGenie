@@ -1,0 +1,32 @@
+.reader-page { padding: 24px 0 80px; min-height: calc(100vh - 64px); }
+
+.reader-back {
+  background: none; border: none;
+  color: var(--clr-magic); font-weight: 700; font-size: 0.9rem;
+  cursor: pointer; padding: 8px 0; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.2s;
+}
+.reader-back:hover { opacity: 0.7; }
+
+.reader-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 24px; flex-wrap: wrap;
+  margin-top: 8px; padding: 24px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  max-width: 780px; margin-left: auto; margin-right: auto;
+}
+
+.reader-rating { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.reader-rating-label { font-size: 0.9rem; font-weight: 600; color: var(--clr-ink-soft); }
+
+.star-rating { display: flex; gap: 2px; }
+.star {
+  background: none; border: none; font-size: 1.6rem;
+  color: var(--clr-border); cursor: pointer;
+  transition: color 0.15s, transform 0.15s; padding: 0;
+}
+.star.filled { color: var(--clr-gold-light); }
+.star:hover { transform: scale(1.2); }
