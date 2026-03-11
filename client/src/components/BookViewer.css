@@ -98,39 +98,71 @@
 
 .char-showcase {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+  align-items: flex-end;
+  justify-content: center;
   width: 100%;
 }
 
 .showcase-char {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 6px 12px;
-  background: rgba(255,255,255,0.5);
+  gap: 6px;
+  padding: 6px 6px 4px;
+  background: rgba(255,255,255,0.55);
   border-radius: var(--radius-md);
-  width: 85%;
+  flex: 1;
+  animation: charEntrance 0.5s ease both;
 }
 
-.showcase-char img,
-.showcase-char .showcase-emoji {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--clr-bg-alt);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
+.showcase-char:nth-child(1) { animation-delay: 0.05s; }
+.showcase-char:nth-child(2) { animation-delay: 0.15s; }
+.showcase-char:nth-child(3) { animation-delay: 0.25s; }
+
+.showcase-char img {
+  width: 52px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: contain;
+  object-position: center bottom;
+  background: transparent;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.showcase-char:hover img {
+  transform: scale(1.07) translateY(-4px);
+}
+
+.showcase-char .showcase-emoji {
+  width: 52px; height: 80px;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 2.8rem;
+  padding-bottom: 4px;
 }
 
 .showcase-name {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--clr-ink-soft);
+  text-align: center;
+  line-height: 1.2;
+}
+
+@keyframes charEntrance {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.85); }
+  60%  { transform: translateY(-4px) scale(1.03); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes charIdle {
+  0%, 100% { transform: translateY(0); }
+  40%       { transform: translateY(-5px); }
+  70%       { transform: translateY(-2px); }
 }
 
 .showcase-location {
@@ -184,18 +216,30 @@
 }
 
 .strip-char {
-  width: 32px; height: 32px;
-  border-radius: 50%;
+  width: 28px;
+  height: 44px;
+  border-radius: 6px;
   overflow: hidden;
   border: 2px solid var(--clr-border);
   background: var(--clr-bg-alt);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  transition: transform 0.2s ease;
+  cursor: default;
 }
+
+.strip-char:hover {
+  transform: translateY(-5px) scale(1.15);
+  border-color: var(--clr-magic-light);
+  z-index: 1;
+}
+
 .strip-char img {
-  width: 100%; height: 100%;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
 }
 
 /* ── Navigation ──────────────────────────────────────────────────────────── */
