@@ -1,9 +1,7 @@
 const express = require('express');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const DURATION_WORD_COUNT = { short: 150, medium: 400, long: 800 };
 const WORDS_PER_PAGE = 80;
@@ -18,18 +16,54 @@ function splitIntoPages(text) {
   return pages;
 }
 
+async function callOpenAI(prompt, apiKey) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1500,
+      temperature: 0.8,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error?.message || `OpenAI hata: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
+
 router.post('/generate', protect, async (req, res) => {
   try {
-    const { characters = [], location, childAge = 5, duration = 'medium', storyLanguage = 'tr', customPrompt = '' } = req.body;
+    const {
+      characters = [],
+      location,
+      childAge = 5,
+      duration = 'medium',
+      storyLanguage = 'tr',
+      customPrompt = '',
+    } = req.body;
 
     if (characters.length === 0) return res.status(400).json({ error: 'En az bir karakter gerekli.' });
-    if (characters.length > 6) return res.status(400).json({ error: 'En fazla 6 karakter seçebilirsin.' });
+    if (characters.length > 6)   return res.status(400).json({ error: 'En fazla 6 karakter seçebilirsin.' });
 
-    const targetWords = DURATION_WORD_COUNT[duration] || 400;
-    const isTurkish = storyLanguage === 'tr';
-    const charNames = characters.map(c => `${c.name} (${c.type === 'animal' ? 'hayvan' : 'insan'})`).join(', ');
-    const locName = location?.name || (isTurkish ? 'büyülü bir yer' : 'a magical place');
-    const customSection = customPrompt.trim() ? (isTurkish ? `\nEk yön: ${customPrompt}` : `\nAdditional direction: ${customPrompt}`) : '';
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'OpenAI API key eksik. .env dosyasını kontrol et.' });
+
+    const targetWords  = DURATION_WORD_COUNT[duration] || 400;
+    const isTurkish    = storyLanguage === 'tr';
+    const charNames    = characters.map(c => `${c.name} (${c.type === 'animal' ? 'hayvan' : 'insan'})`).join(', ');
+    const locName      = location?.name || (isTurkish ? 'büyülü bir yer' : 'a magical place');
+    const customSection = customPrompt.trim()
+      ? (isTurkish ? `\nEk yön: ${customPrompt}` : `\nAdditional direction: ${customPrompt}`)
+      : '';
 
     const storyPrompt = isTurkish
       ? `Sen çocuklar için büyüleyici hikayeler yazan bir yazarsın.
@@ -55,32 +89,35 @@ Rules:
 - Use fluent, child-friendly language
 - Write only the story text, no title or description`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
-    const storyResult = await model.generateContent(storyPrompt);
-    const storyText = storyResult.response.text().trim();
+    const storyText = await callOpenAI(storyPrompt, apiKey);
     if (!storyText) return res.status(500).json({ error: 'AI hikaye üretemedi. Tekrar dene.' });
 
     const titlePrompt = isTurkish
       ? `Bu hikaye için kısa ve çekici bir başlık yaz. Maksimum 6 kelime. Sadece başlığı yaz:\n\n${storyText.substring(0, 200)}`
       : `Write a short catchy title for this story. Max 6 words. Write only the title:\n\n${storyText.substring(0, 200)}`;
 
-    const titleResult = await model.generateContent(titlePrompt);
-    const title = titleResult.response.text().trim().replace(/[*"]/g, '') || (isTurkish ? 'Bugünün Hikayesi' : "Today's Story");
+    const title = (await callOpenAI(titlePrompt, apiKey)).replace(/[*"]/g, '')
+      || (isTurkish ? 'Bugünün Hikayesi' : "Today's Story");
 
     const pages = splitIntoPages(storyText);
 
-    res.json({ title, fullText: storyText, pages, wordCount: storyText.split(' ').length, pageCount: pages.length });
+    res.json({
+      title,
+      fullText: storyText,
+      pages,
+      wordCount: storyText.split(' ').length,
+      pageCount: pages.length,
+    });
 
   } catch (err) {
-    console.error('Gemini error:', err.message);
-    if (err.message?.includes('API_KEY') || err.message?.includes('API key')) {
-      return res.status(500).json({ error: 'Gemini API key geçersiz. .env dosyasını kontrol et.' });
+    console.error('OpenAI error:', err.message);
+    if (err.message?.includes('API key') || err.message?.includes('Incorrect API key')) {
+      return res.status(500).json({ error: 'OpenAI API key geçersiz.' });
     }
-    if (err.message?.includes('quota') || err.status === 429) {
-      return res.status(429).json({ error: 'Gemini kota aşıldı. Biraz bekle.' });
+    if (err.message?.includes('quota') || err.message?.includes('429') || err.message?.includes('insufficient_quota')) {
+      return res.status(429).json({ error: 'OpenAI kota aşıldı.' });
     }
-    res.status(500).json({ error: 'Hikaye üretilirken hata oluştu. Tekrar dene.' });
+    res.status(500).json({ error: 'Hikaye üretilirken hata oluştu: ' + err.message });
   }
 });
 
