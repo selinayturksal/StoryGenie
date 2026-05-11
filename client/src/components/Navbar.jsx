@@ -22,9 +22,21 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner container">
+
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          <span className="logo-icon">📚</span>
+          <div className="logo-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="8" fill="url(#lg)"/>
+              <text x="14" y="20" textAnchor="middle" fontSize="16">📖</text>
+              <defs>
+                <linearGradient id="lg" x1="0" y1="0" x2="28" y2="28">
+                  <stop offset="0%" stopColor="#9b59b6"/>
+                  <stop offset="100%" stopColor="#00c9a7"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
           <span className="logo-text">StoryNest</span>
         </Link>
 
@@ -48,19 +60,19 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="navbar-right">
-          {/* Language switcher */}
+
+          {/* Dil seçici — bayrak yok, sadece metin */}
           <div className="lang-switcher">
             <button
               className={`lang-btn ${lang === 'tr' ? 'active' : ''}`}
               onClick={() => switchLang('tr')}
-            >🇹🇷 TR</button>
+            >TR</button>
             <button
               className={`lang-btn ${lang === 'en' ? 'active' : ''}`}
               onClick={() => switchLang('en')}
-            >🇬🇧 EN</button>
+            >EN</button>
           </div>
 
-          {/* Auth buttons */}
           {user ? (
             <div className="user-menu">
               <button className="user-avatar-btn" onClick={() => setMenuOpen(!menuOpen)}>
@@ -68,7 +80,9 @@ export default function Navbar() {
                   {user.username?.[0]?.toUpperCase() || '?'}
                 </span>
                 <span className="user-name hide-mobile">{user.username}</span>
-                <span className="chevron">{menuOpen ? '▲' : '▼'}</span>
+                <svg className="chevron-icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
+                  <path d={menuOpen ? 'M9 5L5 1L1 5' : 'M1 1L5 5L9 1'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
               </button>
               {menuOpen && (
                 <div className="user-dropdown">
@@ -78,7 +92,7 @@ export default function Navbar() {
                   </div>
                   <hr />
                   <button onClick={handleLogout} className="dropdown-item logout">
-                    🚪 {t.nav.logout}
+                    {t.nav.logout}
                   </button>
                 </div>
               )}
@@ -90,21 +104,20 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Mobile hamburger */}
           <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
             <span /><span /><span />
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && user && (
         <div className="mobile-menu">
           <Link to="/" onClick={() => setMenuOpen(false)}>{t.nav.today}</Link>
           <Link to="/explore" onClick={() => setMenuOpen(false)}>{t.nav.explore}</Link>
           <Link to="/my-stories" onClick={() => setMenuOpen(false)}>{t.nav.myStories}</Link>
           <Link to="/dashboard" onClick={() => setMenuOpen(false)}>{t.nav.dashboard}</Link>
-          <button onClick={handleLogout} className="mobile-logout">🚪 {t.nav.logout}</button>
+          <hr className="mobile-divider" />
+          <button onClick={handleLogout} className="mobile-logout">{t.nav.logout}</button>
         </div>
       )}
     </nav>

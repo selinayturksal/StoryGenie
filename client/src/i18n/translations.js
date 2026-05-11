@@ -1,6 +1,5 @@
 const translations = {
   tr: {
-    // Genel
     appName: 'StoryNest',
     tagline: 'Çocuğunuza özel sihirli hikayeler',
     loading: 'Yükleniyor...',
@@ -15,9 +14,8 @@ const translations = {
     error: 'Bir hata oluştu',
     success: 'Başarılı!',
 
-    // Navbar
     nav: {
-      today: "Bugünün Hikayesi",
+      today: 'Bugünün Hikayesi',
       explore: 'Önerilen Hikayeler',
       myStories: 'Hikayelerim',
       dashboard: 'Dashboard',
@@ -27,7 +25,6 @@ const translations = {
       profile: 'Profilim',
     },
 
-    // Auth
     auth: {
       login: 'Giriş Yap',
       register: 'Kayıt Ol',
@@ -59,43 +56,41 @@ const translations = {
       },
     },
 
-    // Hikaye oluşturma
     create: {
-      pageTitle: "Bugünün Hikayesi",
-      subtitle: 'Çocuğun için büyülü bir hikaye oluştur',
+      pageTitle: 'Büyülü Hikaye Oluştur ✨',
+      subtitle: 'Karakterleri seç, macerayı başlat!',
       characters: 'Karakterler',
-      humanChars: 'İnsan Karakterler',
-      animalChars: 'Hayvan Karakterler',
-      locations: 'Mekan',
-      selectChars: 'En fazla 6 karakter seç',
-      selectedChars: 'Seçilen karakterler',
-      childAge: 'Çocuğun Yaşı',
+      humanChars: 'Çocuk Karakterler',
+      animalChars: 'Hayvan Arkadaşlar',
+      locations: 'Macera Mekanı',
+      selectChars: 'En fazla 6 karakter seçebilirsin',
+      selectedChars: 'Seçilenler',
+      childAge: 'Çocuğun Kaç Yaşında?',
       ageYears: 'yaş',
-      duration: 'Hikaye Süresi',
+      duration: 'Hikaye Ne Kadar Sürsün?',
       durationShort: 'Kısa (~2 dk)',
       durationMedium: 'Orta (~5 dk)',
       durationLong: 'Uzun (~10 dk)',
       storyLanguage: 'Hikaye Dili',
-      customPrompt: 'Hikayeyi Yönlendir (İsteğe Bağlı)',
-      customPlaceholder: 'Hikaye için özel bir istek yaz...',
-      quickPrompts: 'Hazır Yönlendirmeler:',
-      generateBtn: '✨ Hikaye Oluştur',
+      customPrompt: 'Hikayeye Yön Ver',
+      customPlaceholder: 'Özel bir istek yaz... (isteğe bağlı)',
+      quickPrompts: 'Hızlı Seçenekler:',
+      generateBtn: '✨ Hikayemi Oluştur!',
       generating: 'Hikaye yazılıyor...',
-      generatingMsg: 'Sihirli parmaklar çalışıyor, biraz bekle...',
+      generatingMsg: 'Sihirli kalemler çalışıyor, biraz bekle...',
       charLimit: 'En fazla 6 karakter seçebilirsin',
-      selectLocation: 'Bir mekan seçmelisin',
-      selectChar: 'En az bir karakter seçmelisin',
+      selectLocation: 'Bir macera mekanı seçmelisin!',
+      selectChar: 'En az bir karakter seçmelisin!',
       prompts: [
-        'Mutlu sonla biten bir hikaye',
-        'Okul arkadaşlarıyla geçen bir gün',
-        'Gizemli bir hazine arayışı',
-        'Doğaya saygıyı anlatan hikaye',
-        'Yeni bir arkadaşlık hikayesi',
-        'Cesaret ve yardımlaşma temalı',
+        'Mutlu sonla bitsin',
+        'Okul arkadaşlığı',
+        'Gizli hazine arayışı',
+        'Doğa ve hayvanlar',
+        'Yeni bir arkadaşlık',
+        'Cesaret ve yardım',
       ],
     },
 
-    // Hikaye görüntüleyici
     story: {
       page: 'Sayfa',
       of: '/',
@@ -111,7 +106,6 @@ const translations = {
       next: '›',
     },
 
-    // Hikayelerim
     myStories: {
       title: 'Hikayelerim',
       subtitle: 'Oluşturduğun tüm büyülü hikayeler',
@@ -124,7 +118,6 @@ const translations = {
       readStory: 'Oku',
     },
 
-    // Keşfet
     explore: {
       title: 'Önerilen Hikayeler',
       subtitle: 'Aileler tarafından beğenilen hikayeler',
@@ -137,7 +130,6 @@ const translations = {
       views: 'görüntülenme',
     },
 
-    // Dashboard
     dashboard: {
       title: 'Dashboard',
       subtitle: 'Hikaye istatistiklerin',
@@ -150,7 +142,6 @@ const translations = {
       durationDist: 'Süre Dağılımı',
     },
 
-    // Dil seçici
     lang: { tr: 'Türkçe', en: 'English' },
   },
 
@@ -212,37 +203,37 @@ const translations = {
     },
 
     create: {
-      pageTitle: "Today's Story",
-      subtitle: 'Create a magical story for your child',
+      pageTitle: 'Create a Magical Story ✨',
+      subtitle: 'Pick your characters and start the adventure!',
       characters: 'Characters',
-      humanChars: 'Human Characters',
-      animalChars: 'Animal Characters',
-      locations: 'Location',
-      selectChars: 'Select up to 6 characters',
-      selectedChars: 'Selected characters',
-      childAge: "Child's Age",
+      humanChars: 'Kids',
+      animalChars: 'Animal Friends',
+      locations: 'Adventure Location',
+      selectChars: 'Pick up to 6 characters',
+      selectedChars: 'Selected',
+      childAge: "How old is your child?",
       ageYears: 'yrs',
-      duration: 'Story Duration',
+      duration: 'How long should the story be?',
       durationShort: 'Short (~2 min)',
       durationMedium: 'Medium (~5 min)',
       durationLong: 'Long (~10 min)',
       storyLanguage: 'Story Language',
-      customPrompt: 'Guide the Story (Optional)',
-      customPlaceholder: 'Write a special request for the story...',
-      quickPrompts: 'Quick Suggestions:',
-      generateBtn: '✨ Create Story',
+      customPrompt: 'Guide the Story',
+      customPlaceholder: 'Write a special request... (optional)',
+      quickPrompts: 'Quick Options:',
+      generateBtn: '✨ Create My Story!',
       generating: 'Writing your story...',
-      generatingMsg: 'Magic fingers at work, please wait...',
+      generatingMsg: 'Magic pens at work, please wait...',
       charLimit: 'You can select up to 6 characters',
-      selectLocation: 'Please select a location',
-      selectChar: 'Please select at least one character',
+      selectLocation: 'Please pick an adventure location!',
+      selectChar: 'Please select at least one character!',
       prompts: [
-        'A story with a happy ending',
-        'A day with school friends',
-        'A mysterious treasure hunt',
-        'A story about respecting nature',
-        'A new friendship story',
-        'Themed around courage and teamwork',
+        'Happy ending',
+        'School friendship',
+        'Secret treasure hunt',
+        'Nature & animals',
+        'A new friendship',
+        'Courage & teamwork',
       ],
     },
 

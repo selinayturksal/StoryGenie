@@ -12,6 +12,7 @@ const CreateStory = React.lazy(() => import('./pages/CreateStory'));
 const MyStories   = React.lazy(() => import('./pages/MyStories'));
 const Explore     = React.lazy(() => import('./pages/Explore'));
 const Dashboard   = React.lazy(() => import('./pages/Dashboard'));
+const StoryView   = React.lazy(() => import('./pages/StoryView'));
 const StoryReader = React.lazy(() => import('./pages/StoryReader'));
 
 function AppShell() {
@@ -41,6 +42,9 @@ function AppShell() {
           } />
           <Route path="/story/:id" element={
             <ProtectedRoute><StoryReader /></ProtectedRoute>
+          } />
+          <Route path="/story-view" element={
+            <ProtectedRoute><StoryView /></ProtectedRoute>
           } />
 
           {/* Fallback */}
