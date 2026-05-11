@@ -1,0 +1,139 @@
+.settings-page {
+  min-height: calc(100vh - 64px);
+  padding: 52px 0;
+}
+
+.settings-container {
+  max-width: 580px;
+}
+
+.settings-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: rgba(220, 210, 255, 0.95);
+  margin-bottom: 32px;
+}
+
+[data-theme="light"] .settings-title { color: rgb(30, 15, 55); }
+
+/* ── Tabs ── */
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(200, 185, 255, 0.06);
+  border-radius: var(--r-full);
+  padding: 4px;
+  margin-bottom: 28px;
+  width: fit-content;
+  border: 1.5px solid rgba(200, 185, 255, 0.1);
+}
+
+[data-theme="light"] .settings-tabs {
+  background: rgba(117, 70, 104, 0.06);
+  border-color: rgba(117, 70, 104, 0.12);
+}
+
+.settings-tab {
+  padding: 9px 26px;
+  border-radius: var(--r-full);
+  font-family: var(--font-display);
+  font-size: 0.88rem; font-weight: 800;
+  color: rgba(180, 165, 230, 0.7);
+  background: transparent; border: none;
+  cursor: pointer; transition: all 0.2s ease;
+}
+
+.settings-tab.active {
+  background: linear-gradient(135deg, rgb(117, 70, 104), rgb(80, 38, 120));
+  color: #fff;
+  box-shadow: 0 3px 14px rgba(117, 70, 104, 0.45);
+}
+
+[data-theme="light"] .settings-tab       { color: rgba(60, 40, 90, 0.62); }
+[data-theme="light"] .settings-tab.active { color: #fff; }
+
+/* ── Card ── */
+.settings-card {
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(200, 185, 255, 0.1);
+  border-radius: var(--r-lg);
+  padding: 36px 38px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .settings-card {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(117, 70, 104, 0.1);
+  box-shadow: 0 6px 28px rgba(80, 40, 120, 0.1);
+}
+
+.settings-card form {
+  display: flex; flex-direction: column; gap: 22px;
+}
+
+.settings-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.settings-hint {
+  font-size: 0.78rem;
+  color: rgba(180, 165, 230, 0.5);
+  margin-top: 5px;
+}
+[data-theme="light"] .settings-hint { color: rgba(60, 40, 90, 0.5); }
+
+/* ── Language buttons ── */
+.settings-lang-btns { display: flex; gap: 8px; }
+
+.settings-lang-btn {
+  padding: 8px 22px;
+  border-radius: var(--r-full);
+  font-family: var(--font-display); font-size: 0.85rem; font-weight: 800;
+  border: 1.5px solid rgba(200, 185, 255, 0.18);
+  background: transparent; color: rgba(180, 165, 230, 0.75);
+  cursor: pointer; transition: all 0.2s ease;
+}
+.settings-lang-btn.active {
+  background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120));
+  border-color: rgba(200, 185, 255, 0.3);
+  color: #fff;
+}
+.settings-lang-btn:hover:not(.active) { border-color: rgba(200, 185, 255, 0.35); color: rgba(220, 210, 255, 0.9); }
+
+[data-theme="light"] .settings-lang-btn       { border-color: rgba(117,70,104,0.2); color: rgba(60,40,90,0.72); }
+[data-theme="light"] .settings-lang-btn.active { background: rgb(117,70,104); border-color: rgb(117,70,104); color: #fff; }
+[data-theme="light"] .settings-lang-btn:hover:not(.active) { border-color: rgba(117,70,104,0.45); color: rgb(30,15,55); }
+
+/* ── Success ── */
+.settings-success {
+  background: rgba(84, 151, 167, 0.12);
+  border: 1.5px solid rgba(84, 151, 167, 0.28);
+  border-radius: var(--r-md);
+  padding: 11px 16px;
+  font-size: 0.875rem; font-weight: 700;
+  color: rgb(140, 200, 220);
+}
+[data-theme="light"] .settings-success {
+  background: rgba(84, 151, 167, 0.09);
+  color: rgb(40, 100, 120);
+  border-color: rgba(84, 151, 167, 0.25);
+}
+
+.settings-submit {
+  width: 100%; justify-content: center;
+  padding: 13px !important; font-size: 1rem !important;
+  background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120)) !important;
+  box-shadow: 0 4px 0 rgba(40,15,60,0.55), 0 8px 24px rgba(117,70,104,0.4) !important;
+}
+.settings-submit:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 7px 0 rgba(40,15,60,0.55), 0 14px 32px rgba(117,70,104,0.45) !important;
+}
+
+@media (max-width: 600px) {
+  .settings-card { padding: 28px 20px; }
+  .settings-title { font-size: 1.6rem; }
+}

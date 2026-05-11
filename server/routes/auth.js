@@ -18,20 +18,23 @@ const registerValidation = [
     .normalizeEmail()
     .withMessage('Please provide a valid email'),
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters')
+    .matches(/[A-Z]/)
+    .withMessage('Password must contain at least one uppercase letter')
+    .matches(/[a-z]/)
+    .withMessage('Password must contain at least one lowercase letter')
     .matches(/\d/)
     .withMessage('Password must contain at least one number'),
 ];
 
 const loginValidation = [
-  body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+  body('identifier').notEmpty().withMessage('Email or username is required'),
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
 // ─── POST /api/auth/register ──────────────────────────────────────────────────
 router.post('/register', registerValidation, async (req, res) => {
-  // Validasyon hatalarını kontrol et
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -40,7 +43,6 @@ router.post('/register', registerValidation, async (req, res) => {
   try {
     const { username, email, password, preferredLanguage } = req.body;
 
-    // Email veya username zaten kullanılıyor mu?
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       if (existingUser.email === email) {
@@ -70,6 +72,7 @@ router.post('/register', registerValidation, async (req, res) => {
 });
 
 // ─── POST /api/auth/login ─────────────────────────────────────────────────────
+// Accepts email OR username in the `identifier` field
 router.post('/login', loginValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -77,17 +80,20 @@ router.post('/login', loginValidation, async (req, res) => {
   }
 
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    // Şifreyi de getir (model'de select:false var)
-    const user = await User.findOne({ email }).select('+password');
+    // Decide whether identifier looks like an email or a username
+    const isEmail = /^\S+@\S+\.\S+$/.test(identifier);
+    const query   = isEmail ? { email: identifier.toLowerCase() } : { username: identifier };
+
+    const user = await User.findOne(query).select('+password');
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
     const token = signToken(user._id);
@@ -103,12 +109,12 @@ router.post('/login', loginValidation, async (req, res) => {
   }
 });
 
-// ─── GET /api/auth/me (Token doğrulama / profil bilgisi) ──────────────────────
+// ─── GET /api/auth/me ─────────────────────────────────────────────────────────
 router.get('/me', protect, async (req, res) => {
   res.json({ user: req.user.toPublicJSON() });
 });
 
-// ─── PUT /api/auth/profile (Profil güncelleme) ────────────────────────────────
+// ─── PUT /api/auth/profile ────────────────────────────────────────────────────
 router.put('/profile', protect, [
   body('username')
     .optional()
@@ -142,9 +148,58 @@ router.put('/profile', protect, [
   }
 });
 
+// ─── PUT /api/auth/change-password ───────────────────────────────────────────
+router.put('/change-password', protect, [
+  body('currentPassword').notEmpty().withMessage('Current password is required'),
+  body('newPassword')
+    .isLength({ min: 8 })
+    .withMessage('New password must be at least 8 characters')
+    .matches(/[A-Z]/)
+    .withMessage('Password must contain at least one uppercase letter')
+    .matches(/[a-z]/)
+    .withMessage('Password must contain at least one lowercase letter')
+    .matches(/\d/)
+    .withMessage('Password must contain at least one number'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Current password is incorrect.' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password changed successfully.' });
+  } catch (err) {
+    console.error('Change password error:', err);
+    res.status(500).json({ error: 'Server error changing password.' });
+  }
+});
+
+// ─── POST /api/auth/forgot-password ──────────────────────────────────────────
+// Stub — always returns 200 to prevent email enumeration.
+// Wire up a real email service (SendGrid, Resend, etc.) here.
+router.post('/forgot-password', [
+  body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+], async (req, res) => {
+  // Always respond with 200 regardless of whether the email exists
+  res.json({ message: 'If that email is registered, a reset link has been sent.' });
+});
+
 // ─── POST /api/auth/logout ────────────────────────────────────────────────────
-// JWT stateless olduğu için client tarafında token silinir.
-// İstersen bir blacklist mekanizması eklenebilir - şimdilik basit tutuyoruz.
 router.post('/logout', protect, (req, res) => {
   res.json({ message: 'Logged out successfully.' });
 });

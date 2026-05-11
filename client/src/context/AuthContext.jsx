@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext();
@@ -24,8 +24,8 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = useCallback(async (email, password) => {
-    const res = await api.post('/auth/login', { email, password });
+  const login = useCallback(async (identifier, password) => {
+    const res = await api.post('/auth/login', { identifier, password });
     const { token, user } = res.data;
     localStorage.setItem('sn_token', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

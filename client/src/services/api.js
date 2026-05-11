@@ -10,7 +10,10 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // express-validator returns { errors: [{msg, ...}] }, not { error: string }
+    const validationErrors = error.response?.data?.errors;
     const message =
+      (Array.isArray(validationErrors) && validationErrors[0]?.msg) ||
       error.response?.data?.error ||
       error.response?.data?.message ||
       error.message ||

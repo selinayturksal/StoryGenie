@@ -7,12 +7,19 @@
 .exp-filters { display: flex; gap: 12px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
 .filter-select {
   padding: 11px 18px; border-radius: var(--r-full);
-  border: 2.5px solid var(--sky-mid); background: rgba(255,255,255,0.8);
+  border: 1.5px solid rgba(200, 185, 255, 0.2); background: rgba(200, 185, 255, 0.07);
   font-family: var(--font-display); font-size: 0.9rem; font-weight: 700;
-  color: var(--ink); cursor: pointer; transition: border-color 0.2s;
+  color: rgba(200, 185, 255, 0.9); cursor: pointer; transition: border-color 0.2s;
   backdrop-filter: blur(8px);
 }
-.filter-select:focus { border-color: var(--plum); outline: none; box-shadow: 0 0 0 4px rgba(155,89,182,0.12); }
+.filter-select:focus { border-color: rgba(160, 100, 210, 0.6); outline: none; box-shadow: 0 0 0 4px rgba(160, 100, 210, 0.15); }
+
+[data-theme="light"] .filter-select {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(117, 70, 104, 0.25);
+  color: rgb(30, 15, 55);
+}
+[data-theme="light"] .filter-select:focus { border-color: rgb(117, 70, 104); box-shadow: 0 0 0 4px rgba(117, 70, 104, 0.12); }
 
 .exp-loading { display: flex; justify-content: center; padding: 80px; }
 .exp-error { text-align: center; color: var(--coral); padding: 40px; font-weight: 700; }
@@ -28,10 +35,25 @@
 .exp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
 
 .explore-card {
-  background: rgba(255,255,255,0.85); border-radius: var(--r-lg); padding: 22px;
+  background: rgba(255, 255, 255, 0.05); border-radius: var(--r-lg); padding: 22px;
   display: flex; flex-direction: column; gap: 12px;
-  backdrop-filter: blur(10px);
-  box-shadow: var(--sh-sm); border: 2px solid rgba(255,255,255,0.9);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255,255,255,0.05) inset;
+  border: 1.5px solid rgba(200, 185, 255, 0.1);
   transition: all 0.22s ease;
 }
-.explore-card:hover { box-shadow: var(--sh-md); transform: translateY(-4px); }
+.explore-card:hover {
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(200, 185, 255, 0.15) inset;
+  border-color: rgba(200, 185, 255, 0.2);
+  transform: translateY(-4px);
+}
+
+[data-theme="light"] .explore-card {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(117, 70, 104, 0.1);
+  box-shadow: 0 4px 20px rgba(80, 40, 120, 0.1);
+}
+[data-theme="light"] .explore-card:hover {
+  box-shadow: 0 10px 32px rgba(80, 40, 120, 0.16);
+}

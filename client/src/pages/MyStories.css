@@ -16,15 +16,29 @@
 .ms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
 
 .story-card {
-  background: rgba(255,255,255,0.85);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: var(--r-lg); padding: 24px;
   display: flex; flex-direction: column; gap: 14px;
-  backdrop-filter: blur(10px);
-  box-shadow: var(--sh-sm);
-  border: 2px solid rgba(255,255,255,0.9);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255,255,255,0.05) inset;
+  border: 1.5px solid rgba(200, 185, 255, 0.1);
   transition: all 0.22s ease;
 }
-.story-card:hover { box-shadow: var(--sh-md); transform: translateY(-4px); }
+.story-card:hover {
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(200, 185, 255, 0.15) inset;
+  border-color: rgba(200, 185, 255, 0.2);
+  transform: translateY(-4px);
+}
+
+[data-theme="light"] .story-card {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(117, 70, 104, 0.1);
+  box-shadow: 0 4px 20px rgba(80, 40, 120, 0.1);
+}
+[data-theme="light"] .story-card:hover {
+  box-shadow: 0 10px 32px rgba(80, 40, 120, 0.16);
+}
 
 .sc-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .sc-badges { display: flex; gap: 6px; flex-wrap: wrap; }
