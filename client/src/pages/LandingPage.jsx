@@ -67,7 +67,11 @@ export default function LandingPage() {
 
       {/* ═══ HERO ═══ */}
       <section className="lp-hero" id="anasayfa">
-        <img src="/hero_bg.png" alt="" className="lp-hero-img" />
+        <img 
+            src={isDark ? "/hero_bg.png" : "/day.png"} 
+            alt="" 
+            className="lp-hero-img" 
+          />        
         <div className="lp-hero-overlay" />
         <div className="lp-hero-content">
           <motion.div className="lp-hero-text" initial="hidden" animate="visible" variants={stagger(0.1)}>

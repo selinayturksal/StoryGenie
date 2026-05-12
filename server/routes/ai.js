@@ -5,6 +5,7 @@ const router = express.Router();
 
 const DURATION_WORD_COUNT = { short: 150, medium: 400, long: 800 };
 const WORDS_PER_PAGE = 80;
+const BEDROCK_MODEL_ID = 'eu.anthropic.claude-sonnet-4-5-20250929-v1:0';
 
 function splitIntoPages(text) {
   const words = text.split(' ');
@@ -16,28 +17,30 @@ function splitIntoPages(text) {
   return pages;
 }
 
-async function callOpenAI(prompt, apiKey) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+async function callBedrock(prompt, apiKey) {
+  const region = process.env.AWS_REGION || 'eu-central-1';
+  const url = `https://bedrock-runtime.${region}.amazonaws.com/model/${encodeURIComponent(BEDROCK_MODEL_ID)}/invoke`;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
+      anthropic_version: 'bedrock-2023-05-31',
       max_tokens: 1500,
-      temperature: 0.8,
+      messages: [{ role: 'user', content: prompt }],
     }),
   });
 
   if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || `OpenAI hata: ${response.status}`);
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || `Bedrock API hata: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.choices[0].message.content.trim();
+  return data.content[0].text.trim();
 }
 
 router.post('/generate', protect, async (req, res) => {
@@ -54,8 +57,8 @@ router.post('/generate', protect, async (req, res) => {
     if (characters.length === 0) return res.status(400).json({ error: 'En az bir karakter gerekli.' });
     if (characters.length > 6)   return res.status(400).json({ error: 'En fazla 6 karakter seçebilirsin.' });
 
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'OpenAI API key eksik. .env dosyasını kontrol et.' });
+    const apiKey = process.env.BEDROCK_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'Bedrock API key eksik. .env dosyasını kontrol et.' });
 
     const targetWords  = DURATION_WORD_COUNT[duration] || 400;
     const isTurkish    = storyLanguage === 'tr';
@@ -89,14 +92,14 @@ Rules:
 - Use fluent, child-friendly language
 - Write only the story text, no title or description`;
 
-    const storyText = await callOpenAI(storyPrompt, apiKey);
+    const storyText = await callBedrock(storyPrompt, apiKey);
     if (!storyText) return res.status(500).json({ error: 'AI hikaye üretemedi. Tekrar dene.' });
 
     const titlePrompt = isTurkish
       ? `Bu hikaye için kısa ve çekici bir başlık yaz. Maksimum 6 kelime. Sadece başlığı yaz:\n\n${storyText.substring(0, 200)}`
       : `Write a short catchy title for this story. Max 6 words. Write only the title:\n\n${storyText.substring(0, 200)}`;
 
-    const title = (await callOpenAI(titlePrompt, apiKey)).replace(/[*"]/g, '')
+    const title = (await callBedrock(titlePrompt, apiKey)).replace(/[*"]/g, '')
       || (isTurkish ? 'Bugünün Hikayesi' : "Today's Story");
 
     const pages = splitIntoPages(storyText);
@@ -110,12 +113,12 @@ Rules:
     });
 
   } catch (err) {
-    console.error('OpenAI error:', err.message);
-    if (err.message?.includes('API key') || err.message?.includes('Incorrect API key')) {
-      return res.status(500).json({ error: 'OpenAI API key geçersiz.' });
+    console.error('Bedrock error:', err.message);
+    if (err.message?.includes('401') || err.message?.includes('403') || err.message?.includes('API key')) {
+      return res.status(500).json({ error: 'Bedrock API key geçersiz veya yetkisiz.' });
     }
-    if (err.message?.includes('quota') || err.message?.includes('429') || err.message?.includes('insufficient_quota')) {
-      return res.status(429).json({ error: 'OpenAI kota aşıldı.' });
+    if (err.message?.includes('429') || err.message?.includes('ThrottlingException')) {
+      return res.status(429).json({ error: 'Bedrock istek limiti aşıldı, biraz bekle.' });
     }
     res.status(500).json({ error: 'Hikaye üretilirken hata oluştu: ' + err.message });
   }
