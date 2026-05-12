@@ -1,5 +1,20 @@
 .explore-page { padding: 44px 0 80px; min-height: calc(100vh - 68px); }
 
+[data-theme="light"] .explore-page {
+  background: linear-gradient(
+    180deg,
+    #b8dfff 0%,
+    #d4eeff 14%,
+    #e6f3ff 28%,
+    #eeeeff 42%,
+    #ece8ff 57%,
+    #e3daff 72%,
+    #d8ceff 86%,
+    #d0c5ff 100%
+  );
+  min-height: 100vh;
+}
+
 .exp-header { text-align: center; margin-bottom: 36px; }
 .exp-title { font-family: var(--font-display); font-size: 2.6rem; font-weight: 900; color: var(--ink); }
 .exp-subtitle { margin-top: 8px; color: var(--ink-soft); font-weight: 600; }

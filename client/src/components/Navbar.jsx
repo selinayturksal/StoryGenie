@@ -24,6 +24,18 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path;
   const isLanding = location.pathname === '/' && !user;
 
+  const scrollToSection = (id) => {
+    setMenuOpen(false);
+    if (location.pathname === '/') {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      }, 120);
+    }
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate('/');
@@ -50,9 +62,10 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <a href="#features"  className="nav-link">{lang === 'tr' ? 'Özellikler' : 'Features'}</a>
-              <a href="#how"       className="nav-link">{lang === 'tr' ? 'Nasıl Çalışır?' : 'How It Works'}</a>
-              <a href="#contact"   className="nav-link">{lang === 'tr' ? 'İletişim' : 'Contact'}</a>
+              <button onClick={() => scrollToSection('ozellikler')}  className="nav-link">{lang === 'tr' ? 'Özellikler' : 'Features'}</button>
+              <button onClick={() => scrollToSection('nasil-calisir')} className="nav-link">{lang === 'tr' ? 'Nasıl Çalışır?' : 'How It Works'}</button>
+              <button onClick={() => scrollToSection('ornek')}       className="nav-link">{lang === 'tr' ? 'Örnek Hikaye' : 'Example'}</button>
+              <button onClick={() => scrollToSection('iletisim')}    className="nav-link">{lang === 'tr' ? 'İletişim' : 'Contact'}</button>
             </>
           )}
         </div>
@@ -93,8 +106,8 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="auth-btns">
-              <Link to="/login"    className="nav-auth-btn">{t.nav.login}</Link>
-              <Link to="/register" className="nav-auth-btn nav-auth-btn--primary">{t.nav.register}</Link>
+              <Link to="/login"    className={`nav-auth-btn${isActive('/login')    ? ' nav-auth-btn--active' : ''}`}>{t.nav.login}</Link>
+              <Link to="/register" className={`nav-auth-btn${isActive('/register') ? ' nav-auth-btn--active' : ''}`}>{t.nav.register}</Link>
             </div>
           )}
 

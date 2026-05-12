@@ -25,6 +25,20 @@
   z-index: 0;
 }
 
+[data-theme="light"] .auth-page {
+  background: linear-gradient(
+    135deg,
+    #b8dfff 0%,
+    #d4eeff 18%,
+    #e6f3ff 34%,
+    #eeeeff 50%,
+    #ece8ff 65%,
+    #e0d8ff 80%,
+    #d0c5ff 100%
+  );
+}
+[data-theme="light"] .auth-night-bg { display: none; }
+
 /* ── Glassmorphism card ── */
 .auth-card {
   background: rgba(255, 255, 255, 0.055);

@@ -97,7 +97,6 @@ export default function LandingPage() {
       <section className="lp-features-section" id="ozellikler">
         <div className="container">
           <motion.div className="lp-sec-head" initial="hidden" whileInView="visible" viewport={{once:true,margin:'-60px'}} variants={fadeUp()}>
-            <div className="lp-sec-badge">⚙ {lang==='tr' ? 'Özellikler' : 'Features'}</div>
             <h2>{lang==='tr' ? 'Neden Masalmatik?' : 'Why Masalmatik?'}</h2>
             <p>{lang==='tr' ? 'Çocuğunuza büyülü bir hikaye deneyimi yaşatın.' : 'Give your child a magical storytelling experience.'}</p>
           </motion.div>
@@ -117,7 +116,6 @@ export default function LandingPage() {
       <section className="lp-how-section" id="nasil-calisir">
         <div className="container">
           <motion.div className="lp-sec-head lp-sec-head--how" initial="hidden" whileInView="visible" viewport={{once:true,margin:'-60px'}} variants={fadeUp()}>
-            <div className="lp-sec-badge lp-sec-badge--how">⚙ {lang==='tr' ? 'Nasıl Çalışır?' : 'How It Works'}</div>
             <h2>{lang==='tr' ? 'Masalmatik Nasıl Çalışır?' : 'How Masalmatik Works'}</h2>
             <p>{lang==='tr' ? 'Üç basit adımda büyülü masallar oluşturun.' : 'Create magical stories in three simple steps.'}</p>
           </motion.div>
@@ -146,10 +144,79 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ CTA ═══ */}
-      <section className="lp-cta">
-        <div className="lp-cta-bg"><img src="/cta_bg.png" alt="" /></div>
-        <div className="lp-cta-overlay" />
+      {/* ═══ ÖRNEK HİKAYE ═══ */}
+      <section className="lp-showcase" id="ornek">
+        <div className="container">
+          <motion.div className="lp-sec-head" initial="hidden" whileInView="visible" viewport={{once:true,margin:'-60px'}} variants={fadeUp()}>
+            <h2>{lang==='tr' ? 'Masalmatik\'in Sihrine Bakın' : 'See the Magic of Masalmatik'}</h2>
+            <p>{lang==='tr' ? 'Her masal benzersiz, kişisel ve hayal dolu.' : 'Every story is unique, personalized and full of imagination.'}</p>
+          </motion.div>
+
+          <motion.div className="lp-showcase-card" initial="hidden" whileInView="visible" viewport={{once:true,margin:'-40px'}} variants={fadeUp(0.08)}>
+            {/* Sol: nasıl oluşturuldu */}
+            <div className="lp-showcase-meta">
+              <h4>{lang==='tr' ? 'Bu masal nasıl oluşturuldu' : 'How this story was created'}</h4>
+              <div className="lp-showcase-meta-item">
+                <div className="lp-showcase-meta-avatar" style={{background:'linear-gradient(135deg,#f9a8d4,#c084fc)'}}>👦</div>
+                <div>
+                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Kahraman' : 'Hero'}</div>
+                  <div className="lp-showcase-meta-val">Emir</div>
+                </div>
+              </div>
+              <div className="lp-showcase-meta-line" />
+              <div className="lp-showcase-meta-item">
+                <div className="lp-showcase-meta-avatar" style={{background:'linear-gradient(135deg,#6ee7b7,#3b82f6)'}}>🏰</div>
+                <div>
+                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Dünya' : 'World'}</div>
+                  <div className="lp-showcase-meta-val">{lang==='tr' ? 'Büyülü Orman' : 'Enchanted Forest'}</div>
+                </div>
+              </div>
+              <div className="lp-showcase-meta-line" />
+              <div className="lp-showcase-meta-item">
+                <div className="lp-showcase-meta-avatar" style={{background:'linear-gradient(135deg,#fbbf24,#a78bfa)'}}>🛡️</div>
+                <div>
+                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Ders' : 'Lesson'}</div>
+                  <div className="lp-showcase-meta-val">{lang==='tr' ? 'Cesaret & İyilik' : 'Courage & Kindness'}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Orta: hikaye metni */}
+            <div className="lp-showcase-story">
+              <h3>{lang==='tr' ? 'Emir ve Gizli Işık ✨' : 'Emir and the Hidden Light ✨'}</h3>
+              <p>{lang==='tr'
+                ? 'Bir zamanlar Emir adında meraklı ve cesur bir küçük çocuk vardı. Köyünün yakınındaki Büyülü Orman\'ı keşfetmeyi çok severdi.'
+                : 'Once upon a time, Emir was a curious and brave little boy who loved exploring the Enchanted Forest near his village.'}</p>
+              <p>{lang==='tr'
+                ? 'Bir gün ormanın sihirli ışığının kaybolduğunu fark etti. Gökkuşağı soluyordu ve hayvanlar üzgündü.'
+                : 'One day, he discovered that the forest\'s magical light had disappeared. The rainbow was fading, and the animals were feeling sad.'}</p>
+              <p>{lang==='tr'
+                ? 'Emir gizli ışığı bulmaya karar verdi. Pırıltılı nehri geçti, altın tepesine tırmandı ve küçük bir ateşböceğinin yolunu bulmasına yardım etti.'
+                : 'Emir decided to find the hidden light. He crossed the sparkling river, climbed the golden hill, and helped a tiny firefly find its way home.'}</p>
+              <p>{lang==='tr'
+                ? 'Ateşböceği güldü: "Teşekkür ederim Emir! Sen çok iyi kalplisin." Emir ışığı ormana geri getirdi ve her şey eskisinden daha parlak parladı. 🌈'
+                : 'The firefly smiled: "Thank you, Emir! You are kind and brave." Emir brought the light back to the forest, and everything shined brighter than ever! 🌈'}</p>
+              <div className="lp-showcase-tags">
+                <span className="lp-showcase-tag lp-showcase-tag--green">🌿 {lang==='tr' ? '3-7 Yaş' : 'For Ages 3-7'}</span>
+                <span className="lp-showcase-tag lp-showcase-tag--blue">⏱ {lang==='tr' ? '5 dk okuma' : '5 min read'}</span>
+                <span className="lp-showcase-tag lp-showcase-tag--pink">❤️ {lang==='tr' ? 'Olumlu Değerler' : 'Positive Values'}</span>
+                <span className="lp-showcase-tag lp-showcase-tag--purple">✦ {lang==='tr' ? 'Yapay Zeka' : 'AI-Powered'}</span>
+              </div>
+            </div>
+
+            {/* Sağ: görsel */}
+            <div className="lp-showcase-img-wrap">
+              <img src="/image.png" alt={lang==='tr' ? 'Örnek masal görseli' : 'Example story illustration'} className="lp-showcase-img" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══ CTA + FOOTER ═══ */}
+      <section className="lp-cta" id="iletisim">
+        <div className="lp-cta-bg"><img src={isDark ? "/cta_bg.png" : "/dayfooter.png"} alt="" /></div>
+
+        {/* Çağrı metni */}
         <div className="container lp-cta-inner">
           <motion.div className="lp-cta-text" initial="hidden" whileInView="visible" viewport={{once:true}} variants={stagger(0)}>
             <motion.h2 variants={fadeUp()}>{lang==='tr' ? 'Hadi İlk Masalını Oluştur!' : "Let's Create Your First Story!"}</motion.h2>
@@ -159,11 +226,26 @@ export default function LandingPage() {
             </motion.div>
           </motion.div>
         </div>
-      </section>
 
-      <footer className="lp-footer">
-        <p>© 2026 Masalmatik. {lang==='tr' ? 'Tüm hakları saklıdır.' : 'All rights reserved.'}</p>
-      </footer>
+        {/* Marka + footer — görselin üzerinde */}
+        <footer className="lp-footer">
+          <div className="lp-footer-brand">
+            <img src="/logo.png" alt="Masalmatik" className="lp-footer-logo" />
+            <span className="lp-footer-name">Masalmatik</span>
+            <p className="lp-footer-slogan">
+              {lang==='tr' ? '✨ Küçük hayalciler için sevgiyle yapıldı' : '✨ Made with love for little dreamers'}
+            </p>
+          </div>
+
+          <div className="lp-footer-bottom">
+            <a href="mailto:destek@masalmatik.com" className="lp-footer-link">{lang==='tr' ? '✉ İletişim' : '✉ Contact'}</a>
+            <span className="lp-footer-dot">·</span>
+            <a href="/privacy" className="lp-footer-link">{lang==='tr' ? '🔒 Gizlilik Politikası' : '🔒 Privacy Policy'}</a>
+            <span className="lp-footer-dot">·</span>
+            <span className="lp-footer-copy">© 2026 Masalmatik</span>
+          </div>
+        </footer>
+      </section>
     </div>
   );
 }

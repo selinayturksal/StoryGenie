@@ -40,6 +40,7 @@
   color:var(--nb-link);
   transition:all 0.2s ease;
   white-space:nowrap; text-decoration:none;
+  background:transparent; border:none; cursor:pointer;
 }
 .nav-link:hover {
   color:var(--nb-link-active);
@@ -88,7 +89,7 @@
 }
 .theme-toggle:hover { transform:rotate(15deg) scale(1.05); background:var(--nb-link-hover-bg); }
 
-/* Auth butonları — ikisi aynı */
+/* Auth butonları — ikisi aynı stil, active olan dolu */
 .auth-btns { display:flex; gap:8px; align-items:center; }
 .nav-auth-btn {
   display:inline-flex; align-items:center;
@@ -102,6 +103,13 @@
   transition:all 0.2s ease;
 }
 .nav-auth-btn:hover { background:var(--nb-link-hover-bg); transform:translateY(-1px); }
+.nav-auth-btn--active {
+  background:linear-gradient(135deg,rgb(117,70,104),rgb(80,38,120));
+  border-color:transparent;
+  color:#fff;
+  box-shadow:0 4px 16px rgba(117,70,104,0.4);
+}
+.nav-auth-btn--active:hover { transform:translateY(-1px); opacity:0.92; }
 
 /* Kullanıcı menüsü */
 .user-menu { position:relative; }
