@@ -216,34 +216,44 @@ export default function LandingPage() {
       <section className="lp-cta" id="iletisim">
         <div className="lp-cta-bg"><img src={isDark ? "/cta_bg.png" : "/dayfooter.png"} alt="" /></div>
 
-        {/* Çağrı metni */}
-        <div className="container lp-cta-inner">
-          <motion.div className="lp-cta-text" initial="hidden" whileInView="visible" viewport={{once:true}} variants={stagger(0)}>
-            <motion.h2 variants={fadeUp()}>{lang==='tr' ? 'Hadi İlk Masalını Oluştur!' : "Let's Create Your First Story!"}</motion.h2>
-            <motion.p variants={fadeUp(0.06)}>{lang==='tr' ? 'Ücretsiz hesap aç, hemen başla.' : 'Create a free account and start right away.'}</motion.p>
-            <motion.div variants={fadeUp(0.12)}>
-              <Link to="/register" className="lp-btn-cta">{lang==='tr' ? '✨ Ücretsiz Başla' : '✨ Start for Free'}</Link>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* Marka + footer — görselin üzerinde */}
         <footer className="lp-footer">
-          <div className="lp-footer-brand">
-            <img src="/logo.png" alt="Masalmatik" className="lp-footer-logo" />
-            <span className="lp-footer-name">Masalmatik</span>
-            <p className="lp-footer-slogan">
-              {lang==='tr' ? '✨ Küçük hayalciler için sevgiyle yapıldı' : '✨ Made with love for little dreamers'}
-            </p>
-          </div>
+          <motion.div className="lp-footer-inner container"
+            initial="hidden" whileInView="visible" viewport={{once:true}} variants={stagger(0.1)}>
 
-          <div className="lp-footer-bottom">
-            <a href="mailto:destek@masalmatik.com" className="lp-footer-link">{lang==='tr' ? '✉ İletişim' : '✉ Contact'}</a>
-            <span className="lp-footer-dot">·</span>
-            <a href="/privacy" className="lp-footer-link">{lang==='tr' ? '🔒 Gizlilik Politikası' : '🔒 Privacy Policy'}</a>
-            <span className="lp-footer-dot">·</span>
-            <span className="lp-footer-copy">© 2026 Masalmatik</span>
-          </div>
+            {/* Kolon 1 — Marka */}
+            <motion.div className="lp-footer-col lp-footer-brand" variants={fadeUp()}>
+              <img src="/logo.png" alt="Masalmatik" className="lp-footer-logo" />
+              <span className="lp-footer-name">Masalmatik</span>
+              <p className="lp-footer-slogan">
+                {lang==='tr' ? 'Küçük hayalciler için sevgiyle yapıldı' : 'Made with love for little dreamers'}
+              </p>
+            </motion.div>
+
+            <div className="lp-footer-sep" />
+
+            {/* Kolon 2 — CTA */}
+            <motion.div className="lp-footer-col lp-footer-cta-col" variants={fadeUp(0.08)}>
+              <h3 className="lp-footer-cta-title">
+                {lang==='tr' ? 'Hadi Başlayalım!' : "Let's Get Started!"}
+              </h3>
+              <p className="lp-footer-cta-sub">
+                {lang==='tr' ? 'Ücretsiz hesap aç, ilk masalını oluştur.' : 'Create a free account and craft your first story.'}
+              </p>
+              <Link to="/register" className="lp-btn-cta lp-btn-cta--sm">
+                {lang==='tr' ? '✨ Ücretsiz Başla' : '✨ Start for Free'}
+              </Link>
+            </motion.div>
+
+            <div className="lp-footer-sep" />
+
+            {/* Kolon 3 — Linkler */}
+            <motion.div className="lp-footer-col lp-footer-links-col" variants={fadeUp(0.16)}>
+              <a href="mailto:destek@masalmatik.com" className="lp-footer-link">✉ {lang==='tr' ? 'İletişim' : 'Contact'}</a>
+              <a href="/privacy" className="lp-footer-link">🔒 {lang==='tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}</a>
+              <span className="lp-footer-copy">© 2026 Masalmatik</span>
+            </motion.div>
+
+          </motion.div>
         </footer>
       </section>
     </div>

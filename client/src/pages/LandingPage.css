@@ -431,10 +431,10 @@
 /* ════════ CTA + FOOTER ════════ */
 .lp-cta {
   position: relative;
-  padding: 110px 0 0;
+  padding: 0;
   margin-top: -50px;
   background: transparent;
-  overflow: hidden; /* görsel kenarları taşmasın */
+  overflow: hidden;
   display: flex; flex-direction: column;
 }
 .lp-cta-bg {
@@ -468,65 +468,104 @@
 [data-theme="light"] .lp-cta-text h2 { color: var(--lp-text); text-shadow: none; }
 [data-theme="light"] .lp-cta-text p  { color: var(--lp-text-soft); }
 
-/* ════════ FOOTER (CTA içinde) ════════ */
+/* ════════ FOOTER (CTA içinde — 3 kolonlu) ════════ */
 .lp-footer {
   position: relative; z-index: 2;
-  padding: 48px 20px 36px;
-  display: flex; flex-direction: column;
-  align-items: center; gap: 20px;
+  padding: 64px 24px 44px;
   background: transparent; border-top: none;
-  text-align: center;
+}
+.lp-footer-inner {
+  display: flex; flex-direction: row;
+  align-items: center; justify-content: center;
+  gap: 0; flex-wrap: wrap;
 }
 
-/* Brand */
-.lp-footer-brand {
+/* Her kolon */
+.lp-footer-col {
   display: flex; flex-direction: column;
-  align-items: center; gap: 8px;
+  align-items: center; gap: 12px;
+  text-align: center;
+  padding: 0 48px;
 }
+
+/* Dikey ayırıcı */
+.lp-footer-sep {
+  width: 1px; height: 120px; flex-shrink: 0;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.25), transparent);
+}
+[data-theme="light"] .lp-footer-sep {
+  background: linear-gradient(to bottom, transparent, rgba(80,40,120,0.2), transparent);
+}
+
+/* Kolon 1 — Marka */
 .lp-footer-logo {
-  height: 48px; width: auto; object-fit: contain;
-  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.3)) brightness(1.1);
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  object-fit: cover; object-position: center 20%;
+  background: #fff;
+  border: 3px solid rgba(255,255,255,0.4);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 .lp-footer-name {
-  font-family: var(--font-display); font-size: 1.4rem; font-weight: 900;
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;
   color: #fff; letter-spacing: -0.5px;
 }
 .lp-footer-slogan {
-  font-size: 0.9rem; color: rgba(220,210,255,0.75); line-height: 1.5;
+  font-size: 0.85rem; color: rgba(220,210,255,0.72);
+  line-height: 1.55; max-width: 200px;
 }
 [data-theme="light"] .lp-footer-name   { color: var(--lp-text); }
 [data-theme="light"] .lp-footer-slogan { color: var(--lp-text-soft); }
 
-/* Alt bar */
-.lp-footer-bottom {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
+/* Kolon 2 — CTA */
+.lp-footer-cta-title {
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 900;
+  color: #fff; letter-spacing: -0.4px; margin: 0;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+.lp-footer-cta-sub {
+  font-size: 0.88rem; color: rgba(220,210,255,0.72);
+  line-height: 1.5; max-width: 220px; margin: 0;
+}
+[data-theme="light"] .lp-footer-cta-title { color: var(--lp-text); text-shadow: none; }
+[data-theme="light"] .lp-footer-cta-sub   { color: var(--lp-text-soft); }
+
+.lp-btn-cta--sm {
+  padding: 13px 32px !important;
+  font-size: 0.95rem !important;
+}
+
+/* Kolon 3 — Linkler */
+.lp-footer-links-col {
+  gap: 10px;
 }
 .lp-footer-link {
   font-family: var(--font-display); font-size: 0.82rem; font-weight: 700;
-  color: rgba(220,210,255,0.75); text-decoration: none;
-  padding: 5px 13px; border-radius: 99px;
-  border: 1.5px solid rgba(255,255,255,0.18);
-  transition: all 0.2s ease;
+  color: rgba(220,210,255,0.78); text-decoration: none;
+  padding: 6px 16px; border-radius: 99px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  transition: all 0.2s ease; width: 100%; text-align: center;
 }
 .lp-footer-link:hover {
-  color: #fff; border-color: rgba(255,255,255,0.45);
+  color: #fff; border-color: rgba(255,255,255,0.5);
   background: rgba(255,255,255,0.1);
 }
-[data-theme="light"] .lp-footer-link {
-  color: var(--lp-text-soft); border-color: rgba(80,40,120,0.2);
-}
-[data-theme="light"] .lp-footer-link:hover {
-  color: var(--lp-text); border-color: rgba(80,40,120,0.45);
-  background: rgba(80,40,120,0.07);
-}
-
-.lp-footer-dot { color: rgba(255,255,255,0.3); font-size: 1rem; }
-[data-theme="light"] .lp-footer-dot { color: rgba(80,40,120,0.3); }
+[data-theme="light"] .lp-footer-link        { color: var(--lp-text-soft); border-color: rgba(80,40,120,0.22); }
+[data-theme="light"] .lp-footer-link:hover  { color: var(--lp-text); border-color: rgba(80,40,120,0.5); background: rgba(80,40,120,0.07); }
 
 .lp-footer-copy {
-  font-size: 0.75rem; color: rgba(200,190,240,0.5);
+  font-size: 0.74rem; color: rgba(200,190,240,0.45); margin-top: 4px;
 }
-[data-theme="light"] .lp-footer-copy { color: rgba(80,40,120,0.4); }
+[data-theme="light"] .lp-footer-copy { color: rgba(80,40,120,0.38); }
+
+/* Responsive — dar ekranda dikey */
+@media (max-width: 720px) {
+  .lp-footer-inner { flex-direction: column; gap: 32px; }
+  .lp-footer-sep   { width: 80px; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent);
+  }
+  .lp-footer-col   { padding: 0 20px; }
+}
 
 
 /* ════════ NAVBAR HERO ════════ */
