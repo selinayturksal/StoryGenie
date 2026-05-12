@@ -25,6 +25,11 @@ const translations = {
       profile: 'Profilim',
       settings: 'Ayarlar',
       changeLanguage: 'Dili Değiştir',
+      home: 'Ana Sayfa',
+      about: 'Hakkımızda',
+      howItWorks: 'Nasıl Çalışır?',
+      features: 'Özellikler',
+      contact: 'İletişim',
     },
 
     auth: {
@@ -256,6 +261,11 @@ const translations = {
       profile: 'Profile',
       settings: 'Settings',
       changeLanguage: 'Change Language',
+      home: 'Home',
+      about: 'About Us',
+      howItWorks: 'How It Works?',
+      features: 'Features',
+      contact: 'Contact',
     },
 
     auth: {
