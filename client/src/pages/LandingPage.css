@@ -41,9 +41,9 @@
 }
 [data-theme="dark"] {
   --lp-alt-bg:     rgb(16,12,40);
-  --lp-section-bg: #0c0a20; 
-  --lp-text: #dcd2ff
-  --lp-text-soft:  rgba(180,165,230,0.7);
+  --lp-section-bg: #0c0a20;
+  --lp-text:       #dcd2ff;
+  --lp-text-soft:  rgba(210,200,250,0.88);
   --lp-glass:      rgba(255,255,255,0.055);
   --lp-glass-b:    rgba(255,255,255,0.1);
   --lp-how-bg:     rgb(12,10,32);

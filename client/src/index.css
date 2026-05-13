@@ -42,7 +42,7 @@
   --surface:    var(--night-surface);
   --border:     var(--night-border);
   --ink:        var(--night-text);
-  --ink-mid:    rgba(200, 185, 240, 0.85);
+  --ink-mid:    rgba(215, 205, 250, 0.92);
   --ink-soft:   var(--night-text-soft);
   --sky:        rgba(55, 38, 120, 0.5);
   --sky-mid:    rgba(117, 70, 104, 0.4);

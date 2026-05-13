@@ -8,13 +8,7 @@
 }
 
 [data-theme="light"] .create-page {
-  background-color: #eef6ff;
-  background-image:
-    radial-gradient(ellipse 90% 55% at 8%   8%,   rgba(255, 229, 102, 0.13) 0%, transparent 65%),
-    radial-gradient(ellipse 75% 50% at 92%  4%,   rgba(0,  201, 167, 0.10)  0%, transparent 60%),
-    radial-gradient(ellipse 80% 60% at 50%  52%,  rgba(155,  89, 182, 0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 65% 45% at 88%  88%,  rgba(255, 123,  92, 0.08) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 40% at 12%  92%,  rgba(0,  201, 167, 0.07)  0%, transparent 55%);
+  background: transparent;
 }
 
 /* Yüzen süs emojileri */
@@ -216,9 +210,11 @@
 
 .loc-name {
   font-size: 0.8rem; font-weight: 900;
-  color: var(--ink-mid); text-align: center;
+  color: rgba(210, 200, 250, 0.92); text-align: center;
   line-height: 1.3; font-family: var(--font-display);
+  min-height: 2.1em;
 }
+[data-theme="light"] .loc-name { color: rgba(60, 40, 90, 0.8); }
 .loc-card.selected .loc-name { color: var(--plum); }
 
 /* ── Seçenekler ── */
@@ -283,8 +279,10 @@
 }
 .dur-pill:hover { border-color: rgba(160, 100, 210, 0.4); background: rgba(160, 100, 210, 0.08); transform: translateX(4px); color: rgba(220, 210, 255, 0.9); }
 .dur-pill.active {
-  border-color: rgba(100, 130, 220, 0.6); background: rgba(30, 50, 130, 0.18); color: rgba(180, 205, 255, 0.95);
-  box-shadow: 0 2px 10px rgba(30, 50, 130, 0.25);
+  border-color: rgba(60, 90, 180, 0.6);
+  background: rgba(15, 25, 80, 0.25);
+  color: rgba(180, 205, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(15, 25, 80, 0.35);
 }
 
 [data-theme="light"] .dur-pill {
@@ -527,14 +525,14 @@
 }
 
 .wp-step--done .wp-circle {
-  background: rgb(30, 50, 130);
-  border-color: rgb(30, 50, 130);
+  background: rgb(15, 25, 80);
+  border-color: rgb(15, 25, 80);
   color: #fff;
 }
 
 [data-theme="light"] .wp-step--done .wp-circle {
-  background: rgb(20, 30, 90);
-  border-color: rgb(20, 30, 90);
+  background: rgb(10, 15, 60);
+  border-color: rgb(10, 15, 60);
 }
 
 .wp-label {
@@ -562,9 +560,8 @@
   transition: background 0.3s ease;
 }
 
-.wp-line--done { background: rgb(30, 50, 130); }
-[data-theme="light"] .wp-line--done { background: rgb(20, 30, 90); }
-
+.wp-line--done { background: rgb(15, 25, 80); }
+[data-theme="light"] .wp-line--done { background: rgb(10, 15, 60); }
 /* Seçim özet şeridi */
 .selection-summary {
   display: flex;
@@ -654,7 +651,7 @@
   font-family: var(--font-display);
   font-size: 2.4rem;
   font-weight: 900;
-  color: var(--ink);
+  color: rgb(230, 220, 255);
   line-height: 1.2;
 }
 [data-theme="light"] .step-title { color: rgb(26, 26, 46); }
@@ -663,7 +660,7 @@
   margin-top: 8px;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--ink-soft);
+  color: rgba(210, 200, 250, 0.9);
 }
 [data-theme="light"] .step-sub { color: rgba(60, 40, 90, 0.7); }
 
@@ -685,8 +682,10 @@
 .wizard-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 14px 32px;
+  min-width: 140px;
   border-radius: var(--r-full);
   font-family: var(--font-display);
   font-size: 1rem;
@@ -694,12 +693,13 @@
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
   border: none;
+  white-space: nowrap;
 }
 
 .wizard-btn--next {
-  background: linear-gradient(135deg, var(--plum), #4a2080);
+  background: linear-gradient(135deg, rgb(15, 25, 80), rgb(8, 12, 50));
+  box-shadow: 0 4px 0 rgb(5, 8, 35), 0 8px 20px rgba(15,25,80,0.45);
   color: #fff;
-  box-shadow: 0 4px 0 #3a1860, 0 8px 20px rgba(155,89,182,0.35);
   margin-left: auto;
 }
 .wizard-btn--next:hover {

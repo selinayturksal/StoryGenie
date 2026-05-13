@@ -226,7 +226,7 @@ export default function LandingPage() {
               <img src="/assets/landing/logo.png" alt="Masalmatik" className="lp-footer-logo" />
               <span className="lp-footer-name">Masalmatik</span>
               <p className="lp-footer-slogan">
-                {lang==='tr' ? 'Küçük hayalciler için sevgiyle yapıldı' : 'Made with love for little dreamers'}
+                {lang==='tr' ? 'Küçük hayalciler için sevgiyle yapıldı.' : 'Made with love for little dreamers.'}
               </p>
             </motion.div>
 
@@ -249,8 +249,8 @@ export default function LandingPage() {
 
             {/* Kolon 3 — Linkler */}
             <motion.div className="lp-footer-col lp-footer-links-col" variants={fadeUp(0.16)}>
-              <a href="mailto:destek@masalmatik.com" className="lp-footer-link">✉ {lang==='tr' ? 'İletişim' : 'Contact'}</a>
-              <a href="/privacy" className="lp-footer-link">🔒 {lang==='tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}</a>
+              <a href="mailto:destek@masalmatik.com" className="lp-footer-link"> {lang==='tr' ? 'İletişim' : 'Contact'}</a>
+              <a href="/privacy" className="lp-footer-link"> {lang==='tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}</a>
               <span className="lp-footer-copy">© 2026 Masalmatik</span>
             </motion.div>
 

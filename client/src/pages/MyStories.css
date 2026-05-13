@@ -1,13 +1,7 @@
 .my-stories-page { padding: 44px 0 80px; min-height: calc(100vh - 68px); }
 
 [data-theme="light"] .my-stories-page {
-  background-color: #eef6ff;
-  background-image:
-    radial-gradient(ellipse 90% 55% at 8%   8%,   rgba(255, 229, 102, 0.13) 0%, transparent 65%),
-    radial-gradient(ellipse 75% 50% at 92%  4%,   rgba(0,  201, 167, 0.10)  0%, transparent 60%),
-    radial-gradient(ellipse 80% 60% at 50%  52%,  rgba(155,  89, 182, 0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 65% 45% at 88%  88%,  rgba(255, 123,  92, 0.08) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 40% at 12%  92%,  rgba(0,  201, 167, 0.07)  0%, transparent 55%);
+  background: transparent;
 }
 
 .ms-header { text-align: center; margin-bottom: 44px; }
