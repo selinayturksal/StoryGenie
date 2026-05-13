@@ -3,6 +3,7 @@ import './CharacterCard.css';
 
 export default function CharacterCard({ character, selected, onToggle, lang, disabled, variant }) {
   const name = character.name[lang] || character.name.tr;
+  const isAnimal = variant === 'animal';
 
   return (
     <button
@@ -11,6 +12,9 @@ export default function CharacterCard({ character, selected, onToggle, lang, dis
       type="button"
       title={name}
     >
+      {/* Seçili highlight kutusu — sadece çocuklar için */}
+      {selected && <div className="char-selected-bg" />}
+
       <div className="char-visual">
         <div className="char-glow" />
         <img
@@ -31,7 +35,9 @@ export default function CharacterCard({ character, selected, onToggle, lang, dis
         )}
       </div>
       <span className="char-name">{name}</span>
-      {selected && <div className="char-selected-ring" />}
+
+      {/* Hayvanlar için eski halka — dokunulmadı */}
+
     </button>
   );
 }
