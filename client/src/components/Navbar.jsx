@@ -48,7 +48,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          <img src="/logo.png" alt="Masalmatik" className="logo-img" />
+          <img src="/assets/landing/logo.png" alt="Masalmatik" className="logo-img" />
         </Link>
 
         {/* Orta linkler */}
@@ -75,9 +75,10 @@ export default function Navbar() {
         <div className="navbar-right">
 
           {/* Dark mode */}
-          <button className="theme-toggle" onClick={() => setDark(!dark)}>
-            {dark ? '☀️' : '🌙'}
-          </button>
+          <div className="theme-switcher">
+            <button className={`theme-btn ${dark ? 'active' : ''}`} onClick={() => setDark(true)}>🌙</button>
+            <button className={`theme-btn ${!dark ? 'active' : ''}`} onClick={() => setDark(false)}>☀️</button>
+          </div>
 
           {/* Dil */}
           <div className="lang-switcher">

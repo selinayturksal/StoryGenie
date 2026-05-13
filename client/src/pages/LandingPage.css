@@ -224,7 +224,8 @@
   transition:transform 0.22s,box-shadow 0.22s;
 }
 .lp-feat-card:hover { transform:translateY(-5px); box-shadow:0 12px 36px rgba(117,70,104,0.15); }
-.lp-feat-icon { font-size:2.4rem; margin-bottom:14px; }
+.lp-feat-icon { display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+.lp-feat-img  { width:72px; height:72px; object-fit:contain; }
 .lp-feat-card h3 { font-family:var(--font-display); font-size:1.05rem; font-weight:900; color:var(--lp-text); margin-bottom:8px; }
 .lp-feat-card p  { font-size:0.88rem; color:var(--lp-text-soft); line-height:1.6; }
 
@@ -352,7 +353,10 @@
 .lp-showcase-meta-avatar {
   width: 42px; height: 42px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.2rem; flex-shrink: 0;
+  flex-shrink: 0; overflow: hidden;
+}
+.lp-showcase-meta-avatar img {
+  width: 100%; height: 100%; object-fit: cover;
 }
 .lp-showcase-meta-label {
   font-size: 0.72rem; font-weight: 700; color: var(--lp-text-soft);
@@ -498,9 +502,9 @@
   width: 80px; height: 80px;
   border-radius: 50%;
   object-fit: cover; object-position: center 20%;
-  background: #fff;
-  border: 3px solid rgba(255,255,255,0.4);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 .lp-footer-name {
   font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;

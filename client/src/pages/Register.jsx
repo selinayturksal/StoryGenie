@@ -60,12 +60,8 @@ export default function Register() {
 
       <div className="auth-card animate-fadeIn">
         <div className="auth-header">
-          <div className="auth-moon-icon">
-            <svg viewBox="0 0 48 48" width="52" height="52" fill="none">
-              <circle cx="24" cy="24" r="23" fill="rgba(84,151,167,0.25)" stroke="rgba(180,220,230,0.25)" strokeWidth="1"/>
-              <path d="M28 12 A13 13 0 1 0 28 36 A10 10 0 1 1 28 12 Z" fill="rgba(185,230,240,0.8)"/>
-              <path d="M34 10 L35 13 L38 13 L35.5 14.8 L36.5 18 L34 16.2 L31.5 18 L32.5 14.8 L30 13 L33 13 Z" fill="rgba(255,230,100,0.9)"/>
-            </svg>
+          <div className="auth-logo-icon">
+            <img src="/assets/landing/logo.png" alt="Masalmatik" />
           </div>
           <h1 className="auth-title">{t.auth.registerTitle}</h1>
           <p className="auth-subtitle">{t.auth.registerSubtitle}</p>

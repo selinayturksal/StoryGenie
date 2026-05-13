@@ -50,13 +50,8 @@ export default function Login() {
 
       <div className="auth-card animate-fadeIn">
         <div className="auth-header">
-          <div className="auth-moon-icon">
-            <svg viewBox="0 0 48 48" width="52" height="52" fill="none">
-              <circle cx="24" cy="24" r="23" fill="rgba(117,70,104,0.3)" stroke="rgba(210,195,255,0.25)" strokeWidth="1"/>
-              <path d="M28 12 A13 13 0 1 0 28 36 A10 10 0 1 1 28 12 Z" fill="rgba(210,195,255,0.85)"/>
-              <circle cx="34" cy="11" r="2.5" fill="rgba(255,230,120,0.9)"/>
-              <circle cx="38" cy="18" r="1.5" fill="rgba(255,230,120,0.65)"/>
-            </svg>
+          <div className="auth-logo-icon">
+            <img src="/assets/landing/logo.png" alt="Masalmatik" />
           </div>
           <h1 className="auth-title">{t.auth.loginTitle}</h1>
           <p className="auth-subtitle">{t.auth.loginSubtitle}</p>

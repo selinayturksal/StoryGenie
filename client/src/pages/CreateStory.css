@@ -147,14 +147,14 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 .sel-badge:hover { transform: translateY(-2px); background: rgba(160, 100, 210, 0.16); }
-.sel-badge--animal { border-color: rgba(84, 151, 167, 0.4); color: rgba(84, 200, 190, 0.9); background: rgba(84, 151, 167, 0.1); }
+.sel-badge--animal { border-color: rgba(100, 130, 220, 0.4); color: rgba(160, 185, 255, 0.95); background: rgba(30, 50, 130, 0.15); }
 
 [data-theme="light"] .sel-badge {
   background: #fff; border-color: var(--plum-soft); color: var(--plum);
   box-shadow: 0 2px 8px rgba(155, 89, 182, 0.15);
 }
 [data-theme="light"] .sel-badge:hover { background: rgba(155, 89, 182, 0.08); }
-[data-theme="light"] .sel-badge--animal { border-color: var(--teal-soft); color: #008a72; background: #fff; }
+[data-theme="light"] .sel-badge--animal { border-color: rgba(20, 30, 90, 0.3); color: rgb(20, 30, 90); background: #fff; }
 .sel-remove { font-size: 0.68rem; opacity: 0.5; margin-left: 2px; }
 
 /* ── Mekan grid ── */
@@ -283,8 +283,8 @@
 }
 .dur-pill:hover { border-color: rgba(160, 100, 210, 0.4); background: rgba(160, 100, 210, 0.08); transform: translateX(4px); color: rgba(220, 210, 255, 0.9); }
 .dur-pill.active {
-  border-color: rgba(84, 151, 167, 0.6); background: rgba(84, 151, 167, 0.1); color: rgb(84, 200, 190);
-  box-shadow: 0 2px 10px rgba(84, 151, 167, 0.2);
+  border-color: rgba(100, 130, 220, 0.6); background: rgba(30, 50, 130, 0.18); color: rgba(180, 205, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(30, 50, 130, 0.25);
 }
 
 [data-theme="light"] .dur-pill {
@@ -293,7 +293,7 @@
   color: rgba(60, 40, 90, 0.75);
 }
 [data-theme="light"] .dur-pill:hover { border-color: rgb(117, 70, 104); background: rgba(117, 70, 104, 0.05); color: rgb(80, 38, 120); }
-[data-theme="light"] .dur-pill.active { border-color: var(--teal); background: rgba(84, 151, 167, 0.08); color: #007a63; }
+[data-theme="light"] .dur-pill.active { border-color: rgb(20, 30, 90); background: rgba(20, 30, 90, 0.07); color: rgb(20, 30, 90); }
 
 /* Dil */
 .lang-toggle {
@@ -500,22 +500,22 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
-  border: 2px solid rgba(200, 185, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(200, 185, 255, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 900;
   font-size: 1rem;
-  color: rgba(180, 165, 230, 0.65);
+  color: rgba(220, 210, 255, 0.9);
   transition: all 0.3s ease;
 }
 
 [data-theme="light"] .wp-circle {
-  background: rgba(255, 255, 255, 0.65);
-  border-color: rgba(117, 70, 104, 0.25);
-  color: rgba(60, 40, 90, 0.65);
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(30, 40, 100, 0.35);
+  color: rgb(20, 30, 90);
 }
 
 .wp-step--active .wp-circle {
@@ -527,21 +527,31 @@
 }
 
 .wp-step--done .wp-circle {
-  background: var(--teal);
-  border-color: var(--teal);
+  background: rgb(30, 50, 130);
+  border-color: rgb(30, 50, 130);
   color: #fff;
+}
+
+[data-theme="light"] .wp-step--done .wp-circle {
+  background: rgb(20, 30, 90);
+  border-color: rgb(20, 30, 90);
 }
 
 .wp-label {
   font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 800;
-  color: var(--ink-soft);
+  color: rgba(220, 210, 255, 0.9);
   transition: color 0.3s;
 }
 
+[data-theme="light"] .wp-label { color: rgb(20, 30, 90); }
+
 .wp-step--active .wp-label { color: var(--plum); }
-.wp-step--done .wp-label   { color: var(--teal); }
+.wp-step--done .wp-label   { color: rgba(160, 185, 255, 0.95); }
+
+[data-theme="light"] .wp-step--active .wp-label { color: rgb(117, 70, 104); }
+[data-theme="light"] .wp-step--done .wp-label   { color: rgb(20, 30, 90); }
 
 .wp-line {
   width: 80px;
@@ -552,7 +562,8 @@
   transition: background 0.3s ease;
 }
 
-.wp-line--done { background: var(--teal); }
+.wp-line--done { background: rgb(30, 50, 130); }
+[data-theme="light"] .wp-line--done { background: rgb(20, 30, 90); }
 
 /* Seçim özet şeridi */
 .selection-summary {
@@ -646,6 +657,7 @@
   color: var(--ink);
   line-height: 1.2;
 }
+[data-theme="light"] .step-title { color: rgb(26, 26, 46); }
 
 .step-sub {
   margin-top: 8px;
@@ -653,6 +665,7 @@
   font-weight: 600;
   color: var(--ink-soft);
 }
+[data-theme="light"] .step-sub { color: rgba(60, 40, 90, 0.7); }
 
 /* Full-width grid */
 .char-grid--full {

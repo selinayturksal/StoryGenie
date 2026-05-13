@@ -9,30 +9,30 @@ const fadeUp = (d=0) => ({ hidden:{opacity:0,y:40}, visible:{opacity:1,y:0,trans
 const stagger = (d=0) => ({ hidden:{}, visible:{transition:{staggerChildren:0.11,delayChildren:d}} });
 
 const FEATURES = [
-  { icon:'⭐', tr:['Sana Özel Masallar','Her masal yalnızca senin çocuğun için özel olarak yazılır.'], en:['Personalized Stories','Every story is uniquely written just for your child.'] },
-  { icon:'🌍', tr:['Türkçe & İngilizce','İki dilde masal oluştur, dil gelişimini destekle.'], en:['Turkish & English','Create stories in two languages to support language development.'] },
-  { icon:'👶', tr:['Yaşa Uygun İçerik','2-12 yaş arasındaki her çocuğa uygun hikayeler.'], en:['Age-Appropriate','Stories perfectly suited for children aged 2-12.'] },
-  { icon:'🌟', tr:['Topluluk & Keşif','Diğer ailelerin masallarını keşfet ve en iyileri puanla.'], en:['Community & Explore','Discover stories from other families and rate the best.'] },
-  { icon:'🔊', tr:['Sesli Okuma','Hikayeni sesli dinle, uyku vaktini büyülü hale getir.'], en:['Read Aloud','Listen to your story and make bedtime magical.'] },
-  { icon:'🛡️', tr:['Güvenli & Reklamasız','Çocukların özgürce keşfedebileceği güvenli ortam.'], en:['Safe & Ad-Free','A secure child-friendly environment to explore.'] },
+  { img:'/assets/landing/1.png', tr:['Sana Özel Masallar','Her masal yalnızca senin çocuğun için özel olarak yazılır.'], en:['Personalized Stories','Every story is uniquely written just for your child.'] },
+  { img:'/assets/landing/2.png', tr:['Türkçe & İngilizce','İki dilde masal oluştur, dil gelişimini destekle.'], en:['Turkish & English','Create stories in two languages to support language development.'] },
+  { img:'/assets/landing/3.png', tr:['Yaşa Uygun İçerik','2-12 yaş arasındaki her çocuğa uygun hikayeler.'], en:['Age-Appropriate','Stories perfectly suited for children aged 2-12.'] },
+  { img:'/assets/landing/4.png', tr:['Topluluk & Keşif','Diğer ailelerin masallarını keşfet ve en iyileri puanla.'], en:['Community & Explore','Discover stories from other families and rate the best.'] },
+  { img:'/assets/landing/5.png', tr:['Sesli Okuma','Hikayeni sesli dinle, uyku vaktini büyülü hale getir.'], en:['Read Aloud','Listen to your story and make bedtime magical.'] },
+  { img:'/assets/landing/6.png', tr:['Güvenli & Reklamasız','Çocukların özgürce keşfedebileceği güvenli ortam.'], en:['Safe & Ad-Free','A secure child-friendly environment to explore.'] },
 ];
 
 const HOW_STEPS = [
   {
     num:'1',
-    darkImg:'/how_dark_1.png', lightImg:'/how_light_1.png',
+    darkImg:'/assets/landing/how_dark_1.png', lightImg:'/assets/landing/how_light_1.png',
     tr:['Dünyani & Karakterlerini Seç','Favori karakterlerini, temanı ve mekânını seç.'],
     en:['Choose Your World & Characters','Select your favorite characters, theme, and setting.'],
   },
   {
     num:'2',
-    darkImg:'/how_dark_2.png', lightImg:'/how_light_2.png',
+    darkImg:'/assets/landing/how_dark_2.png', lightImg:'/assets/landing/how_light_2.png',
     tr:['Yapay Zeka Masalını Yazar','Yapay zekamız çocuğuna özel, benzersiz bir hikaye oluşturur.'],
     en:['AI Creates Your Story','Our AI crafts a unique, personalized story just for your child.'],
   },
   {
     num:'3',
-    darkImg:'/how_dark_3.png', lightImg:'/how_light_3.png',
+    darkImg:'/assets/landing/how_dark_3.png', lightImg:'/assets/landing/how_light_3.png',
     tr:['Oku, Dinle & Eğlen','Masalı birlikte oku, sesli dinle ve sihrin gerçekleşmesine izin ver.'],
     en:['Read, Listen & Enjoy','Read the story together, listen to the narration, and let the magic come to life.'],
   },
@@ -68,7 +68,7 @@ export default function LandingPage() {
       {/* ═══ HERO ═══ */}
       <section className="lp-hero" id="anasayfa">
         <img 
-            src={isDark ? "/hero_bg.png" : "/day.png"} 
+            src={isDark ? "/assets/landing/hero_bg.png" : "/assets/landing/day.png"}
             alt="" 
             className="lp-hero-img" 
           />        
@@ -103,7 +103,9 @@ export default function LandingPage() {
           <motion.div className="lp-feat-grid" initial="hidden" whileInView="visible" viewport={{once:true,margin:'-40px'}} variants={stagger(0.07)}>
             {FEATURES.map((f,i) => (
               <motion.div key={i} className="lp-feat-card" variants={fadeUp()}>
-                <div className="lp-feat-icon">{f.icon}</div>
+                <div className="lp-feat-icon">
+                  <img src={f.img} alt={lang==='tr' ? f.tr[0] : f.en[0]} className="lp-feat-img" />
+                </div>
                 <h3>{lang==='tr' ? f.tr[0] : f.en[0]}</h3>
                 <p>{lang==='tr' ? f.tr[1] : f.en[1]}</p>
               </motion.div>
@@ -157,26 +159,26 @@ export default function LandingPage() {
             <div className="lp-showcase-meta">
               <h4>{lang==='tr' ? 'Bu masal nasıl oluşturuldu' : 'How this story was created'}</h4>
               <div className="lp-showcase-meta-item">
-                <div className="lp-showcase-meta-avatar" style={{background:'linear-gradient(135deg,#f9a8d4,#c084fc)'}}>👦</div>
+                <div className="lp-showcase-meta-avatar"><img src="/assets/landing/o1.png" alt="" /></div>
                 <div>
-                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Kahraman' : 'Hero'}</div>
+                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Kahramanlarını seç' : 'Choose your heroes'}</div>
                   <div className="lp-showcase-meta-val">Emir</div>
                 </div>
               </div>
               <div className="lp-showcase-meta-line" />
               <div className="lp-showcase-meta-item">
-                <div className="lp-showcase-meta-avatar" style={{background:'linear-gradient(135deg,#6ee7b7,#3b82f6)'}}>🏰</div>
+                <div className="lp-showcase-meta-avatar"><img src="/assets/landing/o2.png" alt="" /></div>
                 <div>
-                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Dünya' : 'World'}</div>
+                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Dünyanı seç' : 'Choose your world'}</div>
                   <div className="lp-showcase-meta-val">{lang==='tr' ? 'Büyülü Orman' : 'Enchanted Forest'}</div>
                 </div>
               </div>
               <div className="lp-showcase-meta-line" />
               <div className="lp-showcase-meta-item">
-                <div className="lp-showcase-meta-avatar" style={{background:'linear-gradient(135deg,#fbbf24,#a78bfa)'}}>🛡️</div>
+                <div className="lp-showcase-meta-avatar"><img src="/assets/landing/o3.png" alt="" /></div>
                 <div>
-                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Ders' : 'Lesson'}</div>
-                  <div className="lp-showcase-meta-val">{lang==='tr' ? 'Cesaret & İyilik' : 'Courage & Kindness'}</div>
+                  <div className="lp-showcase-meta-label">{lang==='tr' ? 'Hikayeni oluştur' : 'Create your story'}</div>
+                  <div className="lp-showcase-meta-val">{lang==='tr' ? 'Oku & Dinle' : 'Courage & Kindness'}</div>
                 </div>
               </div>
             </div>
@@ -199,14 +201,13 @@ export default function LandingPage() {
               <div className="lp-showcase-tags">
                 <span className="lp-showcase-tag lp-showcase-tag--green">🌿 {lang==='tr' ? '3-7 Yaş' : 'For Ages 3-7'}</span>
                 <span className="lp-showcase-tag lp-showcase-tag--blue">⏱ {lang==='tr' ? '5 dk okuma' : '5 min read'}</span>
-                <span className="lp-showcase-tag lp-showcase-tag--pink">❤️ {lang==='tr' ? 'Olumlu Değerler' : 'Positive Values'}</span>
                 <span className="lp-showcase-tag lp-showcase-tag--purple">✦ {lang==='tr' ? 'Yapay Zeka' : 'AI-Powered'}</span>
               </div>
             </div>
 
             {/* Sağ: görsel */}
             <div className="lp-showcase-img-wrap">
-              <img src="/image.png" alt={lang==='tr' ? 'Örnek masal görseli' : 'Example story illustration'} className="lp-showcase-img" />
+              <img src="/assets/landing/image.png" alt={lang==='tr' ? 'Örnek masal görseli' : 'Example story illustration'} className="lp-showcase-img" />
             </div>
           </motion.div>
         </div>
@@ -214,7 +215,7 @@ export default function LandingPage() {
 
       {/* ═══ CTA + FOOTER ═══ */}
       <section className="lp-cta" id="iletisim">
-        <div className="lp-cta-bg"><img src={isDark ? "/cta_bg.png" : "/dayfooter.png"} alt="" /></div>
+        <div className="lp-cta-bg"><img src={isDark ? "/assets/landing/cta_bg.png" : "/assets/landing/dayfooter.png"} alt="" /></div>
 
         <footer className="lp-footer">
           <motion.div className="lp-footer-inner container"
@@ -222,7 +223,7 @@ export default function LandingPage() {
 
             {/* Kolon 1 — Marka */}
             <motion.div className="lp-footer-col lp-footer-brand" variants={fadeUp()}>
-              <img src="/logo.png" alt="Masalmatik" className="lp-footer-logo" />
+              <img src="/assets/landing/logo.png" alt="Masalmatik" className="lp-footer-logo" />
               <span className="lp-footer-name">Masalmatik</span>
               <p className="lp-footer-slogan">
                 {lang==='tr' ? 'Küçük hayalciler için sevgiyle yapıldı' : 'Made with love for little dreamers'}

@@ -16,7 +16,7 @@
   --night-surface: rgba(255, 255, 255, 0.06);
   --night-border:  rgba(255, 255, 255, 0.12);
   --night-text:    rgb(230, 220, 255);
-  --night-text-soft: rgba(200, 185, 240, 0.65);
+  --night-text-soft: rgba(200, 185, 240, 0.82);
 
   /* ── Light mode overrides ── */
   --light-bg:      #eef6ff;              /* StoryGenie açık mavi-beyaz zemin */
