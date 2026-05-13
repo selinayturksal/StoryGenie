@@ -19,11 +19,22 @@
   --night-text-soft: rgba(200, 185, 240, 0.65);
 
   /* ── Light mode overrides ── */
-  --light-bg:      rgb(245, 242, 255);
+  --light-bg:      #eef6ff;              /* StoryGenie açık mavi-beyaz zemin */
   --light-surface: rgba(255, 255, 255, 0.88);
   --light-border:  rgba(117, 70, 104, 0.18);
-  --light-text:    rgb(30, 15, 55);
-  --light-text-soft: rgba(60, 40, 90, 0.6);
+  --light-text:    rgb(26, 26, 46);      /* StoryGenie --ink */
+  --light-text-soft: rgba(136, 136, 170, 0.9); /* StoryGenie --ink-soft */
+
+  /* StoryGenie açık tema aksan renkleri */
+  --sg-sun:        #ffe566;
+  --sg-sun-deep:   #ffb800;
+  --sg-coral:      #ff7b5c;
+  --sg-coral-soft: #ffb39e;
+  --sg-teal:       #00c9a7;
+  --sg-teal-soft:  #7eecd8;
+  --sg-plum:       #9b59b6;
+  --sg-plum-soft:  #d4a8e8;
+  --sg-lime:       #7bc67e;
 
   /* ── Active palette vars (default = dark) ── */
   --bg:         var(--night-deep);
@@ -75,20 +86,25 @@
   --sh-lg:  0 16px 48px rgba(0, 0, 0, 0.5);
 }
 
-/* ── Light mode ── */
+/* ── Light mode (StoryGenie açık tema) ── */
 [data-theme="light"] {
-  --bg:         var(--light-bg);
-  --bg-warm:    rgb(238, 232, 255);
+  --bg:         var(--light-bg);          /* #f0f7ff */
+  --bg-warm:    #fff9ee;
   --surface:    var(--light-surface);
   --border:     var(--light-border);
-  --ink:        var(--light-text);
-  --ink-mid:    rgba(60, 40, 90, 0.85);
+  --ink:        var(--light-text);        /* #1a1a2e */
+  --ink-mid:    rgb(74, 74, 106);
   --ink-soft:   var(--light-text-soft);
-  --sky:        rgba(220, 210, 255, 0.7);
-  --sky-mid:    rgba(180, 150, 220, 0.5);
-  --plum:       rgb(117, 70, 104);
-  --plum-soft:  rgba(117, 70, 104, 0.25);
-  --coral:      rgb(230, 80, 80);
+  --sky:        #e8f4ff;
+  --sky-mid:    #c2e0ff;
+  --plum:       var(--sg-plum);           /* #9b59b6 */
+  --plum-soft:  var(--sg-plum-soft);
+  --teal:       var(--sg-teal);           /* #00c9a7 */
+  --teal-soft:  var(--sg-teal-soft);
+  --coral:      var(--sg-coral);          /* #ff7b5c */
+  --coral-soft: var(--sg-coral-soft);
+  --sun:        var(--sg-sun);
+  --sun-deep:   var(--sg-sun-deep);
 
   --mm-bg:        var(--light-bg);
   --mm-navy:      var(--light-text);
@@ -115,12 +131,13 @@ body {
 }
 
 [data-theme="light"] body {
-  background-color: var(--light-bg);
+  background-color: #eef6ff;
   color: var(--light-text);
   background-image:
-    radial-gradient(ellipse 70% 45% at 10% 5%,  rgba(200, 160, 240, 0.2) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 50% at 90% 15%, rgba(130, 80, 200, 0.14)  0%, transparent 55%),
-    radial-gradient(ellipse 45% 55% at 50% 95%, rgba(84, 151, 167, 0.12)  0%, transparent 56%);
+    radial-gradient(ellipse at 10% 10%,  rgba(255, 229, 102, 0.25) 0%, transparent 45%),
+    radial-gradient(ellipse at 90%  5%,  rgba(0,  201, 167, 0.15)  0%, transparent 40%),
+    radial-gradient(ellipse at 50% 90%,  rgba(155,  89, 182, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 80%,  rgba(255, 123,  92, 0.12) 0%, transparent 40%);
 }
 
 h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; }

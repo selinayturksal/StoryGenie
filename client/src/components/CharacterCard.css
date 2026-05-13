@@ -75,6 +75,13 @@
   transition: transform 0.22s ease, filter 0.22s ease;
   transform: scale(1.15);
   transform-origin: bottom center;
+  /* Koyu arka planı sayfa rengiyle eritir — kalite kaybı yok */
+  mix-blend-mode: lighten;
+}
+
+/* Light modda normal göster */
+[data-theme="light"] .char-visual img {
+  mix-blend-mode: normal;
 }
 
 .char-card:hover:not(.disabled) .char-visual img {
@@ -93,6 +100,7 @@
 .char-card--animal .char-visual img {
   transform: scale(0.88);
   transform-origin: bottom center;
+  mix-blend-mode: lighten;
 }
 
 .char-card--animal:hover:not(.disabled) .char-visual img {

@@ -20,12 +20,28 @@
 .book-container {
   display: flex;
   width: 100%;
-  max-width: 780px;
-  height: 460px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 80px rgba(30,20,16,0.22), 0 4px 16px rgba(30,20,16,0.12);
+  max-width: 960px;
+  height: 560px;
+  border-radius: 4px 16px 16px 4px;
+  box-shadow:
+    -8px 0 0 #b8955a,
+    -14px 4px 0 #9a7a45,
+    -18px 8px 20px rgba(0,0,0,0.35),
+    0 30px 80px rgba(30,20,16,0.28),
+    0 6px 20px rgba(30,20,16,0.16);
   overflow: hidden;
   position: relative;
+  transform: translateY(-2px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.book-container:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    -8px 0 0 #b8955a,
+    -14px 4px 0 #9a7a45,
+    -18px 12px 28px rgba(0,0,0,0.4),
+    0 40px 100px rgba(30,20,16,0.32),
+    0 10px 28px rgba(30,20,16,0.2);
 }
 
 .book-page {
@@ -36,32 +52,34 @@
 
 /* Left page — parchment */
 .book-page-left {
-  background: linear-gradient(160deg, #f9f0df 0%, #f0e2c4 100%);
+  background: linear-gradient(160deg, #f9f0df 0%, #f0e2c4 60%, #e8d4b0 100%);
   border-right: none;
+  border-left: 6px solid #c4903a;
+  box-shadow: inset -4px 0 12px rgba(0,0,0,0.08);
 }
 
 /* Right page — white */
 .book-page-right {
   background: #fffef9;
-  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: left center;
 }
 
 .book-page-right.flip-next {
-  animation: flipNext 0.32s ease forwards;
+  animation: flipNext 0.5s ease forwards;
 }
 .book-page-right.flip-prev {
-  animation: flipPrev 0.32s ease forwards;
+  animation: flipPrev 0.5s ease forwards;
 }
 
 @keyframes flipNext {
   0%   { transform: rotateY(0deg); opacity: 1; }
-  50%  { transform: rotateY(-12deg); opacity: 0.7; }
+  40%  { transform: rotateY(-18deg); opacity: 0.5; }
   100% { transform: rotateY(0deg); opacity: 1; }
 }
 @keyframes flipPrev {
   0%   { transform: rotateY(0deg); opacity: 1; }
-  50%  { transform: rotateY(12deg); opacity: 0.7; }
+  40%  { transform: rotateY(18deg); opacity: 0.5; }
   100% { transform: rotateY(0deg); opacity: 1; }
 }
 

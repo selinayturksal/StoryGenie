@@ -51,17 +51,39 @@ export default function StoryView() {
     setReadAll(false);
   }, []);
 
+  const playPageFlipSound = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const dur = 0.2, rate = ctx.sampleRate;
+      const buf = ctx.createBuffer(1, rate * dur, rate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) {
+        const t = i / rate;
+        d[i] = (Math.random() * 2 - 1) * Math.exp(-t * 18) * (1 - Math.exp(-t * 220)) * 0.65;
+      }
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2800; bp.Q.value = 0.9;
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.8, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      src.connect(bp); bp.connect(g); g.connect(ctx.destination);
+      src.start(); src.stop(ctx.currentTime + dur);
+      src.onended = () => ctx.close();
+    } catch (e) {}
+  }, []);
+
   const speakText = useCallback((text, onEnd) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang  = lang === 'en' ? 'en-US' : 'tr-TR';
-    utter.rate  = 0.88; utter.pitch = 1.05;
-
+    utter.lang = lang === 'en' ? 'en-US' : 'tr-TR';
+    utter.rate = 0.82; utter.pitch = 1.0; utter.volume = 1.0;
     const go = () => {
-      const voices   = window.speechSynthesis.getVoices();
-      const preferred = voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.localService)
-                     || voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr'));
+      const voices = window.speechSynthesis.getVoices();
+      const preferred =
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.name.includes('Google')) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.name.includes('Microsoft')) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.localService) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr'));
       if (preferred) utter.voice = preferred;
       utter.onstart = () => { setSpeaking(true); setPaused(false); };
       utter.onend   = () => { setSpeaking(false); setPaused(false); if (onEnd) onEnd(); };
@@ -69,7 +91,6 @@ export default function StoryView() {
       utteranceRef.current = utter;
       window.speechSynthesis.speak(utter);
     };
-
     if (window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; go(); };
     } else go();
@@ -84,8 +105,7 @@ export default function StoryView() {
 
   const handleReadAll = useCallback(() => {
     if (speaking) { stopSpeech(); return; }
-    setReadAll(true);
-    setCurrentPage(0);
+    setReadAll(true); setCurrentPage(0);
     const readPage = (idx) => {
       if (idx >= pages.length) { setReadAll(false); setSpeaking(false); return; }
       setCurrentPage(idx);
@@ -99,9 +119,9 @@ export default function StoryView() {
     if (dir === 'next' && isLast) return;
     if (dir === 'prev' && isFirst) return;
     if (!readAll) stopSpeech();
-    setFlipDir(dir);
-    setFlipping(true);
-    setTimeout(() => { setCurrentPage(p => dir === 'next' ? p + 1 : p - 1); setFlipping(false); }, 340);
+    playPageFlipSound();
+    setFlipDir(dir); setFlipping(true);
+    setTimeout(() => { setCurrentPage(p => dir === 'next' ? p + 1 : p - 1); setFlipping(false); }, 500);
   };
 
   const handleSave = async () => {
@@ -145,9 +165,10 @@ export default function StoryView() {
       {phase === 'opening' && (
         <div className="sv-opening">
           <div className="sv-book-open">
-            <div className="sv-book-cover sv-book-left" />
-            <div className="sv-book-cover sv-book-right" />
-            <div className="sv-book-spine" />
+            <div className="sv-book-pages-edge" />
+            <div className="sv-book-spine-open" />
+            <div className="sv-book-cover-left" />
+            <div className="sv-book-cover-right" />
           </div>
         </div>
       )}
@@ -156,51 +177,25 @@ export default function StoryView() {
       {phase === 'reading' && (
         <div className="sv-reading animate-fadeIn">
 
-          {/* Geri butonu */}
           <button className="sv-back" onClick={() => { stopSpeech(); navigate('/'); }}>
             ← {lang === 'tr' ? 'Geri' : 'Back'}
           </button>
 
-          {/* Hikaye başlığı */}
-          <h1 className="sv-title">{story.title}</h1>
-
-          {/* Karakterler — üstte boydan */}
-          <div className="sv-chars-row">
-            {characters.map((c, i) => (
-              <div key={c.id || i} className="sv-char" style={{ animationDelay: `${i * 0.1}s` }}>
-                <div className="sv-char-img-wrap">
-                  <img
-                    src={`/assets/characters/${c.file}`}
-                    alt={c.name?.tr || c.name || ''}
-                    onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }}
-                  />
-                  <span style={{ display:'none', fontSize:'3rem' }}>{c.emoji}</span>
-                </div>
-                <span className="sv-char-name">{c.name?.tr || c.name}</span>
-              </div>
-            ))}
-            {location && (
-              <div className="sv-location">
-                <img
-                  src={`/assets/locations/${location.file}`}
-                  alt={location.name?.tr || location.name || ''}
-                  onError={e => { e.target.style.display='none'; }}
-                />
-                <span className="sv-char-name">{location.name?.tr || location.name}</span>
-              </div>
-            )}
-          </div>
-
-          {/* TTS Bar */}
+          {/* Audio Bar */}
           <div className="sv-tts-bar">
-            <span className="sv-tts-icon">{speaking ? '🔊' : '🔈'}</span>
+            <span className="sv-tts-icon">🔊</span>
             <span className="sv-tts-label">
-              {speaking && !paused
-                ? (lang === 'tr' ? 'Okunuyor...' : 'Reading...')
-                : paused
-                ? (lang === 'tr' ? 'Duraklatıldı' : 'Paused')
+              {speaking && !paused ? (lang === 'tr' ? 'Okunuyor...' : 'Reading...')
+                : paused ? (lang === 'tr' ? 'Duraklatıldı' : 'Paused')
                 : (lang === 'tr' ? 'Sesli Okuma' : 'Read Aloud')}
             </span>
+            <div className={`sv-wave ${speaking && !paused ? 'sv-wave--active' : ''}`}>
+              {[...Array(16)].map((_, i) => (
+                <span key={i} className="sv-wave-bar"
+                  style={{ animationDelay: `${i * 0.06}s`,
+                           animationDuration: `${0.5 + (i % 4) * 0.15}s` }} />
+              ))}
+            </div>
             <div className="sv-tts-btns">
               <button className={`sv-tts-btn ${speaking && !paused ? 'active' : ''}`} onClick={handleReadPage}>
                 {speaking && !paused ? '⏸' : '▶'}
@@ -217,69 +212,100 @@ export default function StoryView() {
           </div>
 
           {/* Kitap */}
-          <div className="sv-book">
-            {/* Sol sayfa */}
-            <div className="sv-page-left">
-              <div className="sv-page-ornament">✦</div>
-              <div className="sv-page-chars">
-                {characters.slice(0, 3).map((c, i) => (
-                  <div key={c.id || i} className="sv-page-char">
-                    <img
-                      src={`/assets/characters/${c.file}`}
-                      alt={c.name?.tr || c.name || ''}
-                      onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }}
-                    />
-                    <span style={{ display:'none', fontSize:'2rem' }}>{c.emoji}</span>
-                    <span className="sv-page-char-name">{c.name?.tr || c.name}</span>
-                  </div>
-                ))}
-              </div>
-              {location && (
-                <div className="sv-page-loc">
-                  <span>{location.emoji}</span>
-                  <span>{location.name?.tr || location.name}</span>
-                </div>
-              )}
-              <div className="sv-page-ornament">✦</div>
-              <div className="sv-spine" />
-            </div>
+          <div className="sv-book-wrap">
+            <div className="sv-leaf sv-leaf--left">🌿</div>
+            <div className="sv-leaf sv-leaf--right">🌿</div>
 
-            {/* Sağ sayfa */}
-            <div className={`sv-page-right ${flipping ? `flip-${flipDir}` : ''}`}>
-              <div className="sv-page-header">
-                <span className="sv-page-num">
-                  {lang === 'tr' ? 'Sayfa' : 'Page'} {currentPage + 1} / {totalPages}
-                </span>
-                <button
-                  className={`sv-play-mini ${speaking && !paused ? 'playing' : ''}`}
-                  onClick={handleReadPage}
-                >
-                  {speaking && !paused ? '⏸' : '▶'}
-                </button>
-              </div>
-              <div className="sv-page-text">
-                <p>{pages[currentPage]?.content}</p>
-              </div>
-              {/* Alt karakter şeridi */}
-              <div className="sv-strip">
-                {characters.map((c, i) => (
-                  <div key={c.id || i} className="sv-strip-char" title={c.name?.tr || c.name}>
-                    <img
-                      src={`/assets/characters/${c.file}`}
-                      alt={c.name?.tr || c.name || ''}
-                      onError={e => { e.target.style.display='none'; }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Navigasyon */}
-          <div className="sv-nav">
-            <button className={`sv-nav-btn ${isFirst ? 'sv-hidden' : ''}`}
+            <button className={`sv-nav-btn sv-nav-btn--left ${isFirst ? 'sv-hidden' : ''}`}
               onClick={() => goTo('prev')} disabled={isFirst || flipping}>‹</button>
 
+            <div className="sv-book">
+              {/* Cilt */}
+              <div className="sv-book-binding" />
+              <div className="sv-book-edge" />
+
+              {/* Altın köşe süsleri */}
+              <div className="sv-corner sv-corner--tl" />
+              <div className="sv-corner sv-corner--tr" />
+              <div className="sv-corner sv-corner--bl" />
+              <div className="sv-corner sv-corner--br" />
+
+              {/* Sol sayfa */}
+              <div className="sv-page-left">
+                <span className="sv-sparkle sv-sparkle--1">✦</span>
+                <span className="sv-sparkle sv-sparkle--2">✦</span>
+
+                <div className="sv-char-circle">
+                  {characters[0] ? (
+                    <>
+                      <img src={`/assets/characters/${characters[0].file}`}
+                        alt={characters[0].name?.tr || characters[0].name || ''}
+                        onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
+                      <span style={{ display:'none', fontSize:'6rem', lineHeight:1 }}>{characters[0].emoji}</span>
+                    </>
+                  ) : <span style={{ fontSize:'6rem' }}>🧒</span>}
+                </div>
+
+                <h2 className="sv-book-title">{story.title}</h2>
+
+                {location && (
+                  <div className="sv-page-loc">
+                    <span>{location.emoji}</span>
+                    <span>{location.name?.tr || location.name}</span>
+                  </div>
+                )}
+
+                <span className="sv-sparkle sv-sparkle--3">✦</span>
+                <div className="sv-spine" />
+              </div>
+
+              {/* Orta cilt */}
+              <div className="sv-book-gutter" />
+
+              {/* Sağ sayfa */}
+              <div className={`sv-page-right ${flipping ? `flip-${flipDir}` : ''}`}>
+                <div className="sv-page-header">
+                  <span className="sv-page-num">
+                    ⭐ {lang === 'tr' ? 'Sayfa' : 'Page'} {currentPage + 1} / {totalPages}
+                  </span>
+                  <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
+                    <span className="sv-bookmark-icon">🔖</span>
+                    <button className={`sv-play-mini ${speaking && !paused ? 'playing' : ''}`} onClick={handleReadPage}>
+                      {speaking && !paused ? '⏸' : '▶'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="sv-page-divider">
+                  <div className="sv-page-divider-line" />
+                  <span className="sv-page-divider-star">✦</span>
+                  <div className="sv-page-divider-line" />
+                </div>
+
+                <div className="sv-page-text">
+                  <p>{pages[currentPage]?.content}</p>
+                </div>
+
+                <div className="sv-strip">
+                  {characters.slice(0, 1).map((c, i) => (
+                    <div key={c.id || i} className="sv-strip-char">
+                      <img src={`/assets/characters/${c.file}`}
+                        alt={c.name?.tr || c.name || ''}
+                        onError={e => { e.target.style.display='none'; }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button className={`sv-nav-btn sv-nav-btn--right ${isLast ? 'sv-hidden' : ''}`}
+              onClick={() => goTo('next')} disabled={isLast || flipping}>›</button>
+
+            <div className="sv-bookmark">🔖</div>
+          </div>
+
+          {/* Sayfa noktaları */}
+          <div className="sv-nav">
             <div className="sv-dots">
               {pages.map((_, i) => (
                 <button key={i}
@@ -288,12 +314,8 @@ export default function StoryView() {
                 />
               ))}
             </div>
-
-            <button className={`sv-nav-btn ${isLast ? 'sv-hidden' : ''}`}
-              onClick={() => goTo('next')} disabled={isLast || flipping}>›</button>
           </div>
 
-          {/* Son sayfa aksiyonları */}
           {isLast && (
             <div className="sv-actions animate-fadeIn">
               <button className="sv-action-btn sv-action-outline"

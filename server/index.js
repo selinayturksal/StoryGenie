@@ -10,6 +10,8 @@ const aiRoutes = require('./routes/ai');
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',

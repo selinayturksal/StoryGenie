@@ -44,20 +44,21 @@ export default function BookViewer({ pages, title, characters, location, lang, t
     window.speechSynthesis.cancel();
 
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang  = getLang();
-    utter.rate  = 0.88;
-    utter.pitch = 1.05;
+    utter.lang   = getLang();
+    utter.rate   = 0.82;
+    utter.pitch  = 1.0;
+    utter.volume = 1.0;
 
     const setVoiceAndSpeak = () => {
       const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        const preferred = voices.find(v =>
-          v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.localService
-        ) || voices.find(v =>
-          v.lang.startsWith(lang === 'en' ? 'en' : 'tr')
-        );
-        if (preferred) utter.voice = preferred;
-      }
+      const preferred =
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.name.includes('Google')) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.name.includes('Microsoft')) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.name.includes('Samantha')) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.name.includes('Karen')) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr') && v.localService) ||
+        voices.find(v => v.lang.startsWith(lang === 'en' ? 'en' : 'tr'));
+      if (preferred) utter.voice = preferred;
 
       utter.onstart = () => { setSpeaking(true); setPaused(false); };
       utter.onend   = () => { setSpeaking(false); setPaused(false); if (onEnd) onEnd(); };
@@ -67,7 +68,6 @@ export default function BookViewer({ pages, title, characters, location, lang, t
       window.speechSynthesis.speak(utter);
     };
 
-    // Sesler henüz yüklenmediyse bekle
     if (window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = () => {
         window.speechSynthesis.onvoiceschanged = null;
@@ -117,17 +117,53 @@ export default function BookViewer({ pages, title, characters, location, lang, t
     setTimeout(() => readPage(0), 100);
   }, [speaking, pages, speakText, stopSpeech]);
 
+  // ── Sayfa çevirme sesi ──
+  const playPageFlipSound = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const duration = 0.18;
+      const bufferSize = ctx.sampleRate * duration;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        const t = i / ctx.sampleRate;
+        const envelope = Math.exp(-t * 22) * (1 - Math.exp(-t * 180));
+        data[i] = (Math.random() * 2 - 1) * envelope * 0.55;
+      }
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const bandpass = ctx.createBiquadFilter();
+      bandpass.type = 'bandpass';
+      bandpass.frequency.value = 2800;
+      bandpass.Q.value = 0.7;
+      const highpass = ctx.createBiquadFilter();
+      highpass.type = 'highpass';
+      highpass.frequency.value = 800;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.7, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      source.connect(highpass);
+      highpass.connect(bandpass);
+      bandpass.connect(gain);
+      gain.connect(ctx.destination);
+      source.start();
+      source.stop(ctx.currentTime + duration);
+      source.onended = () => ctx.close();
+    } catch (e) {}
+  }, []);
+
   const goTo = (dir) => {
     if (flipping) return;
     if (dir === 'next' && isLast) return;
     if (dir === 'prev' && isFirst) return;
     if (!readAll) stopSpeech();
+    playPageFlipSound();
     setFlipDir(dir);
     setFlipping(true);
     setTimeout(() => {
       setCurrentPage(p => dir === 'next' ? p + 1 : p - 1);
       setFlipping(false);
-    }, 320);
+    }, 500);
   };
 
   const allChars = characters || [];
