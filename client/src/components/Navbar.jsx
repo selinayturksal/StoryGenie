@@ -62,6 +62,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <button onClick={() => scrollToSection('anasayfa')}    className="nav-link">{lang === 'tr' ? 'Anasayfa' : 'Home'}</button>
               <button onClick={() => scrollToSection('ozellikler')}  className="nav-link">{lang === 'tr' ? 'Özellikler' : 'Features'}</button>
               <button onClick={() => scrollToSection('nasil-calisir')} className="nav-link">{lang === 'tr' ? 'Nasıl Çalışır?' : 'How It Works'}</button>
               <button onClick={() => scrollToSection('ornek')}       className="nav-link">{lang === 'tr' ? 'Örnek Hikaye' : 'Example'}</button>
@@ -130,6 +131,12 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <button onClick={() => scrollToSection('anasayfa')}      className="nav-link">{lang === 'tr' ? 'Anasayfa' : 'Home'}</button>
+              <button onClick={() => scrollToSection('ozellikler')}    className="nav-link">{lang === 'tr' ? 'Özellikler' : 'Features'}</button>
+              <button onClick={() => scrollToSection('nasil-calisir')} className="nav-link">{lang === 'tr' ? 'Nasıl Çalışır?' : 'How It Works'}</button>
+              <button onClick={() => scrollToSection('ornek')}         className="nav-link">{lang === 'tr' ? 'Örnek Hikaye' : 'Example'}</button>
+              <button onClick={() => scrollToSection('iletisim')}      className="nav-link">{lang === 'tr' ? 'İletişim' : 'Contact'}</button>
+              <hr className="mobile-divider" />
               <Link to="/login"    onClick={() => setMenuOpen(false)}>{t.nav.login}</Link>
               <Link to="/register" onClick={() => setMenuOpen(false)}>{t.nav.register}</Link>
             </>
