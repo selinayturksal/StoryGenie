@@ -91,6 +91,7 @@ export default function CreateStory() {
         state: {
           story: {
             ...generatedStory,
+            _id: res.data._id,
             characters: payload.characters.map(c => ({
               ...c, name: { tr: c.name, en: c.name },
               file: c.imagePath?.split('/').pop() || '',
@@ -197,7 +198,7 @@ export default function CreateStory() {
             </div>
             {validError && <div className="valid-error"><span>⚠️</span> {validError}</div>}
             <div className="wizard-nav">
-              <div />
+              <button className="wizard-btn wizard-btn--back" style={{visibility:'hidden'}} disabled>← {lang === 'tr' ? 'Geri' : 'Back'}</button>
               <button className="wizard-btn wizard-btn--next" onClick={goNext}>
                 {lang === 'tr' ? 'İlerle' : 'Next'} →
               </button>
@@ -234,7 +235,7 @@ export default function CreateStory() {
             <div className="wizard-nav">
               <button className="wizard-btn wizard-btn--back" onClick={goBack}>← {lang === 'tr' ? 'Geri' : 'Back'}</button>
               <button className="wizard-btn wizard-btn--next" onClick={goNext}>
-                {lang === 'tr' ? (selectedAnimals.length === 0 ? 'Atla' : 'İlerle') : (selectedAnimals.length === 0 ? 'Skip' : 'Next')} →
+                {lang === 'tr' ? 'İlerle' : 'Next'} →
               </button>
             </div>
           </div>
@@ -317,11 +318,15 @@ export default function CreateStory() {
                   <h4 className="opt-title">{t.create.duration}</h4>
                 </div>
                 <div className="dur-pills">
-                  {DURATION_OPTIONS.map(d => (
+                  {[
+                    { value: 'short',  label: lang === 'tr' ? 'Kısa (~5 dk)'   : 'Short (~5 min)'  },
+                    { value: 'medium', label: lang === 'tr' ? 'Orta (~10 dk)'  : 'Medium (~10 min)' },
+                    { value: 'long',   label: lang === 'tr' ? 'Uzun (~15 dk)'  : 'Long (~15 min)'  },
+                  ].map(d => (
                     <button key={d.value} type="button"
                       className={`dur-pill ${duration === d.value ? 'active' : ''}`}
                       onClick={() => setDuration(d.value)}>
-                      {d.icon} {t.create[d.labelKey]}
+                      {d.label}
                     </button>
                   ))}
                 </div>
@@ -365,7 +370,7 @@ export default function CreateStory() {
       ══════════════════════════════════ */}
       {step === 3 && !generating && (
         <div className="step3-scene"
-          style={{ backgroundImage: `url('/assets/create/${isDark ? 'darkf' : 'dayf'}.png')` }}
+          style={{ backgroundImage: `url('/assets/create/settings-bg.png'), url('/assets/create/${isDark ? 'darkf' : 'dayf'}.png')` }}
         >
           <div className="create-container">
             <div className="step3-layout">

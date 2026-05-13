@@ -10,10 +10,11 @@ const pageSchema = new mongoose.Schema({
 const storyOptionsSchema = new mongoose.Schema({
   characters: [
     {
-      id: String,        // örn: "human_1"
-      name: String,      // örn: "Prenses Elif"
-      type: String,      // "human" | "animal"
-      imagePath: String, // "/assets/characters/human_1.png"
+      id: String,
+      name: String,
+      type: String,
+      imagePath: String,
+      emoji: String,
     },
   ],
   location: {

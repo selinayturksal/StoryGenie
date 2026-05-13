@@ -186,12 +186,21 @@ router.post('/', protect, async (req, res) => {
       return res.status(400).json({ error: 'title, fullText and options are required.' });
     }
 
+    // characters string olarak geldiyse parse et
+    const parsedOptions = { ...options };
+    if (typeof parsedOptions.characters === 'string') {
+      try { parsedOptions.characters = JSON.parse(parsedOptions.characters); } catch (_) {}
+    }
+    if (typeof parsedOptions.location === 'string') {
+      try { parsedOptions.location = JSON.parse(parsedOptions.location); } catch (_) {}
+    }
+
     const story = await Story.create({
       author: req.user._id,
       title,
       fullText,
       pages: pages || [],
-      options,
+      options: parsedOptions,
       isPublic: false,
     });
 

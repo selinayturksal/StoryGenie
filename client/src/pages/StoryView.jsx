@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
+import api from '../services/api';
 import './StoryView.css';
 
 export default function StoryView() {
@@ -22,6 +23,10 @@ export default function StoryView() {
   const [flipDir, setFlipDir]       = useState('next');
   const [saving, setSaving]         = useState(false);
   const [saved, setSaved]           = useState(false);
+  const [sharing, setSharing]       = useState(false);
+  const [shared, setShared]         = useState(false);
+  const [storyId, setStoryId]       = useState(story?._id || null);
+
 
   // TTS
   const [speaking, setSpeaking]     = useState(false);
@@ -37,8 +42,8 @@ export default function StoryView() {
   useEffect(() => {
     if (!story) { navigate('/'); return; }
     // Giriş animasyonu → kitap açılışı
-    const t1 = setTimeout(() => setPhase('opening'), 800);
-    const t2 = setTimeout(() => setPhase('reading'), 2400);
+    const t1 = setTimeout(() => setPhase('opening'), 600);
+    const t2 = setTimeout(() => setPhase('reading'), 3200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
@@ -132,6 +137,43 @@ export default function StoryView() {
     finally { setSaving(false); }
   };
 
+  const handleShare = async () => {
+    if (sharing || shared) return;
+    setSharing(true);
+    try {
+      let id = storyId;
+
+      // Eğer _id yoksa önce kaydet
+      if (!id) {
+        const opts = story.options || {};
+        // characters/location string olarak geldiyse parse et
+        const characters = typeof opts.characters === 'string'
+          ? JSON.parse(opts.characters) : (opts.characters || []);
+        const location = typeof opts.location === 'string'
+          ? JSON.parse(opts.location) : (opts.location || null);
+
+        const saveRes = await api.post('/stories', {
+          title: story.title,
+          fullText: story.fullText || story.pages?.map(p => p.content).join(' ') || '',
+          pages: story.pages || [],
+          options: { ...opts, characters, location },
+        });
+        id = saveRes.data.story._id;
+        setStoryId(id);
+        setSaved(true);
+      }
+
+      // Paylaş
+      await api.patch(`/stories/${id}/publish`, { isPublic: true });
+      setShared(true);
+    } catch (e) {
+      console.error('Share error:', e);
+      alert(e.message || 'Paylaşılamadı');
+    } finally {
+      setSharing(false);
+    }
+  };
+
   if (!story) return null;
 
   return (
@@ -166,9 +208,17 @@ export default function StoryView() {
         <div className="sv-opening">
           <div className="sv-book-open">
             <div className="sv-book-pages-edge" />
+            <div className="sv-book-pages-edge-left" />
             <div className="sv-book-spine-open" />
-            <div className="sv-book-cover-left" />
-            <div className="sv-book-cover-right" />
+            <div className="sv-book-cover-left">
+              <div className="sv-cover-corner sv-cover-corner--tl" />
+              <div className="sv-cover-corner sv-cover-corner--bl" />
+            </div>
+            <div className="sv-book-cover-right">
+              <div className="sv-cover-corner sv-cover-corner--tr" />
+              <div className="sv-cover-corner sv-cover-corner--br" />
+            </div>
+            <div className="sv-book-bottom" />
           </div>
         </div>
       )}
@@ -177,9 +227,22 @@ export default function StoryView() {
       {phase === 'reading' && (
         <div className="sv-reading animate-fadeIn">
 
-          <button className="sv-back" onClick={() => { stopSpeech(); navigate('/'); }}>
-            ← {lang === 'tr' ? 'Geri' : 'Back'}
-          </button>
+          <div className="sv-topbar">
+            <button className="sv-back" onClick={() => { stopSpeech(); navigate('/'); }}>
+              ← {lang === 'tr' ? 'Geri' : 'Back'}
+            </button>
+            <div className="sv-top-actions">
+              <button
+                className={`sv-top-btn ${shared ? 'sv-top-btn--shared' : ''}`}
+                onClick={handleShare}
+                disabled={sharing || shared}
+                title={lang === 'tr' ? 'Herkesle Paylaş' : 'Share with Everyone'}
+              >
+                {shared ? '✓' : sharing ? '...' : '🌍'}
+                <span>{sharing ? (lang === 'tr' ? 'Paylaşılıyor' : 'Sharing') : shared ? (lang === 'tr' ? 'Paylaşıldı' : 'Shared') : (lang === 'tr' ? 'Paylaş' : 'Share')}</span>
+              </button>
+            </div>
+          </div>
 
           {/* Audio Bar */}
           <div className="sv-tts-bar">
@@ -232,30 +295,28 @@ export default function StoryView() {
 
               {/* Sol sayfa */}
               <div className="sv-page-left">
+                {/* Mekan arka planı */}
+                {location && (
+                  <div className="sv-page-left-bg"
+                    style={{ backgroundImage: `url('/assets/locations/${location.file}')` }} />
+                )}
+
                 <span className="sv-sparkle sv-sparkle--1">✦</span>
                 <span className="sv-sparkle sv-sparkle--2">✦</span>
 
-                <div className="sv-char-circle">
-                  {characters[0] ? (
-                    <>
-                      <img src={`/assets/characters/${characters[0].file}`}
-                        alt={characters[0].name?.tr || characters[0].name || ''}
-                        onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
-                      <span style={{ display:'none', fontSize:'6rem', lineHeight:1 }}>{characters[0].emoji}</span>
-                    </>
-                  ) : <span style={{ fontSize:'6rem' }}>🧒</span>}
+                {/* Karakterler boydan */}
+                <div className="sv-chars-row">
+                  {characters.slice(0, 4).map((c, i) => (
+                    <div key={c.id || i} className="sv-char-full">
+                      <img
+                        src={`/assets/characters/${c.file}`}
+                        alt={c.name?.tr || c.name || ''}
+                        onError={e => { e.target.style.display='none'; }}
+                      />
+                    </div>
+                  ))}
                 </div>
 
-                <h2 className="sv-book-title">{story.title}</h2>
-
-                {location && (
-                  <div className="sv-page-loc">
-                    <span>{location.emoji}</span>
-                    <span>{location.name?.tr || location.name}</span>
-                  </div>
-                )}
-
-                <span className="sv-sparkle sv-sparkle--3">✦</span>
                 <div className="sv-spine" />
               </div>
 
@@ -268,12 +329,6 @@ export default function StoryView() {
                   <span className="sv-page-num">
                     ⭐ {lang === 'tr' ? 'Sayfa' : 'Page'} {currentPage + 1} / {totalPages}
                   </span>
-                  <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
-                    <span className="sv-bookmark-icon">🔖</span>
-                    <button className={`sv-play-mini ${speaking && !paused ? 'playing' : ''}`} onClick={handleReadPage}>
-                      {speaking && !paused ? '⏸' : '▶'}
-                    </button>
-                  </div>
                 </div>
 
                 <div className="sv-page-divider">
@@ -322,15 +377,6 @@ export default function StoryView() {
                 onClick={() => { stopSpeech(); setCurrentPage(0); }}>
                 🔄 {lang === 'tr' ? 'Tekrar Oku' : 'Read Again'}
               </button>
-              {onSave && (
-                <button className={`sv-action-btn ${saved ? 'sv-action-gold' : 'sv-action-primary'}`}
-                  onClick={handleSave} disabled={saving || saved}>
-                  {saving ? '⏳ ' : saved ? '✓ ' : '💾 '}
-                  {saving ? (lang === 'tr' ? 'Kaydediliyor...' : 'Saving...')
-                  : saved  ? (lang === 'tr' ? 'Kaydedildi!' : 'Saved!')
-                           : (lang === 'tr' ? 'Hikayeyi Kaydet' : 'Save Story')}
-                </button>
-              )}
             </div>
           )}
         </div>

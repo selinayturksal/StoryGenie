@@ -299,21 +299,34 @@
 
 /* Dil */
 .lang-toggle {
-  display: flex; background: var(--sky);
-  border-radius: var(--r-full); padding: 4px; gap: 4px;
-  border: 2px solid var(--sky-mid);
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--r-full);
+  padding: 4px; gap: 4px;
+  border: 1.5px solid rgba(200, 185, 255, 0.18);
 }
 .lang-btn {
   flex: 1; padding: 10px 8px; border-radius: var(--r-full);
   border: none; background: transparent;
-  font-size: 0.9rem; font-weight: 900; color: var(--ink-soft);
+  font-size: 0.9rem; font-weight: 900; color: rgba(180, 165, 230, 0.8);
   transition: all 0.2s ease; cursor: pointer;
   font-family: var(--font-display);
 }
-.lang-btn:hover { color: var(--ink); }
+.lang-btn:hover { color: rgba(220, 210, 255, 0.95); }
 .lang-btn.active {
-  background: #fff; color: var(--plum);
-  box-shadow: 0 2px 10px rgba(155,89,182,0.2);
+  background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120));
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(117,70,104,0.35);
+}
+[data-theme="light"] .lang-toggle {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(117, 70, 104, 0.18);
+}
+[data-theme="light"] .lang-btn { color: rgba(60, 40, 90, 0.7); }
+[data-theme="light"] .lang-btn:hover { color: rgb(30, 15, 55); }
+[data-theme="light"] .lang-btn.active {
+  background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120));
+  color: #fff;
 }
 
 /* ── Prompt ── */
@@ -679,8 +692,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 8px;
   gap: 16px;
+  margin-top: 32px;
+  padding: 0 8px 40px;
 }
 
 .wizard-btn {
@@ -741,14 +755,16 @@
 /* ── Adım 3 Alt Sahne ── */
 .step3-scene {
   position: relative;
-  background-size: cover;
-  background-position: center bottom;
+  background-size: cover, cover;
+  background-position: center bottom, center bottom;
   min-height: 420px;
-  padding: 80px 0 52px;
+  padding: 40px 0 0;
   display: flex;
   align-items: flex-end;
-  margin-top: -8px;
+  margin-top: -6px;
   justify-content: flex-start; 
+  align-items: flex-start;
+  padding-top: 30px;  /* azalt/artır */
 }
 
 .step3-scene::before {
@@ -778,9 +794,11 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 500px;
+  max-width: 800px;
   width: 100%;
   flex-shrink: 0;
+  margin-right: 1000px;
+ 
 }
 
 .step3-right {
@@ -837,14 +855,15 @@
 }
 
 .step3-back {
-  background: rgba(10, 8, 30, 0.7) !important;
-  border-color: rgba(200, 185, 255, 0.15) !important;
-  color: rgba(220, 210, 255, 0.85) !important;
-  backdrop-filter: blur(12px);
-  padding: 10px 22px !important;
-  font-size: 0.85rem !important;
-  min-width: unset !important;
-  align-self: flex-start;
+  position: fixed;
+  bottom: 32px;
+  left: 40px;
+}
+
+.generate-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 40px;
 }
 [data-theme="light"] .step3-back {
   background: rgba(255, 255, 255, 0.72) !important;

@@ -5,17 +5,15 @@
 /* ── Sayfanın kendisi ── */
 .sv-page {
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse at 50% 0%,   rgba(120, 60, 200, 0.4) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%,  rgba(60,  20, 120, 0.3) 0%, transparent 55%),
-    radial-gradient(ellipse at 10% 90%,  rgba(80,  30, 140, 0.2) 0%, transparent 50%),
-    linear-gradient(175deg, #0e0520 0%, #1a0838 40%, #0d1230 100%);
+  background: transparent;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
+
 
 /* ── Yıldızlar ── */
 .sv-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
@@ -54,55 +52,154 @@
 .sv-opening {
   position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
   z-index: 10; perspective: 1600px;
-  background: radial-gradient(ellipse at 50% 50%, rgba(80,30,140,0.6) 0%, rgba(10,4,24,0.95) 70%);
+  background: transparent;
 }
 .sv-book-open {
-  position: relative; width: 600px; height: 420px;
+  position: relative; width: 680px; height: 480px;
   transform-style: preserve-3d;
-  animation: bookAppear 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  perspective: 2000px;
+  animation: bookAppear 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+  filter: drop-shadow(0 60px 80px rgba(0,0,0,0.7));
 }
 @keyframes bookAppear {
-  from { transform: scale(0.4) rotateX(20deg); opacity: 0; }
-  to   { transform: scale(1) rotateX(0); opacity: 1; }
+  from { transform: scale(0.3) rotateX(35deg) rotateY(-15deg); opacity: 0; }
+  to   { transform: scale(1) rotateX(12deg) rotateY(0deg); opacity: 1; }
 }
+
+/* Sayfa kenarları — sağ taraf */
 .sv-book-pages-edge {
-  position: absolute; left: 50%; top: 5px; bottom: 5px; width: 48%;
-  transform: translateX(3px);
-  background: repeating-linear-gradient(to right, #f8ecd4 0px,#f4e6ca 2px,#e8d5a5 2px,#f0dfc0 4px);
-  border-radius: 0 5px 5px 0; box-shadow: 5px 0 16px rgba(0,0,0,0.3);
+  position: absolute; left: 50%; top: 4px; bottom: 12px; width: 48%;
+  transform: translateX(2px);
+  background: repeating-linear-gradient(to right,
+    #f8ecd4 0px, #f4e6ca 1.5px,
+    #e8d5a5 1.5px, #f0dfc0 3px,
+    #faf0da 3px, #f2e3c0 4.5px
+  );
+  border-radius: 0 6px 6px 0;
+  box-shadow: 6px 0 20px rgba(0,0,0,0.35), inset -2px 0 8px rgba(0,0,0,0.1);
 }
+
+/* Sol sayfa kenarı */
+.sv-book-pages-edge-left {
+  position: absolute; right: 50%; top: 4px; bottom: 12px; width: 6px;
+  transform: translateX(-2px);
+  background: repeating-linear-gradient(to left,
+    #f8ecd4 0px, #e8d5a5 1.5px, #f0dfc0 3px
+  );
+  box-shadow: -4px 0 12px rgba(0,0,0,0.25);
+}
+
+/* Alt kapak kalınlığı */
+.sv-book-bottom {
+  position: absolute; bottom: 0; left: 1%; right: 1%; height: 14px;
+  background: linear-gradient(to right, #ff9de2, #ffb347, #fffb68, #a8edea, #d4a5ff);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+
 .sv-book-spine-open {
   position: absolute; left: 50%; top: 0; width: 20px; height: 100%;
-  background: linear-gradient(to right, #0e0424, #5030a8, #8060d0, #5030a8, #0e0424);
-  transform: translateX(-50%); z-index: 3;
-  box-shadow: 0 0 28px rgba(100,60,200,0.6);
+  background: linear-gradient(to bottom, #ff9de2, #ffb347, #fffb68, #a8edea, #d4a5ff);
+  transform: translateX(-50%); z-index: 4;
+  box-shadow: 0 0 20px rgba(255,150,200,0.5);
 }
+
+/* Altın şerit cilt üzerinde */
+.sv-book-spine-open::before {
+  content: '';
+  position: absolute;
+  top: 15%; bottom: 15%; left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  background: linear-gradient(to bottom, transparent, #d4a820, #ffe066, #d4a820, transparent);
+  border-radius: 2px;
+}
+
 .sv-book-cover-left {
-  position: absolute; top: 0; left: 0; width: 50%; height: 100%;
-  background: linear-gradient(135deg, #7840c0 0%, #4020a0 40%, #200858 80%, #0e0424 100%);
+  position: absolute; top: 0; left: 0;
+  width: calc(50% - 10px); height: 100%;
   transform-origin: right center;
-  animation: openLeft 1.4s 0.3s cubic-bezier(0.4,0,0.2,1) forwards;
-  border-radius: 8px 0 0 8px;
-  box-shadow: -12px 0 30px rgba(0,0,0,0.7);
+  animation: openLeft 1.8s 0.3s cubic-bezier(0.4,0,0.2,1) forwards;
+  border-radius: 10px 0 0 10px;
+  transform-style: preserve-3d; z-index: 5;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,220,80,0.5) 0%, transparent 28%),
+    radial-gradient(circle at 80% 15%, rgba(255,120,180,0.5) 0%, transparent 22%),
+    radial-gradient(circle at 15% 70%, rgba(100,200,255,0.45) 0%, transparent 25%),
+    radial-gradient(circle at 75% 75%, rgba(120,230,150,0.45) 0%, transparent 25%),
+    linear-gradient(135deg, #ff9de2 0%, #ffb347 25%, #fffb68 50%, #a8edea 75%, #d4a5ff 100%);
+  box-shadow: -14px 0 40px rgba(0,0,0,0.25), inset 2px 0 16px rgba(255,255,255,0.3);
 }
 .sv-book-cover-right {
-  position: absolute; top: 0; right: 0; width: 50%; height: 100%;
-  background: linear-gradient(225deg, #6830b0 0%, #3818a0 40%, #180848 80%, #0e0424 100%);
+  position: absolute; top: 0; right: 0;
+  width: calc(50% - 10px); height: 100%;
   transform-origin: left center;
-  animation: openRight 1.4s 0.3s cubic-bezier(0.4,0,0.2,1) forwards;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 12px 0 30px rgba(0,0,0,0.7);
+  animation: openRight 1.8s 0.3s cubic-bezier(0.4,0,0.2,1) forwards;
+  border-radius: 0 10px 10px 0;
+  transform-style: preserve-3d; z-index: 5;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(255,220,80,0.5) 0%, transparent 28%),
+    radial-gradient(circle at 20% 15%, rgba(255,120,180,0.5) 0%, transparent 22%),
+    radial-gradient(circle at 85% 70%, rgba(100,200,255,0.45) 0%, transparent 25%),
+    radial-gradient(circle at 25% 75%, rgba(120,230,150,0.45) 0%, transparent 25%),
+    linear-gradient(225deg, #ff9de2 0%, #ffb347 25%, #fffb68 50%, #a8edea 75%, #d4a5ff 100%);
+  box-shadow: 14px 0 40px rgba(0,0,0,0.25), inset -2px 0 16px rgba(255,255,255,0.3);
 }
-.sv-book-cover-left::before,
+.sv-book-cover-left::before {
+  content: '🌸🌟🦋🌈🌺';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; letter-spacing: 4px;
+  flex-wrap: wrap; padding: 20px;
+}
+.sv-book-cover-left::after {
+  content: '';
+  position: absolute; inset: 10px;
+  border: 3px solid rgba(255,255,255,0.55);
+  border-radius: 8px 0 0 8px;
+}
 .sv-book-cover-right::before {
-  content: '✦';
-  position: absolute; top: 50%; left: 50%;
+  content: '⭐🌻🎀🍭🌷';
+  position: absolute; top: 50%; left: 52%;
   transform: translate(-50%,-50%);
-  font-size: 4rem; color: rgba(255,210,80,0.3);
-  text-shadow: 0 0 20px rgba(255,210,80,0.4);
+  font-size: 5rem; color: rgba(255,210,80,0.2);
+  text-shadow: 0 0 30px rgba(255,210,80,0.5);
 }
-@keyframes openLeft  { 0% { transform: rotateY(0); } 100% { transform: rotateY(-160deg); } }
-@keyframes openRight { 0% { transform: rotateY(0); } 100% { transform: rotateY(160deg);  } }
+.sv-book-cover-right::after {
+  content: '';
+  position: absolute; inset: 10px;
+  border: 3px solid rgba(255,255,255,0.55);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Altın köşe detayları kapak üzerinde */
+.sv-cover-corner {
+  position: absolute; width: 36px; height: 36px; z-index: 6; pointer-events: none;
+}
+.sv-cover-corner::before, .sv-cover-corner::after {
+  content: '';
+  position: absolute;
+  background: linear-gradient(135deg, #ffe066, #d4a820, #f0c840, #b8900a);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(212,168,32,0.6);
+}
+.sv-cover-corner::before { top: 0; left: 0; width: 100%; height: 9px; }
+.sv-cover-corner::after  { top: 0; left: 0; width: 9px; height: 100%; }
+.sv-cover-corner--tl { top: 6px; left: 6px; }
+.sv-cover-corner--bl { bottom: 6px; left: 6px; transform: scaleY(-1); }
+.sv-cover-corner--tr { top: 6px; right: 6px; transform: scaleX(-1); }
+.sv-cover-corner--br { bottom: 6px; right: 6px; transform: scale(-1); }
+
+@keyframes openLeft {
+  0%   { transform: rotateY(0deg); }
+  60%  { transform: rotateY(-175deg); }
+  100% { transform: rotateY(-168deg); }
+}
+@keyframes openRight {
+  0%   { transform: rotateY(0deg); }
+  60%  { transform: rotateY(175deg); }
+  100% { transform: rotateY(168deg); }
+}
 
 /* ════════════════════════════════════════════════════════════
    OKUMA ALANI
@@ -115,16 +212,85 @@
   position: relative; z-index: 1;
 }
 
+.sv-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sv-top-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sv-top-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  background: rgba(255,255,255,0.9);
+  border: 1.5px solid rgba(200,185,255,0.3);
+  color: rgba(80,50,140,0.85);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(100,50,200,0.12);
+}
+.sv-top-btn:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(100,50,200,0.2);
+  border-color: rgba(155,89,182,0.45);
+}
+.sv-top-btn--shared {
+  background: linear-gradient(135deg, #e0a020, #f0c040);
+  color: #1a0838;
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(200,160,30,0.35);
+}
+.sv-top-btn:disabled { opacity: 0.7; cursor: default; }
+
+[data-theme="light"] .sv-top-btn {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(117,70,104,0.2);
+  color: rgba(60,40,90,0.8);
+}
+
 .sv-back {
   align-self: flex-start;
-  background: rgba(255,255,255,0.08);
-  border: 1.5px solid rgba(255,255,255,0.15);
-  color: rgba(220,200,255,0.85); border-radius: 999px;
-  padding: 6px 18px; font-family: var(--font-display);
-  font-weight: 700; font-size: 0.82rem;
-  cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.9);
+  border: 1.5px solid rgba(200,185,255,0.3);
+  color: rgba(80,50,140,0.85);
+  border-radius: 999px;
+  padding: 14px 32px;
+  min-width: 140px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
 }
-.sv-back:hover { background: rgba(255,255,255,0.16); transform: translateX(-3px); color: #fff; }
+.sv-back:hover {
+  background: #fff;
+  border-color: rgba(117,70,104,0.4);
+  transform: translateX(-3px);
+}
+[data-theme="light"] .sv-back {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(117,70,104,0.2);
+  color: rgba(60,40,90,0.8);
+}
 
 /* ════════════════════════════════════════════════════════════
    AUDIO BAR — Purple Glassmorphism + Waveform
@@ -303,13 +469,56 @@
 ════════════════════════════════════════════════════════════ */
 .sv-page-left {
   width: 44%;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(255,240,200,0.6) 0%, transparent 50%),
-    linear-gradient(165deg, #fef8ec 0%, #f8ecd4 40%, #f0e0be 80%, #e8d5a8 100%);
+  background: linear-gradient(165deg, #fef8ec 0%, #f8ecd4 40%, #f0e0be 80%, #e8d5a8 100%);
   position: relative; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 14px; padding: 32px 26px;
+  align-items: flex-end; justify-content: flex-end;
+  gap: 0; padding: 16px 16px 0;
   overflow: hidden;
+}
+
+/* Mekan arka planı — sol sayfanın tamamını kapsar */
+.sv-page-left-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Karakterler boydan — alt hizalı */
+.sv-chars-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: -8px;
+  width: 100%;
+  height: 100%;
+}
+
+.sv-char-full {
+  position: relative;
+  height: 85%;
+  max-height: 340px;
+  flex-shrink: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sv-char-full img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+  mix-blend-mode: multiply;
+}
+
+[data-theme="light"] .sv-char-full img {
+  mix-blend-mode: normal;
 }
 
 /* Parşömen doku */
@@ -347,19 +556,7 @@
 
 /* Daire karakter çerçevesi */
 .sv-char-circle {
-  width: 210px; height: 210px; border-radius: 50%;
-  position: relative;
-  /* Katmanlı altın çerçeve */
-  background: linear-gradient(135deg, #c8e8ff, #a8d0ff, #d0e8ff);
-  border: 0 solid transparent;
-  box-shadow:
-    0 0 0 6px #d4a820,
-    0 0 0 9px rgba(212,168,32,0.25),
-    0 0 0 11px rgba(212,168,32,0.1),
-    0 12px 40px rgba(0,0,0,0.2),
-    0 0 30px rgba(212,168,32,0.15);
-  overflow: hidden;
-  animation: circleGlow 4s ease-in-out infinite;
+  display: none;
 }
 @keyframes circleGlow {
   0%,100% { box-shadow: 0 0 0 6px #d4a820, 0 0 0 9px rgba(212,168,32,0.25), 0 0 0 11px rgba(212,168,32,0.1), 0 12px 40px rgba(0,0,0,0.2), 0 0 30px rgba(212,168,32,0.15); }
@@ -492,18 +689,8 @@
 }
 
 /* Alt karakter yuvarlak avatar */
-.sv-strip {
-  display: flex; justify-content: center;
-  padding-top: 10px; border-top: 1.5px solid #ece0c0; margin-top: 8px;
-}
-.sv-strip-char {
-  width: 54px; height: 54px; border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 0 0 3px #d4a820, 0 0 0 5px rgba(212,168,32,0.22), 0 4px 14px rgba(0,0,0,0.2);
-  background: #f0e8d0;
-  animation: float 4s ease-in-out infinite 1s;
-}
-.sv-strip-char img { width: 100%; height: 100%; object-fit: cover; }
+.sv-strip { display: none; }
+.sv-strip-char { display: none; }
 
 /* ════════════════════════════════════════════════════════════
    NAVİGASYON DOTS

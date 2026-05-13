@@ -1,5 +1,7 @@
 const express = require('express');
 const { protect } = require('../middleware/auth');
+const Story = require('../models/Story');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -104,7 +106,30 @@ Rules:
 
     const pages = splitIntoPages(storyText);
 
+    // Hikayeyi otomatik veritabanına kaydet
+    const savedStory = await Story.create({
+      author: req.user._id,
+      title,
+      fullText: storyText,
+      pages,
+      options: {
+        characters,
+        location,
+        childAge,
+        duration,
+        storyLanguage,
+        customPrompt,
+      },
+      isPublic: false,
+    });
+
+    // Kullanıcı istatistiklerini güncelle
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { 'stats.totalStories': 1 },
+    });
+
     res.json({
+      _id: savedStory._id,
       title,
       fullText: storyText,
       pages,
