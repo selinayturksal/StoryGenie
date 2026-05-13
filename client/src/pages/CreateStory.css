@@ -3,7 +3,7 @@
 ══════════════════════════════════════════════════ */
 
 .create-page {
-  padding: 44px 0 100px;
+  padding: 44px 0 0;
   min-height: calc(100vh - 68px);
 }
 
@@ -738,6 +738,128 @@
   gap: 20px;
 }
 
+/* ── Adım 3 Alt Sahne ── */
+.step3-scene {
+  position: relative;
+  background-size: cover;
+  background-position: center bottom;
+  min-height: 420px;
+  padding: 80px 0 52px;
+  display: flex;
+  align-items: flex-end;
+  margin-top: -8px;
+  justify-content: flex-start; 
+}
+
+.step3-scene::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 42%;
+  background: linear-gradient(to bottom, rgb(8, 8, 24) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme="light"] .step3-scene::before {
+  background: linear-gradient(to bottom, #eef6ff 0%, transparent 100%);
+}
+
+.step3-layout {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 32px;
+}
+
+.step3-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 500px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.step3-right {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding-bottom: 4px;
+}
+
+.step3-prompt-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(10, 8, 30, 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1.5px solid rgba(200, 185, 255, 0.15);
+  border-radius: var(--r-lg);
+  padding: 22px 26px;
+}
+
+[data-theme="light"] .step3-prompt-card {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 24px rgba(80, 40, 120, 0.12);
+}
+
+.step3-prompt-label {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(220, 210, 255, 0.75);
+}
+[data-theme="light"] .step3-prompt-label { color: rgba(60, 40, 90, 0.65); }
+
+.step3-textarea {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(200, 185, 255, 0.2) !important;
+  color: rgba(230, 220, 255, 0.95) !important;
+  border-radius: var(--r-full) !important;
+  resize: none !important;
+  min-height: unset !important;
+  padding: 14px 22px !important;
+}
+[data-theme="light"] .step3-textarea {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(117, 70, 104, 0.2) !important;
+  color: rgb(30, 15, 55) !important;
+}
+
+.step3-nav {
+  margin-top: 4px;
+}
+
+.step3-back {
+  background: rgba(10, 8, 30, 0.7) !important;
+  border-color: rgba(200, 185, 255, 0.15) !important;
+  color: rgba(220, 210, 255, 0.85) !important;
+  backdrop-filter: blur(12px);
+  padding: 10px 22px !important;
+  font-size: 0.85rem !important;
+  min-width: unset !important;
+  align-self: flex-start;
+}
+[data-theme="light"] .step3-back {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(117, 70, 104, 0.22) !important;
+  color: rgba(60, 40, 90, 0.8) !important;
+}
+.step3-back:hover {
+  background: rgba(20, 15, 50, 0.8) !important;
+  color: #fff !important;
+  transform: translateX(-3px) !important;
+}
+[data-theme="light"] .step3-back:hover {
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
 /* Responsive */
 @media (max-width: 1100px) {
   .char-grid--full { grid-template-columns: repeat(5, 1fr); }
@@ -751,4 +873,9 @@
   .settings-grid { grid-template-columns: 1fr; }
   .wizard-nav { flex-wrap: wrap; }
   .wizard-btn--next { margin-left: 0; width: 100%; justify-content: center; }
+  .step3-scene { padding: 60px 0 36px; min-height: 300px; }
+  .step3-layout { flex-direction: column; align-items: stretch; }
+  .step3-left { max-width: 100%; }
+  .step3-right { justify-content: flex-start; }
+  .generate-btn { width: 100%; justify-content: center; }
 }

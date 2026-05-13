@@ -28,6 +28,17 @@ export default function CreateStory() {
   const [generating, setGenerating]             = useState(false);
   const [genError, setGenError]                 = useState('');
   const [validError, setValidError]             = useState('');
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.getAttribute('data-theme') !== 'light'
+  );
+
+  React.useEffect(() => {
+    const obs = new MutationObserver(() =>
+      setIsDark(document.documentElement.getAttribute('data-theme') !== 'light')
+    );
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
 
   const toggleChar = (char) => {
     setSelectedChars(prev => {
@@ -270,7 +281,7 @@ export default function CreateStory() {
         )}
 
         {/* ══════════════════════════════════
-            ADIM 3 — AYARLAR + OLUŞTUR
+            ADIM 3 — AYARLAR (üst kısım)
         ══════════════════════════════════ */}
         {step === 3 && !generating && (
           <div className="wizard-step animate-fadeIn">
@@ -333,38 +344,6 @@ export default function CreateStory() {
                 </div>
               </div>
             </div>
-
-            {/* Özel prompt */}
-            <div className="prompt-card">
-              <div className="opt-card-header">
-                <span className="opt-icon">✏️</span>
-                <h4 className="opt-title">{t.create.customPrompt}</h4>
-              </div>
-              <textarea className="prompt-input"
-                placeholder={t.create.customPlaceholder}
-                value={customPrompt}
-                onChange={e => setCustomPrompt(e.target.value)}
-                rows={3} maxLength={500} />
-              <div className="quick-row">
-                <span className="quick-label">{t.create.quickPrompts}</span>
-                <div className="quick-chips">
-                  {t.create.prompts.map((p, i) => (
-                    <button key={i} type="button" className="quick-chip"
-                      onClick={() => applyQuickPrompt(p)}>{p}</button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {validError && <div className="valid-error"><span>⚠️</span> {validError}</div>}
-            {genError && <div className="valid-error"><span>❌</span> {genError}</div>}
-
-            <div className="wizard-nav">
-              <button className="wizard-btn wizard-btn--back" onClick={goBack}>← {lang === 'tr' ? 'Geri' : 'Back'}</button>
-              <button className="generate-btn" onClick={handleGenerate}>
-                {t.create.generateBtn}
-              </button>
-            </div>
           </div>
         )}
 
@@ -379,7 +358,60 @@ export default function CreateStory() {
           </div>
         )}
 
-      </div>
+      </div>{/* /create-container */}
+
+      {/* ══════════════════════════════════
+          ADIM 3 — Alt sahne (tam genişlik)
+      ══════════════════════════════════ */}
+      {step === 3 && !generating && (
+        <div className="step3-scene"
+          style={{ backgroundImage: `url('/assets/create/${isDark ? 'darkf' : 'dayf'}.png')` }}
+        >
+          <div className="create-container">
+            <div className="step3-layout">
+
+              {/* Sol: prompt + geri */}
+              <div className="step3-left">
+                <div className="step3-prompt-card">
+                  <span className="step3-prompt-label">
+                    {lang === 'tr' ? 'hikayeye yön ver' : 'guide the story'}
+                  </span>
+                  <textarea className="prompt-input step3-textarea"
+                    placeholder={t.create.customPlaceholder}
+                    value={customPrompt}
+                    onChange={e => setCustomPrompt(e.target.value)}
+                    rows={2} maxLength={500} />
+                  <div className="quick-row">
+                    <span className="quick-label">{t.create.quickPrompts}</span>
+                    <div className="quick-chips">
+                      {t.create.prompts.map((p, i) => (
+                        <button key={i} type="button" className="quick-chip"
+                          onClick={() => applyQuickPrompt(p)}>{p}</button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {validError && <div className="valid-error"><span>⚠️</span> {validError}</div>}
+                {genError   && <div className="valid-error"><span>❌</span> {genError}</div>}
+
+                <button className="wizard-btn wizard-btn--back step3-back" onClick={goBack}>
+                  ← {lang === 'tr' ? 'Geri' : 'Back'}
+                </button>
+              </div>
+
+              {/* Sağ: şato alanı + oluştur butonu alt köşede */}
+              <div className="step3-right">
+                <button className="generate-btn" onClick={handleGenerate}>
+                  {t.create.generateBtn}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
