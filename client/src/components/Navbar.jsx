@@ -10,6 +10,7 @@ export default function Navbar() {
   const location  = useLocation();
   const navigate  = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('theme');
     if (saved) return saved === 'dark';
@@ -26,6 +27,7 @@ export default function Navbar() {
 
   const scrollToSection = (id) => {
     setMenuOpen(false);
+    setDropdownOpen(false);
     if (location.pathname === '/') {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     } else {
@@ -40,6 +42,7 @@ export default function Navbar() {
     await logout();
     navigate('/');
     setMenuOpen(false);
+    setDropdownOpen(false);
   };
 
   return (
@@ -88,21 +91,21 @@ export default function Navbar() {
 
           {user ? (
             <div className="user-menu">
-              <button className="user-avatar-btn" onClick={() => setMenuOpen(!menuOpen)}>
+              <button className="user-avatar-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
                 <span className="user-avatar">{user.username?.[0]?.toUpperCase() || '?'}</span>
                 <span className="user-name hide-mobile">{user.username}</span>
                 <svg className="chevron-icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                  <path d={menuOpen ? 'M9 5L5 1L1 5' : 'M1 1L5 5L9 1'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                  <path d={dropdownOpen ? 'M9 5L5 1L1 5' : 'M1 1L5 5L9 1'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                 </svg>
               </button>
-              {menuOpen && (
+              {dropdownOpen && (
                 <div className="user-dropdown">
                   <div className="dropdown-header">
                     <strong>{user.username}</strong>
                     <small>{user.email}</small>
                   </div>
                   <hr />
-                  <button onClick={handleLogout} className="dropdown-item logout">{t.nav.logout}</button>
+                  <button onClick={() => { setDropdownOpen(false); handleLogout(); }} className="dropdown-item logout">{t.nav.logout}</button>
                 </div>
               )}
             </div>
@@ -123,10 +126,10 @@ export default function Navbar() {
         <div className="mobile-menu">
           {user ? (
             <>
-              <Link to="/"           onClick={() => setMenuOpen(false)}>{t.nav.today}</Link>
-              <Link to="/explore"    onClick={() => setMenuOpen(false)}>{t.nav.explore}</Link>
-              <Link to="/my-stories" onClick={() => setMenuOpen(false)}>{t.nav.myStories}</Link>
-              <Link to="/dashboard"  onClick={() => setMenuOpen(false)}>{t.nav.dashboard}</Link>
+              <Link to="/"           onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.today}</Link>
+              <Link to="/explore"    onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.explore}</Link>
+              <Link to="/my-stories" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.myStories}</Link>
+              <Link to="/dashboard"  onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.dashboard}</Link>
               <hr className="mobile-divider" />
               <button onClick={handleLogout} className="mobile-logout">{t.nav.logout}</button>
             </>

@@ -7,11 +7,13 @@ export const ALL_CHARACTERS = [
   { id: 'human_g3', name: { tr: 'Minik Neşe', en: 'Little Lily' },     file: 'girl3.png', emoji: '👧' },
   { id: 'human_g4', name: { tr: 'Tatlı Deniz', en: 'Princess Sofia' }, file: 'girl4.png', emoji: '👧' },
   { id: 'human_g5', name: { tr: 'Çalışkan Rukiye', en: 'Princess Ella' }, file: 'girl5.png', emoji: '👧' },
+  { id: 'human_g6', name: { tr: 'Neşeli Selin',   en: 'Joyful Grace'  }, file: 'girl6.png', emoji: '👧' },
   { id: 'human_b1', name: { tr: 'Meraklı Berke', en: 'Curious Noah' }, file: 'boy1.png', emoji: '👦' },
   { id: 'human_b2', name: { tr: 'Cesur Ali', en: 'Hero Lucas' },        file: 'boy2.png', emoji: '👦' },
   { id: 'human_b3', name: { tr: 'Maceracı Mehmet', en: 'Adventurous Lucas' }, file: 'boy3.png', emoji: '👦' },
   { id: 'human_b4', name: { tr: 'Arkadaş Canlısı Deniz', en: 'Friendly Noah' }, file: 'boy4.png', emoji: '👦' },
-  { id: 'human_b5', name: { tr: 'Mutlu Bilge', en: 'Happy Oliver' },   file: 'boy5.png', emoji: '👦' },
+  { id: 'human_b5', name: { tr: 'Mutlu Bilge',    en: 'Happy Oliver'  }, file: 'boy5.png', emoji: '👦' },
+  { id: 'human_b6', name: { tr: 'Akıllı Kerem',  en: 'Smart Ethan'   }, file: 'boy6.png', emoji: '👦' },
   { id: 'animal_1', name: { tr: 'Oyuncu Tarçın', en: 'Playful Max' },   file: 'animal1.png',  emoji: '🐶' },
   { id: 'animal_2', name: { tr: 'Meraklı Pati', en: 'Curious Luna' },   file: 'animal2.png',  emoji: '🐱' },
   { id: 'animal_3', name: { tr: 'İyi Kalpli Ayı', en: 'Kind Bear' },    file: 'animal3.png',  emoji: '🐻' },
@@ -22,7 +24,8 @@ export const ALL_CHARACTERS = [
   { id: 'animal_8', name: { tr: 'Uysal Koala', en: 'Sleepy Koala' },    file: 'koala.png',    emoji: '🐨' },
   { id: 'animal_9', name: { tr: 'Şen Ördek', en: 'Happy Duck' },        file: 'duck.png',     emoji: '🦆' },
   { id: 'animal_10', name: { tr: 'Tatlı Kirpi', en: 'Sweet Hedgehog' }, file: 'hedgehog.png', emoji: '🦔' },
-  { id: 'animal_11', name: { tr: 'Zarif Geyik', en: 'Gentle Deer' },    file: 'deer.png',     emoji: '🦌' },
+  { id: 'animal_11', name: { tr: 'Zarif Geyik',   en: 'Gentle Deer'    }, file: 'deer.png',     emoji: '🦌' },
+  { id: 'animal_12', name: { tr: 'Sevimli Panda', en: 'Cute Panda'     }, file: 'animal6.png',  emoji: '🐼' },
 ];
 
 // Geriye dönük uyumluluk için (BookViewer vs)

@@ -10,7 +10,6 @@ import api from '../services/api';
 import './CreateStory.css';
 
 const MAX_CHARS = 6;
-const HUMAN_CHARACTERS = [...GIRL_CHARACTERS, ...BOY_CHARACTERS];
 
 // Adım tanımları
 const STEPS = ['humans', 'animals', 'location', 'settings'];
@@ -99,7 +98,6 @@ export default function CreateStory() {
   };
 
   // Seçili özet şerit (her adımda göster)
-  const selectedHumans  = selectedChars.filter(c => !c.id.startsWith('animal'));
   const selectedAnimals = selectedChars.filter(c => c.id.startsWith('animal'));
 
   return (
@@ -164,8 +162,19 @@ export default function CreateStory() {
                 {lang === 'tr' ? `En fazla ${MAX_CHARS} karakter seçebilirsin` : `Pick up to ${MAX_CHARS} characters`}
               </p>
             </div>
-            <div className="char-grid char-grid--full">
-              {HUMAN_CHARACTERS.map((c, i) => (
+            <div className="char-grid char-grid--humans">
+              {GIRL_CHARACTERS.map((c, i) => (
+                <div key={c.id} className="char-cell" style={{ animationDelay: `${i * 0.03}s` }}>
+                  <CharacterCard character={c}
+                    selected={!!selectedChars.find(s => s.id === c.id)}
+                    onToggle={toggleChar} lang={lang}
+                    disabled={selectedChars.length >= MAX_CHARS && !selectedChars.find(s => s.id === c.id)}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="char-grid char-grid--humans">
+              {BOY_CHARACTERS.map((c, i) => (
                 <div key={c.id} className="char-cell" style={{ animationDelay: `${i * 0.03}s` }}>
                   <CharacterCard character={c}
                     selected={!!selectedChars.find(s => s.id === c.id)}
