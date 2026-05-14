@@ -120,27 +120,40 @@ export default function CreateStory() {
     <div className="create-page">
       <div className="create-container">
 
-        {/* ── PROGRESS BAR ── */}
-        <div className="wizard-progress animate-fadeIn">
-          {STEPS.map((s, i) => (
-            <React.Fragment key={s}>
-              <div className={`wp-step ${i <= step ? 'wp-step--done' : ''} ${i === step ? 'wp-step--active' : ''}`}>
-                <div className="wp-circle">
-                  {i < step ? '✓' : i + 1}
+        {/* ── PROGRESS BAR / GEN STATUS ── */}
+        {generating ? (
+          <div className="gen-status-row animate-fadeIn">
+            <span className="gen-status-dots" aria-hidden="true">
+              <span /><span /><span />
+            </span>
+            <span className="gen-status-text">
+              {storyData
+                ? (lang === 'tr' ? '✨ Masalınız hazır!' : '✨ Your story is ready!')
+                : (lang === 'tr' ? 'Masalınız yazılıyor...' : 'Writing your story...')}
+            </span>
+          </div>
+        ) : (
+          <div className="wizard-progress animate-fadeIn">
+            {STEPS.map((s, i) => (
+              <React.Fragment key={s}>
+                <div className={`wp-step ${i <= step ? 'wp-step--done' : ''} ${i === step ? 'wp-step--active' : ''}`}>
+                  <div className="wp-circle">
+                    {i < step ? '✓' : i + 1}
+                  </div>
+                  <span className="wp-label">
+                    {i === 0 ? (lang === 'tr' ? 'Çocuklar' : 'Kids')
+                    : i === 1 ? (lang === 'tr' ? 'Hayvanlar' : 'Animals')
+                    : i === 2 ? (lang === 'tr' ? 'Mekan' : 'Location')
+                    : (lang === 'tr' ? 'Ayarlar' : 'Settings')}
+                  </span>
                 </div>
-                <span className="wp-label">
-                  {i === 0 ? (lang === 'tr' ? 'Çocuklar' : 'Kids')
-                  : i === 1 ? (lang === 'tr' ? 'Hayvanlar' : 'Animals')
-                  : i === 2 ? (lang === 'tr' ? 'Mekan' : 'Location')
-                  : (lang === 'tr' ? 'Ayarlar' : 'Settings')}
-                </span>
-              </div>
-              {i < STEPS.length - 1 && (
-                <div className={`wp-line ${i < step ? 'wp-line--done' : ''}`} />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+                {i < STEPS.length - 1 && (
+                  <div className={`wp-line ${i < step ? 'wp-line--done' : ''}`} />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
 
         {/* ── SEÇİLEN ÖZET ── */}
         {selectedChars.length > 0 && (
