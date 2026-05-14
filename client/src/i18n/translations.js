@@ -15,10 +15,10 @@ const translations = {
     success: 'Başarılı!',
 
     nav: {
-      today: 'Bugünün Hikayesi',
-      explore: 'Önerilen Hikayeler',
+      today: 'Hikaye Oluştur',
+      explore: 'Paylaşılan Hikayeler',
       myStories: 'Hikayelerim',
-      dashboard: 'Dashboard',
+      dashboard: 'İstatistikler',
       login: 'Giriş Yap',
       register: 'Kayıt Ol',
       logout: 'Çıkış Yap',
@@ -160,8 +160,8 @@ const translations = {
     },
 
     explore: {
-      title: 'Önerilen Hikayeler',
-      subtitle: 'Aileler tarafından beğenilen hikayeler',
+      title: 'Paylaşılan Hikayeler',
+      subtitle: 'Topluluktan hikayeler',
       empty: 'Henüz paylaşılan hikaye yok',
       filterAge: 'Yaşa Göre Filtrele',
       filterLang: 'Dile Göre Filtrele',
@@ -172,7 +172,7 @@ const translations = {
     },
 
     dashboard: {
-      title: 'Dashboard',
+      title: 'İstatistikler',
       subtitle: 'Hikaye istatistiklerin',
       totalStories: 'Toplam Hikaye',
       publicStories: 'Paylaşılan',
@@ -222,10 +222,10 @@ const translations = {
         desc: 'Binlerce benzersiz hikaye kombinasyonu ile çocuğunuz hiç aynı masalı iki kez dinlemez. Sınırsız hayal gücü, sınırsız eğlence!',
       },
       cta: {
-        title: 'Bugün İlk Masalını Yaz!',
-        subtitle: 'Binlerce aile MasalMatik ile çocuklarına özel masallar oluşturuyor. Sen de katıl!',
-        btn: 'Hemen Başla — Ücretsiz!',
-        mascotSpeech: 'Hadi! İlk masal seni bekliyor! 📚',
+        title: 'Bugün İlk Hikayeni Yaz!',
+        subtitle: 'Binlerce aile MasalMatik ile kişiselleştirilmiş hikayeler oluşturuyor. Sen de katıl!',
+        btn: 'Ücretsiz Başla!',
+        mascotSpeech: 'Hadi! İlk hikayen seni bekliyor! 📚',
       },
       footer: {
         copy: '© 2025 MasalMatik · Sihirli uyku masalları',
@@ -237,7 +237,7 @@ const translations = {
 
   en: {
     appName: 'MasalMatik',
-    tagline: 'Magical stories made for your child',
+    tagline: 'Imagination unlimited, stories endless.',
     loading: 'Loading...',
     save: 'Save',
     cancel: 'Cancel',
@@ -247,18 +247,18 @@ const translations = {
     no: 'No',
     back: 'Back',
     next: 'Next',
-    error: 'An error occurred',
+    error: 'Something went wrong',
     success: 'Success!',
 
     nav: {
-      today: "Today's Story",
-      explore: 'Recommended Stories',
+      today: 'Create Story',
+      explore: 'Shared Stories',
       myStories: 'My Stories',
-      dashboard: 'Dashboard',
+      dashboard: 'Statistics',
       login: 'Log In',
       register: 'Sign Up',
       logout: 'Log Out',
-      profile: 'Profile',
+      profile: 'My Profile',
       settings: 'Settings',
       changeLanguage: 'Change Language',
       home: 'Home',
@@ -305,7 +305,7 @@ const translations = {
 
     forgotPassword: {
       title: 'Forgot Password',
-      subtitle: 'Enter your email and we\'ll send you a reset link.',
+      subtitle: "Enter your email and we'll send you a reset link.",
       emailLabel: 'Email Address',
       submit: 'Send Reset Link',
       success: 'Email sent! Please check your inbox.',
@@ -342,7 +342,7 @@ const translations = {
       locations: 'Adventure Location',
       selectChars: 'Pick up to 6 characters',
       selectedChars: 'Selected',
-      childAge: "How old is your child?",
+      childAge: 'How old is your child?',
       ageYears: 'yrs',
       duration: 'How long should the story be?',
       durationShort: 'Short (~2 min)',
@@ -396,8 +396,8 @@ const translations = {
     },
 
     explore: {
-      title: 'Recommended Stories',
-      subtitle: 'Stories loved by families',
+      title: 'Shared Stories',
+      subtitle: 'Stories from the community',
       empty: 'No shared stories yet',
       filterAge: 'Filter by Age',
       filterLang: 'Filter by Language',
@@ -408,7 +408,7 @@ const translations = {
     },
 
     dashboard: {
-      title: 'Dashboard',
+      title: 'Statistics',
       subtitle: 'Your story statistics',
       totalStories: 'Total Stories',
       publicStories: 'Shared',

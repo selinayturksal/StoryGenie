@@ -89,7 +89,7 @@ router.get('/explore', async (req, res) => {
       Story.find(filter)
         .sort({ communityAverageRating: -1, createdAt: -1 })
         .skip(skip).limit(limit)
-        .populate('author', 'username avatar')
+        .populate('author', 'username avatar avatarBg')
         .select('-pages -fullText'),
       Story.countDocuments(filter),
     ]);
@@ -135,7 +135,7 @@ router.get('/dashboard', protect, async (req, res) => {
 // GET /api/stories/:id
 router.get('/:id', async (req, res) => {
   try {
-    const story = await Story.findById(req.params.id).populate('author', 'username avatar');
+    const story = await Story.findById(req.params.id).populate('author', 'username avatar avatarBg');
     if (!story) return res.status(404).json({ error: 'Hikaye bulunamadı.' });
     if (!story.isPublic) {
       const authHeader = req.headers.authorization;

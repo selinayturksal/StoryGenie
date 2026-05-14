@@ -111,7 +111,7 @@ export default function Dashboard() {
 
         {/* Header */}
         <div className="dash-header animate-fadeIn">
-          <h1 className="dash-title">{t.dashboard?.title || 'Dashboard'}</h1>
+          <h1 className="dash-title">{t.dashboard?.title || 'İstatistikler'}</h1>
           <p className="dash-subtitle">Merhaba {user?.username}! {t.dashboard?.subtitle || 'İstatistiklerin aşağıda'}</p>
         </div>
 
@@ -218,25 +218,45 @@ export default function Dashboard() {
               <p className="chart-desc">Hikayelerin okuma süresine göre dağılımı</p>
             </div>
             {durationData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie
-                    data={durationData} cx="50%" cy="50%"
-                    outerRadius={85} innerRadius={40}
-                    dataKey="value"
-                    label={false}
-                    labelLine={false}
-                  >
-                    {durationData.map((_, i) => (
-                      <Cell key={i} fill={COLORS_DUR[i % COLORS_DUR.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend
-                    formatter={(value) => <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{value}</span>}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div style={{ position: 'relative' }}>
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie
+                      data={durationData} cx="50%" cy="45%"
+                      outerRadius={85} innerRadius={42}
+                      dataKey="value"
+                      label={false}
+                      labelLine={false}
+                    >
+                      {durationData.map((_, i) => (
+                        <Cell key={i} fill={COLORS_DUR[i % COLORS_DUR.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend
+                      formatter={(value) => <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Ortada saat ikonu */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%', left: '50%',
+                  transform: 'translate(-50%, -62%)',
+                  pointerEvents: 'none',
+                }}>
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="13" stroke="rgba(150,130,200,0.5)" strokeWidth="2" fill="none"/>
+                    <line x1="16" y1="8" x2="16" y2="16" stroke="rgba(150,130,200,0.8)" strokeWidth="2.2" strokeLinecap="round"/>
+                    <line x1="16" y1="16" x2="21" y2="19" stroke="rgba(150,130,200,0.8)" strokeWidth="2.2" strokeLinecap="round"/>
+                    <circle cx="16" cy="16" r="1.8" fill="rgba(150,130,200,0.9)"/>
+                    <line x1="16" y1="4" x2="16" y2="6" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="16" y1="26" x2="16" y2="28" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="4" y1="16" x2="6" y2="16" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="26" y1="16" x2="28" y2="16" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </div>
+              </div>
             ) : <div className="chart-empty">Henüz veri yok</div>}
           </div>
 

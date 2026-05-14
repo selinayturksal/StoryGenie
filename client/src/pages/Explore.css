@@ -43,27 +43,21 @@
   white-space: nowrap;
 }
 .exp-tab:hover {
-  border-color: rgba(160, 100, 210, 0.5);
-  color: rgba(220, 210, 255, 0.95);
-  background: rgba(160, 100, 210, 0.1);
+  border-color: rgb(10, 15, 60);
+  color: rgb(10, 15, 60);
+  background: color-mix(in srgb, rgb(10, 15, 60) 6%, transparent);
 }
 .exp-tab.active {
-  background: rgba(160, 100, 210, 0.85);
-  border-color: rgba(160, 100, 210, 0.9);
+  background: rgb(10, 15, 60);
+  border-color: rgb(10, 15, 60);
   color: #fff;
 }
 [data-theme="light"] .exp-tab {
   border-color: rgba(117,70,104,0.2);
   color: #555;
 }
-[data-theme="light"] .exp-tab:hover {
-  border-color: rgb(117, 70, 104);
-  color: rgb(80, 38, 120);
-  background: rgba(117, 70, 104, 0.08);
-}
 [data-theme="light"] .exp-tab.active {
   background: rgb(10, 15, 60);
-  border-color: rgb(10, 15, 60);
   color: #fff;
 }
 
@@ -221,9 +215,11 @@
   border-radius: 50%;
   background: rgb(10, 15, 60);
   color: #fff;
-  font-size: 0.75rem; font-weight: 800;
+  font-size: 1rem; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+  line-height: 1;
 }
 .ec-username {
   font-size: 0.8rem; font-weight: 700;

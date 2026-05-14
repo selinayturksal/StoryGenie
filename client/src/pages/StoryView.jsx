@@ -15,7 +15,7 @@ export default function StoryView() {
   const location   = story?.location  || null;
   const onSave     = state?.onSave;
 
-  const [phase, setPhase]             = useState('intro');
+  const [phase, setPhase]             = useState('reading');
   const [currentPage, setCurrentPage] = useState(0);
   const [flipping, setFlipping]       = useState(false);
   const [flipDir, setFlipDir]         = useState('next');
@@ -34,9 +34,7 @@ export default function StoryView() {
 
   useEffect(() => {
     if (!story) { navigate('/'); return; }
-    const t1 = setTimeout(() => setPhase('opening'), 600);
-    const t2 = setTimeout(() => setPhase('reading'), 3200);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    setPhase('reading');
   }, []);
 
   useEffect(() => { if (!readAll) stopSpeech(); }, [currentPage]);
@@ -50,21 +48,41 @@ export default function StoryView() {
 
   const playPageFlipSound = useCallback(() => {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const dur = 0.2, rate = ctx.sampleRate;
-      const buf = ctx.createBuffer(1, rate * dur, rate);
-      const d = buf.getChannelData(0);
+      const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+      const dur  = 0.42;
+      const rate = ctx.sampleRate;
+      const buf  = ctx.createBuffer(1, Math.ceil(rate * dur), rate);
+      const d    = buf.getChannelData(0);
+
       for (let i = 0; i < d.length; i++) {
         const t = i / rate;
-        d[i] = (Math.random() * 2 - 1) * Math.exp(-t * 18) * (1 - Math.exp(-t * 220)) * 0.65;
+        // Soft paper rustle: quick rise, slow fade
+        const env = Math.exp(-t * 7) * (1 - Math.exp(-t * 80));
+        d[i] = (Math.random() * 2 - 1) * env;
       }
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2800; bp.Q.value = 0.9;
-      const g = ctx.createGain(); g.gain.setValueAtTime(0.8, ctx.currentTime);
+
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+
+      // Mid-range bandpass — paper body, not harsh highs
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 800;
+      bp.Q.value = 0.55;
+
+      // Cut everything above ~2 kHz for softness
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 2000;
+
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 0.018);
       g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-      src.connect(bp); bp.connect(g); g.connect(ctx.destination);
+
+      src.connect(bp); bp.connect(lp); lp.connect(g); g.connect(ctx.destination);
       src.start(); src.stop(ctx.currentTime + dur);
-      src.onended = () => ctx.close();
+      src.onended = () => { if (ctx.state !== 'closed') ctx.close(); };
     } catch (e) {}
   }, []);
 
@@ -210,9 +228,6 @@ export default function StoryView() {
               ← {lang === 'tr' ? 'Geri' : 'Back'}
             </button>
 
-            {/* Başlık */}
-            <span className="sv-topbar-title">{story.title}</span>
-
             {/* Kaydet butonu — sadece kaydedilmemişse göster */}
             <div className="sv-top-actions">
               {!alreadySaved && (
@@ -231,17 +246,15 @@ export default function StoryView() {
             </div>
           </div>
 
-          {/* ── SON SAYFA AKSIYON BANDI (üstte, kitabın hemen üstü) ── */}
+          {/* ── SON SAYFA BANNER ── */}
           {isLast && (
             <div className="sv-finish-banner animate-fadeIn">
-              <div className="sv-finish-left">
-                <span className="sv-finish-emoji">🎉</span>
-                <div className="sv-finish-text">
-                  <strong>{lang === 'tr' ? 'Hikaye bitti!' : 'Story complete!'}</strong>
-                  <span>{lang === 'tr' ? 'Harika bir okuma yaptın.' : 'Great reading session!'}</span>
-                </div>
+              <span className="sv-finish-emoji">🎉</span>
+              <div className="sv-finish-text">
+                <strong>{lang === 'tr' ? 'Hikaye bitti!' : 'Story complete!'}</strong>
+                <span>{lang === 'tr' ? 'Harika bir okuma yaptın.' : 'Great reading session!'}</span>
               </div>
-              <div className="sv-finish-right">
+              <div className="sv-finish-actions">
                 <button className="sv-finish-btn sv-finish-btn--replay"
                   onClick={() => { stopSpeech(); setCurrentPage(0); }}>
                   🔄 {lang === 'tr' ? 'Tekrar Oku' : 'Read Again'}
@@ -261,43 +274,26 @@ export default function StoryView() {
             </div>
           )}
 
-          {/* ── SES ÇUBUĞU ── */}
-          <div className="sv-tts-bar">
-            <span className="sv-tts-icon">🔊</span>
-            <span className="sv-tts-label">
-              {speaking && !paused
-                ? (lang === 'tr' ? 'Okunuyor...' : 'Reading...')
-                : paused
-                ? (lang === 'tr' ? 'Duraklatıldı' : 'Paused')
-                : (lang === 'tr' ? 'Sesli Okuma' : 'Read Aloud')}
-            </span>
-            <div className={`sv-wave ${speaking && !paused ? 'sv-wave--active' : ''}`}>
-              {[...Array(16)].map((_, i) => (
-                <span key={i} className="sv-wave-bar"
-                  style={{ animationDelay: `${i * 0.06}s`, animationDuration: `${0.5 + (i % 4) * 0.15}s` }} />
-              ))}
-            </div>
-            <div className="sv-tts-btns">
-              <button className={`sv-tts-btn ${speaking && !paused ? 'active' : ''}`} onClick={handleReadPage}>
-                {speaking && !paused ? '⏸' : '▶'}
-                {lang === 'tr' ? (paused ? ' Devam' : ' Bu Sayfayı Oku') : (paused ? ' Resume' : ' Read Page')}
-              </button>
-              <button className={`sv-tts-btn ${readAll ? 'teal' : ''}`} onClick={handleReadAll}>
-                {readAll ? '⏹' : '📖'}
-                {lang === 'tr' ? (readAll ? ' Durdur' : ' Tümünü Oku') : (readAll ? ' Stop' : ' Read All')}
-              </button>
-              {(speaking || paused) && (
-                <button className="sv-tts-btn coral" onClick={stopSpeech}>
-                  ⏹ {lang === 'tr' ? 'Durdur' : 'Stop'}
-                </button>
-              )}
-            </div>
-          </div>
-
           {/* ── KİTAP ── */}
           <div className="sv-book-wrap">
-            <div className="sv-leaf sv-leaf--left">🌿</div>
-            <div className="sv-leaf sv-leaf--right">🌿</div>
+
+            {/* Kompakt sesli okuma pill — kitabın sağ üstünde */}
+            <div className="sv-tts-pill">
+              <span className="sv-tts-pill-icon">🔊</span>
+              <div className={`sv-tts-pill-wave ${speaking && !paused ? 'sv-tts-pill-wave--active' : ''}`}>
+                {[...Array(6)].map((_, i) => (
+                  <span key={i} style={{ animationDelay: `${i * 0.1}s`, animationDuration: `${0.5 + (i % 3) * 0.18}s` }} />
+                ))}
+              </div>
+              <button className={`sv-tts-pill-btn ${speaking && !paused ? 'active' : ''}`} onClick={handleReadPage}>
+                {speaking && !paused ? '⏸' : paused ? '▶' : '▶'}
+                <span>{lang === 'tr' ? (paused ? 'Devam' : 'Sayfayı Oku') : (paused ? 'Resume' : 'Read Page')}</span>
+              </button>
+              <button className={`sv-tts-pill-btn ${readAll ? 'teal' : ''}`} onClick={handleReadAll}>
+                {readAll ? '⏹' : '📖'}
+                <span>{lang === 'tr' ? (readAll ? 'Durdur' : 'Tümünü Oku') : (readAll ? 'Stop' : 'Read All')}</span>
+              </button>
+            </div>
 
             <button className={`sv-nav-btn sv-nav-btn--left ${isFirst ? 'sv-hidden' : ''}`}
               onClick={() => goTo('prev')} disabled={isFirst || flipping}>‹</button>
@@ -305,10 +301,6 @@ export default function StoryView() {
             <div className="sv-book">
               <div className="sv-book-binding" />
               <div className="sv-book-edge" />
-              <div className="sv-corner sv-corner--tl" />
-              <div className="sv-corner sv-corner--tr" />
-              <div className="sv-corner sv-corner--bl" />
-              <div className="sv-corner sv-corner--br" />
 
               {/* ── SOL SAYFA — MEKAN ARKA PLAN + KARAKTERLERİ BOYDAN ── */}
               <div className="sv-page-left">
@@ -317,6 +309,11 @@ export default function StoryView() {
                   <div className="sv-page-left-bg"
                     style={{ backgroundImage: `url('/assets/locations/${location.file}')` }} />
                 )}
+
+                {/* Hikaye başlığı — sol sayfanın üstünde */}
+                <div className="sv-page-title">
+                  <span>{story.title}</span>
+                </div>
 
                 {/* Mekan isim rozeti — en altta */}
 
@@ -369,7 +366,6 @@ export default function StoryView() {
             <button className={`sv-nav-btn sv-nav-btn--right ${isLast ? 'sv-hidden' : ''}`}
               onClick={() => goTo('next')} disabled={isLast || flipping}>›</button>
 
-            <div className="sv-bookmark">🔖</div>
           </div>
 
           {/* ── SAYFA NOKTALARI ── */}

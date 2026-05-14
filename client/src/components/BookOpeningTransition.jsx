@@ -1,24 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './BookOpeningTransition.css';
 
-/* Pre-defined particles — deterministic, no Math.random on each render */
 const PARTICLES = [
-  { id:  0, x: -145, y: -210, delay: 0.00, dur: 2.4, emoji: '✨', size: 17 },
-  { id:  1, x:  125, y: -255, delay: 0.35, dur: 2.6, emoji: '⭐', size: 13 },
-  { id:  2, x: -195, y: -175, delay: 0.75, dur: 2.0, emoji: '💫', size: 15 },
-  { id:  3, x:  175, y: -220, delay: 0.20, dur: 2.2, emoji: '✦',  size: 11 },
-  { id:  4, x:  -58, y: -275, delay: 1.00, dur: 2.9, emoji: '🌟', size: 14 },
-  { id:  5, x:  158, y: -182, delay: 0.50, dur: 2.1, emoji: '✨', size: 12 },
-  { id:  6, x: -158, y: -235, delay: 1.20, dur: 2.5, emoji: '⭐', size: 16 },
-  { id:  7, x:   48, y: -198, delay: 0.65, dur: 2.3, emoji: '💫', size: 12 },
-  { id:  8, x:  215, y: -160, delay: 1.40, dur: 2.8, emoji: '✦',  size: 10 },
-  { id:  9, x: -215, y: -150, delay: 0.55, dur: 1.9, emoji: '✨', size: 18 },
-  { id: 10, x:  118, y: -280, delay: 1.10, dur: 2.6, emoji: '🌟', size: 12 },
-  { id: 11, x:  -78, y: -165, delay: 1.60, dur: 2.2, emoji: '⭐', size: 14 },
+  { id:  0, x: -130, y: -190, delay: 0.00, dur: 2.4, emoji: '✨', size: 16 },
+  { id:  1, x:  115, y: -235, delay: 0.35, dur: 2.6, emoji: '⭐', size: 12 },
+  { id:  2, x: -175, y: -160, delay: 0.75, dur: 2.0, emoji: '💫', size: 14 },
+  { id:  3, x:  160, y: -200, delay: 0.20, dur: 2.2, emoji: '✦',  size: 10 },
+  { id:  4, x:  -52, y: -255, delay: 1.00, dur: 2.9, emoji: '🌟', size: 13 },
+  { id:  5, x:  145, y: -168, delay: 0.50, dur: 2.1, emoji: '✨', size: 11 },
+  { id:  6, x: -145, y: -215, delay: 1.20, dur: 2.5, emoji: '⭐', size: 15 },
+  { id:  7, x:   42, y: -182, delay: 0.65, dur: 2.3, emoji: '💫', size: 12 },
+  { id:  8, x:  198, y: -148, delay: 1.40, dur: 2.8, emoji: '✦',  size:  9 },
+  { id:  9, x: -198, y: -138, delay: 0.55, dur: 1.9, emoji: '✨', size: 17 },
+  { id: 10, x:  108, y: -260, delay: 1.10, dur: 2.6, emoji: '🌟', size: 11 },
+  { id: 11, x:  -68, y: -152, delay: 1.60, dur: 2.2, emoji: '⭐', size: 13 },
 ];
 
-const MIN_DISPLAY_MS = 4000;
+const MIN_DISPLAY_MS = 5500;
 const SLOW_DOWN_MS   = 1200;
 
 /**
@@ -31,7 +30,7 @@ const SLOW_DOWN_MS   = 1200;
  *   lang        — 'tr' | 'en'
  */
 export default function BookOpeningTransition({ visible, storyReady, onComplete, lang }) {
-  const [phase, setPhase]       = useState('hidden');
+  const [phase, setPhase]         = useState('hidden');
   const [isSlowing, setIsSlowing] = useState(false);
 
   const minDoneRef    = useRef(false);
@@ -66,8 +65,11 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
     const tc = tryCompleteRef;
     const ts = [
       setTimeout(() => setPhase('overlay'),   10),
-      setTimeout(() => setPhase('book'),     300),
-      setTimeout(() => setPhase('flipping'), 820),
+      setTimeout(() => setPhase('book'),     350),
+      // cover starts rotating at 1100ms, takes ~2850ms to fully open
+      setTimeout(() => setPhase('opening'), 1100),
+      // pages start flipping after cover is fully open
+      setTimeout(() => setPhase('flipping'), 4050),
       setTimeout(() => { minDoneRef.current = true; tc.current(); }, MIN_DISPLAY_MS),
     ];
     return () => ts.forEach(clearTimeout);
@@ -80,13 +82,10 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
   if (phase === 'hidden') return null;
 
   const showBook     = phase !== 'overlay';
+  const coverOpen    = phase === 'flipping' || phase === 'exit';
   const showFlipping = phase === 'flipping' || phase === 'exit';
   const isExiting    = phase === 'exit';
   const uiLang       = lang || 'tr';
-
-  const statusLabel = uiLang === 'tr'
-    ? (storyReady ? '✨ Masalınız hazır!' : 'Masalınız yazılıyor...')
-    : (storyReady ? '✨ Your story is ready!' : 'Writing your story...');
 
   return (
     <div
@@ -96,28 +95,13 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
       aria-label={uiLang === 'tr' ? 'Hikaye oluşturuluyor' : 'Generating story'}
       aria-live="polite"
     >
-      {/* Frosted backdrop */}
-      <motion.div
-        className="bot-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isExiting ? 0 : 1 }}
-        transition={{ duration: 0.65 }}
-      />
-
-      {/* Ambient star field */}
-      <div className="bot-stars" aria-hidden="true">
-        {Array.from({ length: 28 }, (_, i) => (
-          <div key={i} className="bot-star" style={{ '--si': i }} />
-        ))}
-      </div>
-
       {/* Book + particles + status */}
       <AnimatePresence>
         {showBook && (
           <motion.div
             key="book-scene"
             className="bot-scene"
-            initial={{ opacity: 0, y: 80, scale: 0.52 }}
+            initial={{ opacity: 0, y: 64, scale: 0.50 }}
             animate={
               isExiting
                 ? { opacity: 0 }
@@ -126,51 +110,61 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
             transition={
               isExiting
                 ? { duration: 0.80, ease: 'easeIn' }
-                : { type: 'spring', stiffness: 175, damping: 22, delay: 0.05 }
+                : { type: 'spring', stiffness: 170, damping: 22, delay: 0.06 }
             }
           >
-            {/* Magical glow */}
-            <div className={`bot-glow${showFlipping ? ' bot-glow--active' : ''}`} aria-hidden="true" />
+            {/* Magical glow behind the book */}
+            <div className={`bot-glow${coverOpen ? ' bot-glow--open' : ''}`} aria-hidden="true" />
 
-            {/* Open book spread */}
-            <div className="bot-book-wrap" aria-hidden="true">
-              <div className="bot-spread">
+            {/* 3D Book — shifts right when open so the full spread is centered */}
+            <div className={`bot-book-wrap${showFlipping ? ' bot-book-wrap--open' : ''}`} aria-hidden="true">
+              <div className="bot-book">
 
                 {/* Ground shadow */}
                 <div className="bot-shadow" />
 
-                {/* ── Left page (already-written content) ── */}
-                <div className="bot-page bot-page--left">
-                  <div className="bot-pg-lines">
-                    {Array.from({ length: 9 }, (_, i) => (
-                      <div key={i} className="bot-pg-line bot-pg-line--done" style={{ '--li': i }} />
-                    ))}
-                  </div>
-                  <div className="bot-pg-deco">📖</div>
-                </div>
-
-                {/* ── Center spine / gutter ── */}
-                <div className="bot-spine-gutter" />
-
-                {/* ── Right page (base — content being written) ── */}
-                <div className="bot-page bot-page--right">
-                  <div className="bot-pg-lines">
-                    {Array.from({ length: 9 }, (_, i) => (
-                      <div
-                        key={i}
-                        className={`bot-pg-line${showFlipping ? ' bot-pg-line--shimmer' : ''}`}
-                        style={{ '--li': i }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
                 {/*
-                  ── Flipping pages ──
-                  3 pages flip sequentially (CSS animation, staggered via --fi).
-                  They are absolute children of bot-spread, positioned over the
-                  right half, rotating around the spine (transform-origin: left center).
+                  Left page — appears when the cover opens.
+                  Positioned absolute to the LEFT of bot-book (right: 100%).
+                  Shows "already written" content.
                 */}
+                {showFlipping && (
+                  <motion.div
+                    className="bot-left-page"
+                    initial={{ opacity: 0, x: 18 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.38, delay: 0.1 }}
+                  >
+                    <div className="bot-pg-lines-inner">
+                      {Array.from({ length: 7 }, (_, i) => (
+                        <div key={i} className="bot-pg-line bot-pg-line--done" style={{ '--li': i }} />
+                      ))}
+                    </div>
+                    <div className="bot-pg-icon" aria-hidden="true">📖</div>
+                  </motion.div>
+                )}
+
+                {/* Right page — always visible behind cover */}
+                <div className="bot-pages">
+                  <AnimatePresence>
+                    {coverOpen && (
+                      <motion.div
+                        key="page-content"
+                        className="bot-pages-inner"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3, duration: 0.45 }}
+                      >
+                        <span className="bot-pages-icon" aria-hidden="true">✨</span>
+                        {Array.from({ length: 6 }, (_, i) => (
+                          <div key={i} className="bot-pg-line bot-pg-line--shimmer" style={{ '--li': i }} />
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Flipping pages — same bounds as right page, rotate around spine */}
                 {showFlipping && [0, 1, 2].map(fi => (
                   <div
                     key={fi}
@@ -178,25 +172,43 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
                     style={{ '--fi': fi }}
                     aria-hidden="true"
                   >
-                    {/* Front face — visible when page is on the right (0°) */}
                     <div className="bot-flip-f">
-                      <div className="bot-pg-lines">
-                        {Array.from({ length: 9 }, (_, li) => (
+                      <div className="bot-pg-lines-inner">
+                        {Array.from({ length: 6 }, (_, li) => (
                           <div key={li} className="bot-pg-line bot-pg-line--shimmer" style={{ '--li': li }} />
                         ))}
                       </div>
                     </div>
-                    {/* Back face — visible when page has landed on the left (−180°) */}
-                    <div className="bot-flip-b">
-                      <div className="bot-pg-lines">
-                        {Array.from({ length: 9 }, (_, li) => (
-                          <div key={li} className="bot-pg-line bot-pg-line--done" style={{ '--li': li }} />
-                        ))}
-                      </div>
-                    </div>
+                    {/* Back face transparent — pages "absorb" into book, keeps spread centered */}
+                    <div className="bot-flip-b" />
                   </div>
                 ))}
 
+                {/* Cover — removed from DOM once pages start flipping (prevents 3D z-fighting) */}
+                {!showFlipping && (
+                  <div className={`bot-cover${coverOpen ? ' bot-cover--open' : ''}`}>
+                    <div className="bot-cover-f">
+                      <div className="bot-cover-art">
+                        <div className="bot-moon">🌙</div>
+                        <p className="bot-cover-word">
+                          {uiLang === 'tr' ? 'Masal' : 'Story'}
+                        </p>
+                        <p className="bot-cover-word bot-cover-word--sub">
+                          {uiLang === 'tr' ? 'Zamanı' : 'Time'}
+                        </p>
+                        <p className="bot-cover-deco">✦ ✨ ✦</p>
+                      </div>
+                      <div className="bot-cover-shine" />
+                      <div className="bot-cover-frame" />
+                    </div>
+                    <div className="bot-cover-b">
+                      <span aria-hidden="true">📖</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Spine */}
+                <div className="bot-spine" />
               </div>
             </div>
 
@@ -209,10 +221,10 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
                 initial={{ opacity: 0, x: 0, y: 0, scale: 0, rotate: 0 }}
                 animate={{
                   opacity: [0, 1, 1, 0],
-                  x: [0, p.x * 0.42, p.x],
-                  y: [0, p.y * 0.42, p.y],
-                  scale: [0, 1.35, 0.75],
-                  rotate: [0, 25, -18],
+                  x: [0, p.x * 0.40, p.x],
+                  y: [0, p.y * 0.40, p.y],
+                  scale: [0, 1.30, 0.72],
+                  rotate: [0, 24, -16],
                 }}
                 transition={{
                   delay: p.delay,
@@ -228,30 +240,6 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
               </motion.div>
             ))}
 
-            {/* Status text */}
-            <motion.div
-              className="bot-status"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.45 }}
-            >
-              {storyReady ? (
-                <motion.span
-                  className="bot-ready-star"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 16 }}
-                  aria-hidden="true"
-                >
-                  ✨
-                </motion.span>
-              ) : (
-                <span className="bot-dots" aria-hidden="true">
-                  <span /><span /><span />
-                </span>
-              )}
-              <span className="bot-status-text">{statusLabel}</span>
-            </motion.div>
 
           </motion.div>
         )}

@@ -18,6 +18,7 @@ const Dashboard      = React.lazy(() => import('./pages/Dashboard'));
 const StoryView      = React.lazy(() => import('./pages/StoryView'));
 const StoryReader    = React.lazy(() => import('./pages/StoryReader'));
 const Settings       = React.lazy(() => import('./pages/Settings'));
+const Profile        = React.lazy(() => import('./pages/Profile'));
 
 const Spinner = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
@@ -67,6 +68,9 @@ function AppShell() {
           } />
           <Route path="/settings" element={
             <ProtectedRoute><Settings /></ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute><Profile /></ProtectedRoute>
           } />
 
           {/* Fallback */}

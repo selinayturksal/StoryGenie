@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    avatarBg: {
+      type: String,
+      default: '#0a0f3c',
+    },
     preferredLanguage: {
       type: String,
       enum: ['tr', 'en'],
@@ -66,6 +70,7 @@ userSchema.methods.toPublicJSON = function () {
     username: this.username,
     email: this.email,
     avatar: this.avatar,
+    avatarBg: this.avatarBg,
     preferredLanguage: this.preferredLanguage,
     stats: this.stats,
     createdAt: this.createdAt,

@@ -293,57 +293,53 @@
 }
 
 /* ════════════════════════════════════════════════════════════
-   AUDIO BAR — Purple Glassmorphism + Waveform
+   AUDIO PILL — kompakt, kitabın sağ üstünde absolute
 ════════════════════════════════════════════════════════════ */
-.sv-tts-bar {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  width: 100%; max-width: 1060px;
-  background: linear-gradient(135deg, rgba(100,50,200,0.35), rgba(60,20,140,0.25));
-  backdrop-filter: blur(20px) saturate(160%);
-  border: 1.5px solid rgba(160,100,255,0.3);
-  border-radius: 20px; padding: 10px 18px;
-  box-shadow: 0 0 0 1px rgba(120,70,220,0.15) inset, 0 8px 32px rgba(80,30,160,0.25);
-}
-.sv-tts-icon { font-size: 1.2rem; }
-.sv-tts-label {
-  font-family: var(--font-display); font-size: 0.86rem;
-  font-weight: 800; color: rgba(220,200,255,0.9);
+.sv-tts-pill {
+  position: absolute;
+  top: 12px; right: 12px;
+  z-index: 10;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(70, 30, 160, 0.82);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(160,100,255,0.35);
+  border-radius: 999px;
+  padding: 7px 14px 7px 12px;
+  box-shadow: 0 4px 20px rgba(60,20,140,0.35);
+  white-space: nowrap;
 }
 
-/* Ses dalgası */
-.sv-wave {
-  display: flex; align-items: center; gap: 3px;
-  height: 28px; flex: 1; min-width: 80px;
+.sv-tts-pill-icon { font-size: 1rem; line-height: 1; flex-shrink: 0; }
+
+/* Mini ses dalgası */
+.sv-tts-pill-wave {
+  display: flex; align-items: center; gap: 2.5px; height: 18px;
 }
-.sv-wave-bar {
-  display: block; width: 3.5px; border-radius: 3px;
-  background: rgba(160,100,255,0.3); height: 5px;
+.sv-tts-pill-wave span {
+  display: block; width: 3px; border-radius: 3px;
+  background: rgba(200,160,255,0.35); height: 4px;
   transition: height 0.1s;
 }
-.sv-wave--active .sv-wave-bar {
-  background: linear-gradient(to top, #7040d0, #c084f8, #f0c0ff);
-  box-shadow: 0 0 6px rgba(160,100,255,0.4);
-  animation: waveAnim 0.6s ease-in-out infinite alternate;
+.sv-tts-pill-wave--active span {
+  background: linear-gradient(to top, #9060e0, #d0a0ff);
+  animation: pillWave 0.6s ease-in-out infinite alternate;
 }
-@keyframes waveAnim {
-  0%   { height: 4px; }
-  100% { height: 22px; }
+@keyframes pillWave {
+  0%   { height: 3px; }
+  100% { height: 14px; }
 }
 
-.sv-tts-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
-.sv-tts-btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 8px 16px; border-radius: 999px;
-  border: 1.5px solid rgba(160,100,255,0.35);
-  background: rgba(100,50,200,0.25); color: rgba(220,200,255,0.95);
-  font-family: var(--font-display); font-size: 0.78rem; font-weight: 800;
-  cursor: pointer; transition: all 0.2s; white-space: nowrap;
-  box-shadow: 0 2px 10px rgba(80,30,160,0.2);
+.sv-tts-pill-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 999px;
+  border: 1px solid rgba(160,100,255,0.30);
+  background: rgba(255,255,255,0.10); color: rgba(230,215,255,0.95);
+  font-family: var(--font-display); font-size: 0.72rem; font-weight: 800;
+  cursor: pointer; transition: all 0.18s;
 }
-.sv-tts-btn:hover { background: rgba(120,60,220,0.45); transform: translateY(-2px); color: #fff; box-shadow: 0 4px 16px rgba(100,50,200,0.4); }
-.sv-tts-btn.active { background: linear-gradient(135deg,#7040c0,#4020a0); border-color: #8050d0; color: #fff; box-shadow: 0 4px 16px rgba(100,50,200,0.5); }
-.sv-tts-btn.teal   { background: linear-gradient(135deg,#00b894,#00897b); border-color: #00c9a7; color: #fff; }
-.sv-tts-btn.coral  { background: linear-gradient(135deg,#e05050,#c03030); border-color: #ff6060; color: #fff; }
+.sv-tts-pill-btn:hover { background: rgba(255,255,255,0.20); transform: translateY(-1px); }
+.sv-tts-pill-btn.active { background: linear-gradient(135deg,#7040c0,#4020a0); border-color: #9060d0; }
+.sv-tts-pill-btn.teal   { background: linear-gradient(135deg,#00b894,#00897b); border-color: #00c9a7; }
 
 /* ════════════════════════════════════════════════════════════
    KİTAP WRAPPER
@@ -356,17 +352,7 @@
 }
 
 /* Yaprak süsler */
-.sv-leaf {
-  position: absolute; font-size: 4rem; opacity: 0.95; z-index: 2; pointer-events: none;
-  animation: leafSway 5s ease-in-out infinite;
-}
-.sv-leaf--left  { left: -22px; top: 46%; transform: translateY(-50%) scaleX(-1); animation-delay: 0s; }
-.sv-leaf--right { right: -22px; top: 46%; transform: translateY(-50%); animation-delay: 1.2s; }
-@keyframes leafSway {
-  0%,100% { transform: translateY(-50%) scaleX(var(--sx,1)) rotate(-3deg); }
-  50%      { transform: translateY(calc(-50% - 6px)) scaleX(var(--sx,1)) rotate(3deg); }
-}
-.sv-leaf--left  { --sx: -1; }
+.sv-leaf { display: none; }
 
 /* Nav butonlar */
 .sv-nav-btn {
@@ -388,13 +374,7 @@
 .sv-nav-btn--right { right: -32px; }
 .sv-hidden { opacity: 0; pointer-events: none; }
 
-/* Alt altın ayraç */
-.sv-bookmark {
-  position: absolute; bottom: -32px; left: 50%; transform: translateX(-50%);
-  font-size: 2.4rem; z-index: 5;
-  filter: drop-shadow(0 3px 10px rgba(200,160,30,0.5));
-  animation: float 3.5s ease-in-out infinite;
-}
+.sv-bookmark { display: none; }
 
 /* ════════════════════════════════════════════════════════════
    KİTAP — 3D Gerçekçi Hardcover
@@ -402,7 +382,7 @@
 .sv-book {
   display: flex; width: 100%;
   height: 66vh; min-height: 460px; max-height: 720px;
-  border-radius: 5px 14px 14px 5px;
+  border-radius: 5px 18px 18px 5px;
   position: relative; overflow: hidden;
   /* Sol cilt kalınlığı */
   border-left: 36px solid transparent;
@@ -446,23 +426,7 @@
   z-index: 3;
 }
 
-/* ── Altın köşe süsleri ── */
-.sv-corner {
-  position: absolute; width: 52px; height: 52px; z-index: 5; pointer-events: none;
-}
-.sv-corner::before, .sv-corner::after {
-  content: '';
-  position: absolute;
-  background: linear-gradient(135deg, #ffe066, #d4a820, #ffe880, #c89010);
-  border-radius: 2px;
-  box-shadow: 0 0 8px rgba(212,168,32,0.4);
-}
-.sv-corner::before { top: 0; left: 0; width: 100%; height: 9px; }
-.sv-corner::after  { top: 0; left: 0; width: 9px; height: 100%; }
-.sv-corner--tl { top: 0; left: 0; }
-.sv-corner--tr { top: 0; right: 0; transform: scaleX(-1); }
-.sv-corner--bl { bottom: 0; left: 0; transform: scaleY(-1); }
-.sv-corner--br { bottom: 0; right: 0; transform: scale(-1); }
+.sv-corner { display: none; }
 
 /* ════════════════════════════════════════════════════════════
    SOL SAYFA — Parşömen + Karakter
@@ -474,6 +438,36 @@
   align-items: flex-end; justify-content: flex-end;
   gap: 0; padding: 16px 16px 0;
   overflow: hidden;
+  border-radius: 0 0 0 18px;
+}
+
+/* Hikaye başlığı — sol sayfanın üstünde */
+.sv-page-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  padding: 10px 14px 9px;
+  background: linear-gradient(
+    to bottom,
+    rgba(20, 10, 50, 0.72) 0%,
+    rgba(20, 10, 50, 0.10) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sv-page-title span {
+  font-family: var(--font-display, 'Baloo 2', cursive);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: rgba(255, 240, 210, 0.97);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.25;
 }
 
 /* Mekan arka planı — sol sayfanın tamamını kapsar */
@@ -606,6 +600,7 @@
   padding: 26px 30px 14px;
   transform-origin: left center;
   position: relative; overflow: hidden;
+  border-radius: 0 18px 18px 0;
 }
 .sv-page-right::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
@@ -802,79 +797,86 @@
 
 /* ── Son sayfa banner ── */
 .sv-finish-banner {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: 0.5rem 1rem 0.75rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 2px solid #f59e0b;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
-  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.88);
+  border: 1.5px solid rgba(160,100,255,0.22);
+  box-shadow: 0 4px 24px rgba(100,50,200,0.12);
+  backdrop-filter: blur(12px);
+  align-self: center;
+  flex-wrap: nowrap;
 }
 
-.sv-finish-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+[data-theme="dark"] .sv-finish-banner {
+  background: rgba(40,20,80,0.72);
+  border-color: rgba(160,100,255,0.28);
 }
-.sv-finish-emoji { font-size: 2rem; line-height: 1; }
+
+.sv-finish-emoji { font-size: 1.3rem; flex-shrink: 0; }
+
 .sv-finish-text {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 1px;
 }
 .sv-finish-text strong {
-  font-size: 0.95rem;
-  color: #78350f;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: rgba(60,30,100,0.95);
+  white-space: nowrap;
 }
 .sv-finish-text span {
-  font-size: 0.8rem;
-  color: #92400e;
+  font-size: 0.70rem;
+  color: rgba(80,50,130,0.70);
+  white-space: nowrap;
 }
 
-.sv-finish-right {
+[data-theme="dark"] .sv-finish-text strong { color: rgba(230,215,255,0.95); }
+[data-theme="dark"] .sv-finish-text span   { color: rgba(200,180,255,0.65); }
+
+.sv-finish-actions {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .sv-finish-btn {
-  padding: 0.5rem 1.1rem;
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 14px; border-radius: 999px;
+  font-family: var(--font-display); font-size: 0.72rem; font-weight: 800;
+  cursor: pointer; transition: all 0.2s; border: none; white-space: nowrap;
 }
 .sv-finish-btn--replay {
-  background: #fff;
-  color: #78350f;
-  border: 2px solid #f59e0b;
+  background: rgba(100,50,200,0.10);
+  color: rgba(80,40,160,0.9);
+  border: 1.5px solid rgba(100,50,200,0.22);
 }
-.sv-finish-btn--replay:hover { background: #fef3c7; }
+.sv-finish-btn--replay:hover { background: rgba(100,50,200,0.18); transform: translateY(-1px); }
+
+[data-theme="dark"] .sv-finish-btn--replay {
+  background: rgba(160,100,255,0.15);
+  color: rgba(220,200,255,0.9);
+  border-color: rgba(160,100,255,0.3);
+}
 
 .sv-finish-btn--save {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #7c3aed, #9d5cf6);
   color: #fff;
+  box-shadow: 0 3px 14px rgba(120,50,220,0.35);
 }
-.sv-finish-btn--save:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.sv-finish-btn--save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(120,50,220,0.45); }
 .sv-finish-btn--save:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .sv-finish-saved {
-  color: #065f46;
-  font-weight: 700;
-  font-size: 0.85rem;
-  background: #d1fae5;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-display); font-size: 0.78rem; font-weight: 800;
+  color: #065f46; background: rgba(209,250,229,0.9);
+  padding: 8px 16px; border-radius: 999px;
+  border: 1px solid rgba(16,185,129,0.3);
 }
 
 /* ── Sol sayfa (mekan + karakterler) ── */
