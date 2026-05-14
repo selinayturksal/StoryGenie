@@ -90,8 +90,12 @@ function CommunityStoryCard({ story, onRate, lang }) {
 
         {/* Yazar + zaman */}
         <div className="ec-author-row">
-          <div className="ec-avatar">
-            {story.author?.username?.[0]?.toUpperCase() || '?'}
+          <div className="ec-avatar" style={{ background: story.author?.avatarBg || 'rgb(10,15,60)' }}>
+            {story.author?.avatar && story.author.avatar.length > 0
+              ? story.author.avatar.startsWith('/')
+                ? <img src={story.author.avatar} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}} />
+                : <span style={{fontSize:'1rem',lineHeight:1}}>{story.author.avatar}</span>
+              : <span>{story.author?.username?.[0]?.toUpperCase() || '?'}</span>}
           </div>
           <span className="ec-username">{story.author?.username}</span>
           <span className="ec-time">{timeAgo(story.createdAt)}</span>

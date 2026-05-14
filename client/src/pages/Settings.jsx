@@ -18,7 +18,7 @@ function validatePassword(current, next, confirm, t) {
 
 export default function Settings() {
   const { user, updateUser } = useAuth();
-  const { t, lang, switchLang } = useLang();
+  const { t, lang } = useLang();
   const [tab, setTab] = useState('profile');
 
   // Profile tab state
@@ -124,23 +124,6 @@ export default function Settings() {
                   className="input-field settings-disabled"
                 />
                 <span className="settings-hint">{t.settings.emailHint}</span>
-              </div>
-
-              {/* Language preference */}
-              <div className="form-group">
-                <label className="form-label">{t.settings.language}</label>
-                <div className="settings-lang-btns">
-                  <button
-                    type="button"
-                    className={`settings-lang-btn ${lang === 'tr' ? 'active' : ''}`}
-                    onClick={() => switchLang('tr')}
-                  >Türkçe</button>
-                  <button
-                    type="button"
-                    className={`settings-lang-btn ${lang === 'en' ? 'active' : ''}`}
-                    onClick={() => switchLang('en')}
-                  >English</button>
-                </div>
               </div>
 
               {profileSuccess && <div className="settings-success">{profileSuccess}</div>}

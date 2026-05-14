@@ -208,7 +208,7 @@
 .user-avatar-btn:hover { border-color:var(--plum-soft); }
 .user-avatar {
   width:32px; height:32px; border-radius:50%;
-  background:linear-gradient(135deg,#00c9a7,#7c3aed);
+  background: rgb(10, 15, 60);
   color:#fff; display:flex; align-items:center; justify-content:center;
   font-family:var(--font-display); font-weight:900; font-size:0.9rem;
 }

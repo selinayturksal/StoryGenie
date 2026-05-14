@@ -58,10 +58,10 @@ export default function Navbar() {
         <div className="navbar-links">
           {user ? (
             <>
-              <Link to="/"            className={`nav-link ${isActive('/') ? 'active' : ''}`}>{t.nav.today}</Link>
-              <Link to="/explore"     className={`nav-link ${isActive('/explore') ? 'active' : ''}`}>{t.nav.explore}</Link>
+              <Link to="/"            className={`nav-link ${isActive('/') ? 'active' : ''}`}>{lang === 'tr' ? 'Hikaye Oluştur' : 'Create Story'}</Link>
+              <Link to="/explore"     className={`nav-link ${isActive('/explore') ? 'active' : ''}`}>{lang === 'tr' ? 'Paylaşılan Hikayeler' : 'Shared Stories'}</Link>
               <Link to="/my-stories"  className={`nav-link ${isActive('/my-stories') ? 'active' : ''}`}>{t.nav.myStories}</Link>
-              <Link to="/dashboard"   className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}>{t.nav.dashboard}</Link>
+
             </>
           ) : (
             <>
@@ -92,7 +92,11 @@ export default function Navbar() {
           {user ? (
             <div className="user-menu">
               <button className="user-avatar-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                <span className="user-avatar">{user.username?.[0]?.toUpperCase() || '?'}</span>
+                <span className="user-avatar" style={{ background: user.avatarBg || localStorage.getItem('avatarBg') || 'rgb(10,15,60)' }}>
+                  {user.avatar?.startsWith('/')
+                    ? <img src={user.avatar} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}} />
+                    : (user.avatar || user.username?.[0]?.toUpperCase() || '?')}
+                </span>
                 <span className="user-name hide-mobile">{user.username}</span>
                 <svg className="chevron-icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
                   <path d={dropdownOpen ? 'M9 5L5 1L1 5' : 'M1 1L5 5L9 1'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
@@ -104,6 +108,13 @@ export default function Navbar() {
                     <strong>{user.username}</strong>
                     <small>{user.email}</small>
                   </div>
+                  <hr />
+                  <button onClick={() => { navigate('/profile'); setDropdownOpen(false); }} className="dropdown-item">
+                    👤 {lang === 'tr' ? 'Profilim' : 'My Profile'}
+                  </button>
+                  <button onClick={() => { navigate('/dashboard'); setDropdownOpen(false); }} className="dropdown-item">
+                    📊 {lang === 'tr' ? 'İstatistikler' : 'Statistics'}
+                  </button>
                   <hr />
                   <button onClick={() => { setDropdownOpen(false); handleLogout(); }} className="dropdown-item logout">{t.nav.logout}</button>
                 </div>
@@ -126,10 +137,12 @@ export default function Navbar() {
         <div className="mobile-menu">
           {user ? (
             <>
-              <Link to="/"           onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.today}</Link>
-              <Link to="/explore"    onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.explore}</Link>
+              <Link to="/"           onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{lang === 'tr' ? 'Hikaye Oluştur' : 'Create Story'}</Link>
+              <Link to="/explore"    onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{lang === 'tr' ? 'Paylaşılan Hikayeler' : 'Shared Stories'}</Link>
               <Link to="/my-stories" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.myStories}</Link>
-              <Link to="/dashboard"  onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>{t.nav.dashboard}</Link>
+
+              <Link to="/profile"    onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>👤 {lang === 'tr' ? 'Profilim' : 'My Profile'}</Link>
+              <Link to="/dashboard"  onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>📊 {lang === 'tr' ? 'İstatistikler' : 'Statistics'}</Link>
               <hr className="mobile-divider" />
               <button onClick={handleLogout} className="mobile-logout">{t.nav.logout}</button>
             </>
