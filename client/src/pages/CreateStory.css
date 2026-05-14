@@ -399,11 +399,12 @@
 /* ── Hata ── */
 .valid-error {
   display: flex; align-items: center; gap: 10px;
-  background: rgba(255,123,92,0.1); border: 2px solid rgba(255,123,92,0.4);
+  background: rgba(255,123,92,0.12); border: 2px solid rgba(255,123,92,0.4);
   border-radius: var(--r-md); padding: 14px 20px;
-  font-weight: 700; font-size: 0.9rem; color: #c0402a;
+  font-weight: 700; font-size: 0.9rem; color: rgba(255, 160, 130, 0.95);
   animation: shakeError 0.4s ease;
 }
+[data-theme="light"] .valid-error { color: #c0402a; }
 @keyframes shakeError {
   0%,100% { transform: translateX(0); }
   20%      { transform: translateX(-6px); }

@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
 import CharacterCard from '../components/CharacterCard';
+import BookOpeningTransition from '../components/BookOpeningTransition';
 import {
   GIRL_CHARACTERS, BOY_CHARACTERS, ANIMAL_CHARACTERS, LOCATIONS,
-  AGE_OPTIONS, DURATION_OPTIONS, STORY_LANGUAGES,
+  AGE_OPTIONS, STORY_LANGUAGES,
 } from '../data/storyOptions';
 import api from '../services/api';
 import './CreateStory.css';
@@ -26,6 +27,7 @@ export default function CreateStory() {
   const [storyLang, setStoryLang]               = useState(lang);
   const [customPrompt, setCustomPrompt]         = useState('');
   const [generating, setGenerating]             = useState(false);
+  const [storyData, setStoryData]               = useState(null);
   const [genError, setGenError]                 = useState('');
   const [validError, setValidError]             = useState('');
   const [isDark, setIsDark] = useState(
@@ -71,7 +73,10 @@ export default function CreateStory() {
   const handleGenerate = async () => {
     if (selectedChars.length === 0) { setValidError(t.create.selectChar); return; }
     if (!selectedLocation)          { setValidError(t.create.selectLocation); return; }
-    setValidError(''); setGenerating(true); setGenError('');
+    setValidError('');
+    setGenerating(true);
+    setGenError('');
+    setStoryData(null);
     try {
       const payload = {
         characters: selectedChars.map(c => ({
@@ -86,31 +91,30 @@ export default function CreateStory() {
         childAge, duration, storyLanguage: storyLang, customPrompt,
       };
       const res = await api.post('/ai/generate', payload);
-      const generatedStory = { ...res.data, options: payload };
-      navigate('/story-view', {
-        state: {
-          story: {
-            ...generatedStory,
-            _id: res.data._id,
-            characters: payload.characters.map(c => ({
-              ...c, name: { tr: c.name, en: c.name },
-              file: c.imagePath?.split('/').pop() || '',
-            })),
-            location: {
-              ...payload.location,
-              name: { tr: payload.location.name, en: payload.location.name },
-              file: payload.location.imagePath?.split('/').pop() || '',
-            },
-          },
-        }
+      // Store story — BookOpeningTransition will call handleTransitionComplete when ready
+      setStoryData({
+        ...res.data,
+        options: payload,
+        _id: res.data._id,
+        characters: payload.characters.map(c => ({
+          ...c, name: { tr: c.name, en: c.name },
+          file: c.imagePath?.split('/').pop() || '',
+        })),
+        location: {
+          ...payload.location,
+          name: { tr: payload.location.name, en: payload.location.name },
+          file: payload.location.imagePath?.split('/').pop() || '',
+        },
       });
     } catch (err) {
       setGenError(err.message);
-    } finally { setGenerating(false); }
+      setGenerating(false); // only hide overlay on error
+    }
   };
 
-  // Seçili özet şerit (her adımda göster)
-  const selectedAnimals = selectedChars.filter(c => c.id.startsWith('animal'));
+  const handleTransitionComplete = () => {
+    navigate('/story-view', { state: { story: storyData } });
+  };
 
   return (
     <div className="create-page">
@@ -352,17 +356,6 @@ export default function CreateStory() {
           </div>
         )}
 
-        {/* Oluşturuluyor */}
-        {generating && (
-          <div className="generating-state animate-fadeIn">
-            <div className="gen-book">📖</div>
-            <div className="gen-sparkles">✨ ✦ ✨</div>
-            <h3>{t.create.generating}</h3>
-            <p>{t.create.generatingMsg}</p>
-            <div className="gen-dots"><span /><span /><span /></div>
-          </div>
-        )}
-
       </div>{/* /create-container */}
 
       {/* ══════════════════════════════════
@@ -417,6 +410,13 @@ export default function CreateStory() {
         </div>
       )}
 
+      {/* Cinematic book-opening transition overlay */}
+      <BookOpeningTransition
+        visible={generating}
+        storyReady={!!storyData}
+        onComplete={handleTransitionComplete}
+        lang={lang}
+      />
     </div>
   );
 }

@@ -92,12 +92,12 @@
 
 .stat-sublabel {
   font-size: 0.72rem;
-  color: rgba(180,165,230,0.55);
+  color: rgba(200,185,240,0.75);
   font-weight: 500;
   line-height: 1.4;
   max-width: 200px;
 }
-[data-theme="light"] .stat-sublabel { color: rgba(60,40,90,0.5); }
+[data-theme="light"] .stat-sublabel { color: rgba(60,40,90,0.6); }
 
 /* ── Grafik Grid ── */
 .charts-grid {
@@ -141,18 +141,18 @@
 
 .chart-desc {
   font-size: 0.72rem;
-  color: rgba(180,165,230,0.5);
+  color: rgba(200,185,240,0.7);
   font-weight: 500;
   margin: 0;
 }
-[data-theme="light"] .chart-desc { color: rgba(60,40,90,0.45); }
+[data-theme="light"] .chart-desc { color: rgba(60,40,90,0.55); }
 
 .chart-empty {
   height: 220px;
   display: flex; align-items: center; justify-content: center;
-  color: rgba(180,165,230,0.4); font-size: 0.9rem;
+  color: rgba(200,185,240,0.6); font-size: 0.9rem;
 }
-[data-theme="light"] .chart-empty { color: rgba(60,40,90,0.4); }
+[data-theme="light"] .chart-empty { color: rgba(60,40,90,0.5); }
 
 /* Tooltip */
 .dash-tooltip {

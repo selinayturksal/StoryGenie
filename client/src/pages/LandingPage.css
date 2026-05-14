@@ -2,34 +2,9 @@
    MasalMatik — Landing Page
 ═══════════════════════════════════════════════════════════ */
 :root {
-    --sky: #e8f4ff;
-    --sky-mid: #c2e0ff;
-    --sun: #ffe566;
-    --sun-deep: #ffb800;
-    --coral: #ff7b5c;
-    --coral-soft: #ffb39e;
-    --teal: #00c9a7;
-    --teal-soft: #7eecd8;
-    --plum: #9b59b6;
-    --plum-soft: #d4a8e8;
-    --lime: #7bc67e;
-    --lime-soft: #c3e8c4;
-    --ink: #1a1a2e;
-    --ink-mid: #4a4a6a;
-    --ink-soft: #8888aa;
-    --surface: #ffffff;
-    --bg: #f0f7ff;
-    --bg-warm: #fff9ee;
-    --r-sm: 10px;
-    --r-md: 18px;
-    --r-lg: 28px;
-    --r-xl: 40px;
-    --r-full: 999px;
-    --font-display: 'Baloo 2', 'Comic Sans MS', cursive;
-    --font-body: 'Nunito', 'Segoe UI', sans-serif;
-    --sh-sm: 0 2px 8px rgba(26, 26, 46, 0.08);
-    --sh-md: 0 6px 24px rgba(26, 26, 46, 0.12);
-    --sh-lg: 0 16px 48px rgba(26, 26, 46, 0.16);
+    /* LP-specific variables only — global vars (--ink, --sky, --plum, etc.) are
+       defined in index.css and must NOT be overridden here, as this CSS file is
+       always loaded and would break dark-mode text readability on every page. */
     --lp-section-bg: var(--bg-warm);
     --lp-text: var(--ink);
     --lp-text-soft: var(--ink-mid);

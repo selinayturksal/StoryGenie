@@ -256,7 +256,7 @@
   font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 900;
-  color: #7c3aed;
+  color: var(--plum);
   min-width: 36px;
 }
 .sc-rating-hint {
@@ -314,9 +314,10 @@
 .sc-btn--ghost {
   background: rgba(245,158,11,0.12);
   border: 2px solid rgba(245,158,11,0.3);
-  color: #b45309;
+  color: rgba(252, 200, 80, 0.95);
 }
 .sc-btn--ghost:hover { background: rgba(245,158,11,0.2); }
+[data-theme="light"] .sc-btn--ghost { color: #b45309; }
 .sc-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 /* Sayfalama */
