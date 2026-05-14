@@ -9,39 +9,31 @@ export default function StoryView() {
   const navigate     = useNavigate();
   const { t, lang }  = useLang();
 
-  // state'den hikaye verisi
   const story      = state?.story;
   const pages      = story?.pages || [];
   const characters = story?.characters || [];
   const location   = story?.location  || null;
   const onSave     = state?.onSave;
 
-  // Aşamalar: 'intro' → 'opening' → 'reading'
-  const [phase, setPhase]           = useState('intro');
+  const [phase, setPhase]             = useState('intro');
   const [currentPage, setCurrentPage] = useState(0);
-  const [flipping, setFlipping]     = useState(false);
-  const [flipDir, setFlipDir]       = useState('next');
-  const [saving, setSaving]         = useState(false);
-  const [saved, setSaved]           = useState(false);
-  const [sharing, setSharing]       = useState(false);
-  const [shared, setShared]         = useState(false);
-  const [storyId, setStoryId]       = useState(story?._id || null);
+  const [flipping, setFlipping]       = useState(false);
+  const [flipDir, setFlipDir]         = useState('next');
+  const [saving, setSaving]           = useState(false);
+  const [saved, setSaved]             = useState(false);
+  const [storyId, setStoryId]         = useState(story?._id || null);
 
-
-  // TTS
-  const [speaking, setSpeaking]     = useState(false);
-  const [paused, setPaused]         = useState(false);
-  const [readAll, setReadAll]       = useState(false);
-  const utteranceRef                = useRef(null);
+  const [speaking, setSpeaking] = useState(false);
+  const [paused, setPaused]     = useState(false);
+  const [readAll, setReadAll]   = useState(false);
+  const utteranceRef            = useRef(null);
 
   const totalPages = pages.length;
   const isFirst    = currentPage === 0;
   const isLast     = currentPage === totalPages - 1;
 
-  // Hikaye yoksa geri yönlendir
   useEffect(() => {
     if (!story) { navigate('/'); return; }
-    // Giriş animasyonu → kitap açılışı
     const t1 = setTimeout(() => setPhase('opening'), 600);
     const t2 = setTimeout(() => setPhase('reading'), 3200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -130,51 +122,36 @@ export default function StoryView() {
   };
 
   const handleSave = async () => {
-    if (saving || saved || !onSave) return;
+    if (saving || saved) return;
     setSaving(true);
-    try { await onSave(); setSaved(true); }
-    catch (e) { alert(e.message); }
-    finally { setSaving(false); }
-  };
-
-  const handleShare = async () => {
-    if (sharing || shared) return;
-    setSharing(true);
     try {
-      let id = storyId;
-
-      // Eğer _id yoksa önce kaydet
-      if (!id) {
+      if (onSave) {
+        await onSave();
+      } else {
         const opts = story.options || {};
-        // characters/location string olarak geldiyse parse et
-        const characters = typeof opts.characters === 'string'
+        const chars = typeof opts.characters === 'string'
           ? JSON.parse(opts.characters) : (opts.characters || []);
-        const location = typeof opts.location === 'string'
+        const loc = typeof opts.location === 'string'
           ? JSON.parse(opts.location) : (opts.location || null);
-
         const saveRes = await api.post('/stories', {
-          title: story.title,
+          title:    story.title,
           fullText: story.fullText || story.pages?.map(p => p.content).join(' ') || '',
-          pages: story.pages || [],
-          options: { ...opts, characters, location },
+          pages:    story.pages || [],
+          options:  { ...opts, characters: chars, location: loc },
         });
-        id = saveRes.data.story._id;
-        setStoryId(id);
-        setSaved(true);
+        setStoryId(saveRes.data.story._id);
       }
-
-      // Paylaş
-      await api.patch(`/stories/${id}/publish`, { isPublic: true });
-      setShared(true);
+      setSaved(true);
     } catch (e) {
-      console.error('Share error:', e);
-      alert(e.message || 'Paylaşılamadı');
+      alert(e.message || 'Kaydedilemedi');
     } finally {
-      setSharing(false);
+      setSaving(false);
     }
   };
 
   if (!story) return null;
+
+  const alreadySaved = !!(storyId || saved);
 
   return (
     <div className={`sv-page sv-phase--${phase}`}>
@@ -183,17 +160,17 @@ export default function StoryView() {
       <div className="sv-bg">
         {[...Array(20)].map((_, i) => (
           <div key={i} className="sv-star" style={{
-            left: `${Math.random() * 100}%`,
-            top:  `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 4}s`,
+            left:              `${Math.random() * 100}%`,
+            top:               `${Math.random() * 100}%`,
+            animationDelay:    `${Math.random() * 4}s`,
             animationDuration: `${2 + Math.random() * 3}s`,
-            width:  `${4 + Math.random() * 6}px`,
-            height: `${4 + Math.random() * 6}px`,
+            width:             `${4 + Math.random() * 6}px`,
+            height:            `${4 + Math.random() * 6}px`,
           }} />
         ))}
       </div>
 
-      {/* ── INTRO EKRANI ── */}
+      {/* ── INTRO ── */}
       {phase === 'intro' && (
         <div className="sv-intro">
           <div className="sv-intro-book">📖</div>
@@ -227,36 +204,77 @@ export default function StoryView() {
       {phase === 'reading' && (
         <div className="sv-reading animate-fadeIn">
 
+          {/* ── ÜST BAR ── */}
           <div className="sv-topbar">
             <button className="sv-back" onClick={() => { stopSpeech(); navigate('/'); }}>
               ← {lang === 'tr' ? 'Geri' : 'Back'}
             </button>
+
+            {/* Başlık */}
+            <span className="sv-topbar-title">{story.title}</span>
+
+            {/* Kaydet butonu — sadece kaydedilmemişse göster */}
             <div className="sv-top-actions">
-              <button
-                className={`sv-top-btn ${shared ? 'sv-top-btn--shared' : ''}`}
-                onClick={handleShare}
-                disabled={sharing || shared}
-                title={lang === 'tr' ? 'Herkesle Paylaş' : 'Share with Everyone'}
-              >
-                {shared ? '✓' : sharing ? '...' : '🌍'}
-                <span>{sharing ? (lang === 'tr' ? 'Paylaşılıyor' : 'Sharing') : shared ? (lang === 'tr' ? 'Paylaşıldı' : 'Shared') : (lang === 'tr' ? 'Paylaş' : 'Share')}</span>
-              </button>
+              {!alreadySaved && (
+                <button
+                  className={`sv-top-btn ${saving ? 'sv-top-btn--saving' : ''}`}
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <><span className="sv-btn-spinner" /> {lang === 'tr' ? 'Kaydediliyor' : 'Saving'}</>
+                  ) : (
+                    <><span>💾</span> {lang === 'tr' ? 'Kaydet' : 'Save'}</>
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Audio Bar */}
+          {/* ── SON SAYFA AKSIYON BANDI (üstte, kitabın hemen üstü) ── */}
+          {isLast && (
+            <div className="sv-finish-banner animate-fadeIn">
+              <div className="sv-finish-left">
+                <span className="sv-finish-emoji">🎉</span>
+                <div className="sv-finish-text">
+                  <strong>{lang === 'tr' ? 'Hikaye bitti!' : 'Story complete!'}</strong>
+                  <span>{lang === 'tr' ? 'Harika bir okuma yaptın.' : 'Great reading session!'}</span>
+                </div>
+              </div>
+              <div className="sv-finish-right">
+                <button className="sv-finish-btn sv-finish-btn--replay"
+                  onClick={() => { stopSpeech(); setCurrentPage(0); }}>
+                  🔄 {lang === 'tr' ? 'Tekrar Oku' : 'Read Again'}
+                </button>
+                {!alreadySaved && (
+                  <button className="sv-finish-btn sv-finish-btn--save"
+                    onClick={handleSave} disabled={saving}>
+                    {saving ? '⏳' : '💾'} {lang === 'tr' ? 'Hikayelerime Ekle' : 'Add to My Stories'}
+                  </button>
+                )}
+                {alreadySaved && (
+                  <span className="sv-finish-saved">
+                    ✅ {lang === 'tr' ? 'Hikayelerime eklendi!' : 'Added to My Stories!'}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── SES ÇUBUĞU ── */}
           <div className="sv-tts-bar">
             <span className="sv-tts-icon">🔊</span>
             <span className="sv-tts-label">
-              {speaking && !paused ? (lang === 'tr' ? 'Okunuyor...' : 'Reading...')
-                : paused ? (lang === 'tr' ? 'Duraklatıldı' : 'Paused')
+              {speaking && !paused
+                ? (lang === 'tr' ? 'Okunuyor...' : 'Reading...')
+                : paused
+                ? (lang === 'tr' ? 'Duraklatıldı' : 'Paused')
                 : (lang === 'tr' ? 'Sesli Okuma' : 'Read Aloud')}
             </span>
             <div className={`sv-wave ${speaking && !paused ? 'sv-wave--active' : ''}`}>
               {[...Array(16)].map((_, i) => (
                 <span key={i} className="sv-wave-bar"
-                  style={{ animationDelay: `${i * 0.06}s`,
-                           animationDuration: `${0.5 + (i % 4) * 0.15}s` }} />
+                  style={{ animationDelay: `${i * 0.06}s`, animationDuration: `${0.5 + (i % 4) * 0.15}s` }} />
               ))}
             </div>
             <div className="sv-tts-btns">
@@ -269,12 +287,14 @@ export default function StoryView() {
                 {lang === 'tr' ? (readAll ? ' Durdur' : ' Tümünü Oku') : (readAll ? ' Stop' : ' Read All')}
               </button>
               {(speaking || paused) && (
-                <button className="sv-tts-btn coral" onClick={stopSpeech}>⏹ {lang === 'tr' ? 'Durdur' : 'Stop'}</button>
+                <button className="sv-tts-btn coral" onClick={stopSpeech}>
+                  ⏹ {lang === 'tr' ? 'Durdur' : 'Stop'}
+                </button>
               )}
             </div>
           </div>
 
-          {/* Kitap */}
+          {/* ── KİTAP ── */}
           <div className="sv-book-wrap">
             <div className="sv-leaf sv-leaf--left">🌿</div>
             <div className="sv-leaf sv-leaf--right">🌿</div>
@@ -283,36 +303,41 @@ export default function StoryView() {
               onClick={() => goTo('prev')} disabled={isFirst || flipping}>‹</button>
 
             <div className="sv-book">
-              {/* Cilt */}
               <div className="sv-book-binding" />
               <div className="sv-book-edge" />
-
-              {/* Altın köşe süsleri */}
               <div className="sv-corner sv-corner--tl" />
               <div className="sv-corner sv-corner--tr" />
               <div className="sv-corner sv-corner--bl" />
               <div className="sv-corner sv-corner--br" />
 
-              {/* Sol sayfa */}
+              {/* ── SOL SAYFA — MEKAN ARKA PLAN + KARAKTERLERİ BOYDAN ── */}
               <div className="sv-page-left">
-                {/* Mekan arka planı */}
+                {/* Mekan arka plan görseli */}
                 {location && (
                   <div className="sv-page-left-bg"
                     style={{ backgroundImage: `url('/assets/locations/${location.file}')` }} />
                 )}
 
-                <span className="sv-sparkle sv-sparkle--1">✦</span>
-                <span className="sv-sparkle sv-sparkle--2">✦</span>
+                {/* Mekan isim rozeti — en altta */}
 
-                {/* Karakterler boydan */}
-                <div className="sv-chars-row">
-                  {characters.slice(0, 4).map((c, i) => (
-                    <div key={c.id || i} className="sv-char-full">
+                {/* Karakterler boydan — kaç tane olursa sığsın */}
+                <div
+                  className="sv-chars-fullheight"
+                  style={{ '--char-count': characters.length }}
+                >
+                  {characters.map((c, i) => (
+                    <div key={c.id || i} className="sv-char-full-item">
                       <img
                         src={`/assets/characters/${c.file}`}
                         alt={c.name?.tr || c.name || ''}
-                        onError={e => { e.target.style.display='none'; }}
+                        onError={e => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
                       />
+                      <span className="sv-char-emoji-fallback" style={{ display: 'none' }}>
+                        {c.emoji || '👤'}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -323,32 +348,20 @@ export default function StoryView() {
               {/* Orta cilt */}
               <div className="sv-book-gutter" />
 
-              {/* Sağ sayfa */}
+              {/* ── SAĞ SAYFA — METİN ── */}
               <div className={`sv-page-right ${flipping ? `flip-${flipDir}` : ''}`}>
                 <div className="sv-page-header">
                   <span className="sv-page-num">
                     ⭐ {lang === 'tr' ? 'Sayfa' : 'Page'} {currentPage + 1} / {totalPages}
                   </span>
                 </div>
-
                 <div className="sv-page-divider">
                   <div className="sv-page-divider-line" />
                   <span className="sv-page-divider-star">✦</span>
                   <div className="sv-page-divider-line" />
                 </div>
-
                 <div className="sv-page-text">
                   <p>{pages[currentPage]?.content}</p>
-                </div>
-
-                <div className="sv-strip">
-                  {characters.slice(0, 1).map((c, i) => (
-                    <div key={c.id || i} className="sv-strip-char">
-                      <img src={`/assets/characters/${c.file}`}
-                        alt={c.name?.tr || c.name || ''}
-                        onError={e => { e.target.style.display='none'; }} />
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -359,7 +372,7 @@ export default function StoryView() {
             <div className="sv-bookmark">🔖</div>
           </div>
 
-          {/* Sayfa noktaları */}
+          {/* ── SAYFA NOKTALARI ── */}
           <div className="sv-nav">
             <div className="sv-dots">
               {pages.map((_, i) => (
@@ -371,14 +384,6 @@ export default function StoryView() {
             </div>
           </div>
 
-          {isLast && (
-            <div className="sv-actions animate-fadeIn">
-              <button className="sv-action-btn sv-action-outline"
-                onClick={() => { stopSpeech(); setCurrentPage(0); }}>
-                🔄 {lang === 'tr' ? 'Tekrar Oku' : 'Read Again'}
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>

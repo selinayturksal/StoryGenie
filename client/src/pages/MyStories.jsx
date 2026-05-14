@@ -20,8 +20,8 @@ function StarRating({ value, onChange }) {
 }
 
 function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
-  const [rating, setRating] = useState(story.rating || 0);
-  const [isPublic, setIsPublic] = useState(story.isPublic);
+  const [rating, setRating]       = useState(story.rating || 0);
+  const [isPublic, setIsPublic]   = useState(story.isPublic);
   const [publishing, setPublishing] = useState(false);
   const [ratingLoading, setRatingLoading] = useState(false);
 
@@ -37,17 +37,28 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
     setIsPublic(newVal); setPublishing(false);
   };
 
-  const chars = story.options?.characters || [];
+  const chars    = story.options?.characters || [];
   const location = story.options?.location;
-  const date = new Date(story.createdAt).toLocaleDateString(
+  const date     = new Date(story.createdAt).toLocaleDateString(
     lang === 'tr' ? 'tr-TR' : 'en-US',
     { day: 'numeric', month: 'long', year: 'numeric' }
   );
 
+  const locationFile = location?.imagePath?.split('/').pop() || '';
+
   return (
-    <div className="story-card animate-fadeIn">
-      <div className="sc-header">
-        <div className="sc-badges">
+    <div className="sc-card animate-fadeIn">
+
+      {/* ── SOL — mekan arka plan + karakterler boydan ── */}
+      <div className="sc-visual">
+        {/* Mekan arka planı */}
+        {locationFile && (
+          <div className="sc-visual-bg"
+            style={{ backgroundImage: `url('/assets/locations/${locationFile}')` }} />
+        )}
+
+        {/* Durum ve dil rozetleri */}
+        <div className="sc-visual-badges">
           <span className={`sc-badge ${isPublic ? 'public' : 'private'}`}>
             {isPublic ? '🌍 Herkese Açık' : '🔒 Gizli'}
           </span>
@@ -57,52 +68,103 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
             </span>
           )}
         </div>
-        <span className="sc-date">{date}</span>
+
+        {/* Karakterler boydan */}
+        <div className="sc-chars-row" style={{ '--char-count': chars.length || 1 }}>
+          {chars.map((c, i) => {
+            const file = c.imagePath?.split('/').pop() || '';
+            return (
+              <div key={i} className="sc-char-col">
+                <img
+                  src={`/assets/characters/${file}`}
+                  alt={c.name || ''}
+                  onError={e => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+                <span className="sc-char-emoji" style={{ display: 'none' }}>
+                  {c.emoji || '👤'}
+                </span>
+                <span className="sc-char-name">{c.name || ''}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <h3 className="sc-title">{story.title}</h3>
+      {/* ── SAĞ — hikaye detayları ── */}
+      <div className="sc-info">
 
-      {chars.length > 0 && (
-        <div className="sc-chars">
-          {chars.map((c, i) => (
-            <div key={i} className="sc-char-chip">
-              <img src={`/assets/characters/${c.imagePath?.split('/').pop() || ''}`}
-                alt={c.name} onError={e => { e.target.style.display='none'; }} />
-              <span>{c.name}</span>
-            </div>
-          ))}
-          {location && (
-            <div className="sc-char-chip location">
-              <span>{location.emoji || '📍'}</span>
+        {/* Tarih */}
+        <div className="sc-date">📅 {date}</div>
+
+        {/* Başlık */}
+        <h3 className="sc-title">{story.title}</h3>
+
+        {/* Karakter chipleri */}
+        {chars.length > 0 && (
+          <div className="sc-chip-row">
+            {chars.map((c, i) => {
+              const file = c.imagePath?.split('/').pop() || '';
+              return (
+                <div key={i} className="sc-chip">
+                  <img src={`/assets/characters/${file}`} alt={c.name || ''}
+                    onError={e => { e.target.style.display = 'none'; }} />
+                  <span>{c.name}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Mekan chip */}
+        {location && (
+          <div className="sc-chip-row">
+            <div className="sc-chip sc-chip--loc">
+              <span>📍</span>
               <span>{location.name}</span>
             </div>
+          </div>
+        )}
+
+        {/* Meta bilgiler */}
+        <div className="sc-meta-row">
+          {story.options?.childAge && (
+            <span className="sc-meta">🍼 {story.options.childAge} yaş</span>
+          )}
+          {story.options?.duration && (
+            <span className="sc-meta">
+              {story.options.duration === 'short' ? '📖 Kısa'
+                : story.options.duration === 'medium' ? '📖 Orta' : '📚 Uzun'}
+            </span>
+          )}
+          {story.viewCount > 0 && (
+            <span className="sc-meta">👁 {story.viewCount}</span>
           )}
         </div>
-      )}
 
-      <div className="sc-meta">
-        {story.options?.childAge && <span className="sc-meta-item">👶 {story.options.childAge} yaş</span>}
-        {story.options?.duration && (
-          <span className="sc-meta-item">
-            {story.options.duration === 'short' ? '⚡ Kısa' : story.options.duration === 'medium' ? '📖 Orta' : '📚 Uzun'}
-          </span>
-        )}
-        {story.viewCount > 0 && <span className="sc-meta-item">👁 {story.viewCount}</span>}
-      </div>
+        {/* Puanlama */}
+        <div className="sc-rating-block">
+          <div className="sc-rating-label">
+            {rating
+              ? <><span className="sc-rating-score">{rating}/5</span></>
+              : <span className="sc-rating-hint">{lang === 'tr' ? 'Puanla' : 'Rate'}</span>}
+          </div>
+          <StarRating value={rating} onChange={handleRate} />
+        </div>
 
-      <div className="sc-rating">
-        <span className="sc-rating-label">
-          {ratingLoading ? 'Kaydediliyor...' : rating ? `Puanın: ${rating}/5 ` : 'Hikayeyi puanla: '}
-        </span>
-        <StarRating value={rating} onChange={handleRate} />
-      </div>
-
-      <div className="sc-actions">
-        <button className="btn btn-primary sc-btn" onClick={() => onRead(story._id)}>📖 Oku</button>
-        <button className={`btn sc-btn ${isPublic ? 'btn-outline' : 'btn-gold'}`}
-          onClick={handlePublish} disabled={publishing}>
-          {publishing ? '⏳' : isPublic ? '🔒 Gizle' : '🌍 Paylaş'}
-        </button>
+        {/* Aksiyonlar */}
+        <div className="sc-actions">
+          <button className="sc-btn sc-btn--primary" onClick={() => onRead(story._id)}>
+            📖 {lang === 'tr' ? 'Oku' : 'Read'}
+          </button>
+          <button
+            className={`sc-btn ${isPublic ? 'sc-btn--outline' : 'sc-btn--ghost'}`}
+            onClick={handlePublish} disabled={publishing}>
+            {publishing ? '⏳' : isPublic ? '🔒 Gizle' : '🌍 Paylaş'}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -110,11 +172,11 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
 
 export default function MyStories() {
   const { t, lang } = useLang();
-  const navigate = useNavigate();
-  const [stories, setStories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [page, setPage] = useState(1);
+  const navigate    = useNavigate();
+  const [stories, setStories]       = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState('');
+  const [page, setPage]             = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchStories = useCallback(async (p = 1) => {
@@ -176,7 +238,9 @@ export default function MyStories() {
         {totalPages > 1 && (
           <div className="ms-pagination">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-              <button key={p} className={`page-btn ${p === page ? 'active' : ''}`} onClick={() => setPage(p)}>{p}</button>
+              <button key={p}
+                className={`page-btn ${p === page ? 'active' : ''}`}
+                onClick={() => setPage(p)}>{p}</button>
             ))}
           </div>
         )}

@@ -1,49 +1,47 @@
 const mongoose = require('mongoose');
 
-// Tek bir hikaye sayfası
 const pageSchema = new mongoose.Schema({
   pageNumber: { type: Number, required: true },
-  content: { type: String, required: true },
+  content:    { type: String, required: true },
 });
 
-// Kullanıcının hikaye için yaptığı seçimler
 const storyOptionsSchema = new mongoose.Schema({
   characters: [
     {
-      id: String,
-      name: String,
-      type: String,
-      imagePath: String,
-      emoji: String,
+      id:        { type: String, default: '' },
+      name:      { type: String, default: '' },
+      type:      { type: String, default: 'human' },
+      imagePath: { type: String, default: '' },
+      emoji:     { type: String, default: '' },
     },
   ],
   location: {
-    id: String,          // örn: "location_forest"
-    name: String,        // örn: "Büyülü Orman"
-    imagePath: String,
+    id:        { type: String, default: '' },
+    name:      { type: String, default: '' },
+    imagePath: { type: String, default: '' },
   },
   childAge: {
     type: Number,
-    min: 2,
-    max: 12,
-    required: true,
+    min: 1,
+    max: 18,
+    default: 5,
   },
   duration: {
     type: String,
-    enum: ['short', 'medium', 'long'], // ~2dk / ~5dk / ~10dk
-    required: true,
+    enum: ['short', 'medium', 'long'],
+    default: 'medium',
   },
   storyLanguage: {
     type: String,
     enum: ['tr', 'en'],
-    required: true,
+    default: 'tr',
   },
   customPrompt: {
     type: String,
     default: '',
     maxlength: 500,
   },
-});
+}, { _id: false });
 
 const storySchema = new mongoose.Schema(
   {
@@ -58,58 +56,32 @@ const storySchema = new mongoose.Schema(
       trim: true,
       maxlength: 200,
     },
-    // Hikaye ya tek metin ya da sayfalara bölünmüş olabilir
     fullText: {
       type: String,
       required: true,
     },
     pages: [pageSchema],
-
-    options: storyOptionsSchema,
-
-    // Sosyal özellikler
-    isPublic: {
-      type: Boolean,
-      default: false,
-    },
-    rating: {
-      type: Number,
-      min: 1,
-      max: 5,
-      default: null,
-    },
-    // Diğer kullanıcıların puanları (önerilen hikayeler sayfası için)
+    options: { type: storyOptionsSchema, default: () => ({}) },
+    isPublic: { type: Boolean, default: false },
+    rating: { type: Number, min: 1, max: 5, default: null },
     communityRatings: [
       {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        user:   { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         rating: { type: Number, min: 1, max: 5 },
       },
     ],
-    communityAverageRating: {
-      type: Number,
-      default: 0,
-    },
-    viewCount: {
-      type: Number,
-      default: 0,
-    },
+    communityAverageRating: { type: Number, default: 0 },
+    viewCount: { type: Number, default: 0 },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// Community average rating'i otomatik hesapla
 storySchema.methods.recalculateCommunityRating = function () {
-  if (this.communityRatings.length === 0) {
-    this.communityAverageRating = 0;
-    return;
-  }
+  if (this.communityRatings.length === 0) { this.communityAverageRating = 0; return; }
   const sum = this.communityRatings.reduce((acc, r) => acc + r.rating, 0);
   this.communityAverageRating = Math.round((sum / this.communityRatings.length) * 10) / 10;
 };
 
-// Index'ler - hızlı sorgular için
 storySchema.index({ author: 1, createdAt: -1 });
 storySchema.index({ isPublic: 1, communityAverageRating: -1 });
 storySchema.index({ createdAt: -1 });

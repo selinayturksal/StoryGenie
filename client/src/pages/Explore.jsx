@@ -6,78 +6,129 @@ import api from '../services/api';
 import './Explore.css';
 
 function CommunityStoryCard({ story, onRate, lang }) {
+  const [liked, setLiked]       = useState(false);
   const [userRating, setUserRating] = useState(0);
-  const [hover, setHover] = useState(0);
-  const [rated, setRated] = useState(false);
+  const [rated, setRated]       = useState(false);
 
-  const chars = story.options?.characters || [];
-  const date = new Date(story.createdAt).toLocaleDateString(
-    lang === 'tr' ? 'tr-TR' : 'en-US',
-    { month: 'short', year: 'numeric' }
-  );
+  const chars    = story.options?.characters || [];
+  const location = story.options?.location;
+  const locationFile = location?.imagePath?.split('/').pop() || '';
+
+  // Görsel: önce ilk karakter, yoksa mekan
+  const firstCharFile = chars[0]?.imagePath?.split('/').pop() || '';
+
+  const likeCount = story.communityRatings?.length || 0;
+
+  const timeAgo = (dateStr) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const days = Math.floor(diff / 86400000);
+    if (days === 0) return lang === 'tr' ? 'Bugün' : 'Today';
+    if (days === 1) return lang === 'tr' ? '1 gün önce' : '1 day ago';
+    if (days < 7)  return lang === 'tr' ? `${days} gün önce` : `${days} days ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks === 1) return lang === 'tr' ? '1 hafta önce' : '1 week ago';
+    return lang === 'tr' ? `${weeks} hafta önce` : `${weeks} weeks ago`;
+  };
+
+  const getBadge = () => {
+    const days = Math.floor((Date.now() - new Date(story.createdAt).getTime()) / 86400000);
+    if (days <= 3) return { label: '⭐ Yeni', cls: 'badge--new' };
+    if (story.viewCount > 200) return { label: '📖 Çok Okunan', cls: 'badge--read' };
+    if (story.communityAverageRating >= 4) return { label: '🏆 Editör Seçkisi', cls: 'badge--editor' };
+    if (likeCount > 30) return { label: '🔥 Popüler', cls: 'badge--popular' };
+    return null;
+  };
+
+  const badge = getBadge();
 
   const handleRate = async (val) => {
-    setUserRating(val);
-    setRated(true);
+    setUserRating(val); setRated(true);
     await onRate(story._id, val);
   };
 
+  const durationLabel = (d) => {
+    if (d === 'short') return lang === 'tr' ? 'Kolay' : 'Short';
+    if (d === 'long')  return lang === 'tr' ? 'Zor'   : 'Long';
+    return lang === 'tr' ? 'Orta' : 'Medium';
+  };
+
   return (
-    <div className="explore-card animate-fadeIn">
-      {/* Top */}
-      <div className="ec-top">
-        <div className="ec-author">
-          <div className="ec-avatar">{story.author?.username?.[0]?.toUpperCase() || '?'}</div>
-          <div>
-            <span className="ec-username">{story.author?.username}</span>
-            <span className="ec-date">{date}</span>
-          </div>
-        </div>
-        <div className="ec-community-rating">
-          <span className="ec-star">★</span>
-          <span>{story.communityAverageRating > 0 ? story.communityAverageRating.toFixed(1) : '—'}</span>
-          <span className="ec-rating-count">({story.communityRatings?.length || 0})</span>
-        </div>
-      </div>
+    <div className="ec-card animate-fadeIn">
 
-      {/* Title */}
-      <h3 className="ec-title">{story.title}</h3>
-
-      {/* Characters strip */}
-      {chars.length > 0 && (
-        <div className="ec-chars">
-          {chars.slice(0, 4).map((c, i) => (
-            <div key={i} className="ec-char" title={c.name}>
-              <img src={`/assets/characters/${c.imagePath?.split('/').pop() || ''}`}
-                alt={c.name} onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
-              <span className="ec-char-emoji" style={{ display:'none' }}>👤</span>
-            </div>
-          ))}
-          {chars.length > 4 && <span className="ec-more">+{chars.length - 4}</span>}
-        </div>
-      )}
-
-      {/* Meta */}
-      <div className="ec-meta">
-        {story.options?.childAge && <span className="ec-tag">👶 {story.options.childAge} yaş</span>}
-        {story.options?.storyLanguage && (
-          <span className="ec-tag">{story.options.storyLanguage === 'tr' ? '🇹🇷' : '🇬🇧'}</span>
+      {/* ── GÖRSEL ── */}
+      <div className="ec-cover">
+        {/* Mekan arka plan */}
+        {locationFile && (
+          <div className="ec-cover-bg"
+            style={{ backgroundImage: `url('/assets/locations/${locationFile}')` }} />
         )}
-        {story.viewCount > 0 && <span className="ec-tag">👁 {story.viewCount}</span>}
+        {/* Karakterler */}
+        <div className="ec-cover-chars" style={{ '--char-count': chars.length || 1 }}>
+          {chars.map((c, i) => {
+            const file = c.imagePath?.split('/').pop() || '';
+            return (
+              <div key={i} className="ec-cover-char">
+                <img src={`/assets/characters/${file}`} alt={c.name || ''}
+                  onError={e => { e.target.style.display = 'none'; }} />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Sol üst badge */}
+        {badge && <span className={`ec-badge ${badge.cls}`}>{badge.label}</span>}
+
+        {/* Sağ üst beğeni */}
+        <button className="ec-like-btn" onClick={() => setLiked(l => !l)}>
+          <span>{liked ? '❤️' : '🤍'}</span>
+          <span>{likeCount + (liked ? 1 : 0)}</span>
+        </button>
       </div>
 
-      {/* Rate it */}
-      <div className="ec-rate">
-        <span className="ec-rate-label">{rated ? '✓ Puanlandı!' : 'Puan ver:'}</span>
-        <div className="star-rating">
-          {[1,2,3,4,5].map(s => (
-            <button key={s} type="button"
-              className={`star ${s <= (hover || userRating) ? 'filled' : ''}`}
-              onMouseEnter={() => setHover(s)}
-              onMouseLeave={() => setHover(0)}
-              onClick={() => handleRate(s)}
-              disabled={rated}>★</button>
-          ))}
+      {/* ── BİLGİ ── */}
+      <div className="ec-body">
+
+        {/* Yazar + zaman */}
+        <div className="ec-author-row">
+          <div className="ec-avatar">
+            {story.author?.username?.[0]?.toUpperCase() || '?'}
+          </div>
+          <span className="ec-username">{story.author?.username}</span>
+          <span className="ec-time">{timeAgo(story.createdAt)}</span>
+        </div>
+
+        {/* Başlık */}
+        <h3 className="ec-title">{story.title}</h3>
+
+        {/* Kısa açıklama — hikayenin ilk cümlesi */}
+        {story.fullText && (
+          <p className="ec-excerpt">
+            {story.fullText.split('.')[0].slice(0, 80)}{story.fullText.length > 80 ? '...' : ''}
+          </p>
+        )}
+
+        {/* Meta */}
+        <div className="ec-meta-row">
+          {story.options?.childAge && (
+            <span className="ec-meta">😊 {story.options.childAge} yaş</span>
+          )}
+          {story.options?.duration && (
+            <span className="ec-meta">📖 {durationLabel(story.options.duration)}</span>
+          )}
+          {story.viewCount > 0 && (
+            <span className="ec-meta">👁 {story.viewCount}</span>
+          )}
+        </div>
+
+        {/* Alt aksiyon */}
+        <div className="ec-footer">
+          <button className="ec-heart-btn" onClick={() => setLiked(l => !l)}>
+            <span>{liked ? '❤️' : '🤍'}</span>
+            <span>{likeCount + (liked ? 1 : 0)}</span>
+          </button>
+          <button className="ec-read-btn" onClick={() => onRate(story._id, 0, true)}>
+            {lang === 'tr' ? 'Oku' : 'Read'}
+          </button>
         </div>
       </div>
     </div>
@@ -86,59 +137,74 @@ function CommunityStoryCard({ story, onRate, lang }) {
 
 export default function Explore() {
   const { t, lang } = useLang();
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const { user }    = useAuth();
+  const navigate    = useNavigate();
 
-  const [stories, setStories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [page, setPage] = useState(1);
+  const [stories, setStories]       = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState('');
+  const [page, setPage]             = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filterAge, setFilterAge] = useState('');
-  const [filterLang, setFilterLang] = useState('');
+  const [filterTab, setFilterTab]   = useState('all'); // all | new | mostRead | topRated
 
   const fetchStories = useCallback(async (p = 1) => {
     setLoading(true);
     try {
       let url = `/stories/explore?page=${p}&limit=12`;
-      if (filterAge) url += `&ageGroup=${filterAge}`;
-      if (filterLang) url += `&language=${filterLang}`;
       const res = await api.get(url);
-      setStories(res.data.stories);
+      let data = res.data.stories;
+
+      if (filterTab === 'new')      data = [...data].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      if (filterTab === 'mostRead') data = [...data].sort((a,b) => (b.viewCount||0) - (a.viewCount||0));
+      if (filterTab === 'topRated') data = [...data].sort((a,b) => (b.communityAverageRating||0) - (a.communityAverageRating||0));
+
+      setStories(data);
       setTotalPages(res.data.pagination.totalPages);
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
-  }, [filterAge, filterLang]);
+  }, [filterTab]);
 
   useEffect(() => { fetchStories(page); }, [page, fetchStories]);
 
-  const handleRate = async (id, rating) => {
+  const handleRate = async (id, rating, read = false) => {
+    if (read) { navigate(`/story/${id}`); return; }
     if (!user) { navigate('/login'); return; }
     try { await api.post(`/stories/${id}/community-rating`, { rating }); } catch (e) {}
   };
 
+  const tabs = [
+    { key: 'all',      icon: '⊞', label: lang === 'tr' ? 'Tümü'          : 'All'        },
+    { key: 'new',      icon: '🕐', label: lang === 'tr' ? 'En Yeni'       : 'Newest'     },
+    { key: 'mostRead', icon: '👁', label: lang === 'tr' ? 'En Çok Okunan' : 'Most Read'  },
+    { key: 'topRated', icon: '❤️', label: lang === 'tr' ? 'En Çok Beğenilen' : 'Top Rated' },
+  ];
+
   return (
     <div className="explore-page">
       <div className="container">
+
         {/* Header */}
         <div className="exp-header animate-fadeIn">
-          <h1 className="exp-title">{t.explore.title}</h1>
-          <p className="exp-subtitle">{t.explore.subtitle}</p>
+          <h1 className="exp-title">{t.explore?.title || 'Keşfet'}</h1>
+          <p className="exp-subtitle">{t.explore?.subtitle || 'Topluluktan hikayeler'}</p>
         </div>
 
-        {/* Filters */}
-        <div className="exp-filters animate-fadeIn">
-          <select className="filter-select" value={filterAge} onChange={e => { setFilterAge(e.target.value); setPage(1); }}>
-            <option value="">{t.explore.allAges}</option>
-            {[2,3,4,5,6,7,8,9,10,11,12].map(a => (
-              <option key={a} value={a}>{a} yaş</option>
+        {/* Tab filtreler + paylaş butonu */}
+        <div className="exp-toolbar animate-fadeIn">
+          <div className="exp-tabs">
+            {tabs.map(tab => (
+              <button key={tab.key}
+                className={`exp-tab ${filterTab === tab.key ? 'active' : ''}`}
+                onClick={() => { setFilterTab(tab.key); setPage(1); }}>
+                <span>{tab.icon}</span> {tab.label}
+              </button>
             ))}
-          </select>
-          <select className="filter-select" value={filterLang} onChange={e => { setFilterLang(e.target.value); setPage(1); }}>
-            <option value="">{t.explore.allLangs}</option>
-            <option value="tr">🇹🇷 Türkçe</option>
-            <option value="en">🇬🇧 English</option>
-          </select>
+          </div>
+          {user && (
+            <button className="exp-share-btn" onClick={() => navigate('/')}>
+              + {lang === 'tr' ? 'Hikaye Paylaş' : 'Share Story'}
+            </button>
+          )}
         </div>
 
         {loading && <div className="exp-loading"><div className="spinner" /></div>}
@@ -147,7 +213,7 @@ export default function Explore() {
         {!loading && stories.length === 0 && (
           <div className="exp-empty animate-fadeIn">
             <div className="exp-empty-icon">🌟</div>
-            <h3>{t.explore.empty}</h3>
+            <h3>{t.explore?.empty || 'Henüz hikaye yok'}</h3>
             <p>Henüz paylaşılan hikaye yok. İlk paylaşan sen ol!</p>
             {user && (
               <button className="btn btn-primary" onClick={() => navigate('/')}>
@@ -169,9 +235,11 @@ export default function Explore() {
         )}
 
         {totalPages > 1 && (
-          <div className="ms-pagination">
+          <div className="exp-pagination">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-              <button key={p} className={`page-btn ${p === page ? 'active' : ''}`} onClick={() => setPage(p)}>{p}</button>
+              <button key={p}
+                className={`page-btn ${p === page ? 'active' : ''}`}
+                onClick={() => setPage(p)}>{p}</button>
             ))}
           </div>
         )}
