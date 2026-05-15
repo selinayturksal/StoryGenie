@@ -15,6 +15,14 @@ export default function StoryView() {
   const location   = story?.location  || null;
   const onSave     = state?.onSave;
 
+  const cleanMd = (text = '') =>
+    text
+      .replace(/^#{1,6}\s*/gm, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/_{1,2}(.*?)_{1,2}/g, '$1')
+      .trim();
+
   const [phase, setPhase]             = useState('reading');
   const [currentPage, setCurrentPage] = useState(0);
   const [flipping, setFlipping]       = useState(false);
@@ -358,7 +366,7 @@ export default function StoryView() {
                   <div className="sv-page-divider-line" />
                 </div>
                 <div className="sv-page-text">
-                  <p>{pages[currentPage]?.content}</p>
+                  <p>{cleanMd(pages[currentPage]?.content)}</p>
                 </div>
               </div>
             </div>

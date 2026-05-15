@@ -8,9 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import './Dashboard.css';
 
-const COLORS_BAR  = ['#7c3aed', '#7c3aed', '#7c3aed', '#7c3aed', '#7c3aed', '#7c3aed', '#7c3aed'];
 const COLORS_LANG = ['#7c3aed', '#06b6d4'];
-const COLORS_AGE  = ['#f59e0b', '#ec4899', '#10b981', '#f97316', '#06b6d4'];
 const COLORS_DUR  = ['#ec4899', '#f97316', '#06b6d4'];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -29,14 +27,6 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const CustomBar = (props) => {
-  const { x, y, width, height, fill } = props;
-  return (
-    <rect x={x} y={y} width={width} height={height}
-      rx={6} ry={6} fill={fill} />
-  );
-};
-
 function StatCard({ label, sublabel, value, color, index }) {
   return (
     <div className="stat-card animate-fadeIn" style={{ '--accent': color, animationDelay: `${index * 0.1}s` }}>
@@ -45,6 +35,33 @@ function StatCard({ label, sublabel, value, color, index }) {
         <div className="stat-value" style={{ color }}>{value}</div>
         <div className="stat-label">{label}</div>
         {sublabel && <div className="stat-sublabel">{sublabel}</div>}
+      </div>
+    </div>
+  );
+}
+
+// En çok kullanılan karakter/mekan kartı
+function TopItem({ imagePath, name, count, index }) {
+  const file = imagePath?.split('/').pop() || '';
+  const isChar = imagePath?.includes('characters');
+  const isLoc  = imagePath?.includes('locations');
+  return (
+    <div className="top-item" style={{ animationDelay: `${index * 0.08}s` }}>
+      <div className="top-item-img">
+        {file ? (
+          <img
+            src={isChar ? `/assets/characters/${file}` : isLoc ? `/assets/locations/${file}` : `/assets/characters/${file}`}
+            alt={name}
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+        ) : <span className="top-item-placeholder">?</span>}
+      </div>
+      <div className="top-item-info">
+        <span className="top-item-name">{name}</span>
+        <span className="top-item-count">{count} hikaye</span>
+      </div>
+      <div className="top-item-bar-wrap">
+        <div className="top-item-bar" style={{ width: `${Math.min(count * 20, 100)}%` }} />
       </div>
     </div>
   );
@@ -88,22 +105,15 @@ export default function Dashboard() {
   }));
 
   const durationData = (charts?.durationDistribution || []).map(d => ({
-    name: d._id === 'short' ? 'Kısa (0-2 dk)' : d._id === 'medium' ? 'Orta (2-5 dk)' : 'Uzun (5 dk+)',
+    name: d._id === 'short' ? 'Kısa' : d._id === 'medium' ? 'Orta' : 'Uzun',
     value: d.count,
   }));
 
-  const ageData = (charts?.ageDistribution || []).map(d => {
-    const age = d._id;
-    let label = `${age} Yaş`;
-    if (age <= 4) label = '3-4 Yaş';
-    else if (age <= 6) label = '5-6 Yaş';
-    else if (age <= 8) label = '7-8 Yaş';
-    else if (age <= 10) label = '9-10 Yaş';
-    else label = '11+ Yaş';
-    return { name: label, count: d.count };
-  });
-
   const barData = charts?.storiesPerDay || [];
+
+  const topHumans  = charts?.topHumans  || [];
+  const topAnimals = charts?.topAnimals || [];
+  const topLocations = charts?.topLocations || [];
 
   return (
     <div className="dashboard-page">
@@ -115,147 +125,148 @@ export default function Dashboard() {
           <p className="dash-subtitle">Merhaba {user?.username}! {t.dashboard?.subtitle || 'İstatistiklerin aşağıda'}</p>
         </div>
 
-        {/* Stat kartları */}
+        {/* Stat kartları — sadece 2 */}
         <div className="stat-cards">
           <StatCard index={0}
             label="Toplam Hikaye"
-            sublabel="Oluşturulan tüm hikayelerin toplam sayısı"
+            sublabel="Oluşturulan tüm hikayelerin sayısı"
             value={summary?.totalStories ?? 0}
             color="#7c3aed"
           />
           <StatCard index={1}
-            label="Paylaşılan"
-            sublabel="Topluluk ile paylaşılan hikayelerin sayısı"
+            label="Paylaşılan Hikaye"
+            sublabel="Topluluk ile paylaşılan hikayeler"
             value={summary?.publicStories ?? 0}
             color="#06b6d4"
           />
-          <StatCard index={2}
-            label="Ortalama Puan"
-            sublabel="Hikayelere verilen ortalama puan"
-            value={summary?.avgRating > 0 ? `${summary.avgRating}/5` : '—'}
-            color="#f59e0b"
-          />
         </div>
 
-        {/* Grafikler */}
+        {/* Grafikler grid */}
         <div className="charts-grid">
 
-          {/* Son 7 Gün — Bar */}
-          <div className="chart-card animate-fadeIn">
+          {/* Son 7 Gün Bar */}
+          <div className="chart-card animate-fadeIn" style={{ gridColumn: 'span 2' }}>
             <div className="chart-card-header">
-              <h3 className="chart-title">Son 7 Günlük Hikayeler</h3>
+              <h3 className="chart-title">📅 Son 7 Günlük Hikayeler</h3>
               <p className="chart-desc">Son 7 günde oluşturulan hikaye sayısı</p>
             </div>
             {barData.length > 0 ? (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={barData} margin={{ top: 16, right: 8, bottom: 8, left: -10 }}>
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--clr-ink-muted)' }} />
-                  <YAxis tick={{ fontSize: 11, fill: 'var(--clr-ink-muted)' }} allowDecimals={false}
-                    label={{ value: 'Hikaye Sayısı', angle: -90, position: 'insideLeft', offset: 10, style: { fontSize: 10, fill: 'var(--clr-ink-muted)' } }} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--clr-ink-muted)' }} allowDecimals={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="count" name="Hikaye" radius={[6, 6, 0, 0]} fill="#7c3aed" maxBarSize={28} />
+                  <Bar dataKey="count" name="Hikaye" radius={[6,6,0,0]} fill="#7c3aed" maxBarSize={36} />
                 </BarChart>
               </ResponsiveContainer>
             ) : <div className="chart-empty">Henüz veri yok</div>}
           </div>
 
-          {/* Dil Dağılımı — Pie */}
+          {/* Dil Dağılımı */}
           <div className="chart-card animate-fadeIn">
             <div className="chart-card-header">
-              <h3 className="chart-title">Dil Dağılımı</h3>
-              <p className="chart-desc">Hikayelerin yazıldığı dillere göre dağılım</p>
+              <h3 className="chart-title">🌍 Dil Tercih Dağılımı</h3>
+              <p className="chart-desc">Hikayelerin yazıldığı diller</p>
             </div>
             {langData.length > 0 ? (
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie
-                    data={langData} cx="50%" cy="50%"
-                    outerRadius={85} innerRadius={0}
-                    dataKey="value"
-                    label={false}
-                    labelLine={false}
-                  >
+                  <Pie data={langData} cx="50%" cy="50%"
+                    outerRadius={80} dataKey="value" label={false} labelLine={false}>
                     {langData.map((_, i) => (
                       <Cell key={i} fill={COLORS_LANG[i % COLORS_LANG.length]} />
                     ))}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend
-                    formatter={(value) => <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{value}</span>}
-                  />
+                  <Legend formatter={v => <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{v}</span>} />
                 </PieChart>
               </ResponsiveContainer>
             ) : <div className="chart-empty">Henüz veri yok</div>}
           </div>
 
-          {/* Yaş Dağılımı — Bar */}
+          {/* Süre Dağılımı */}
           <div className="chart-card animate-fadeIn">
             <div className="chart-card-header">
-              <h3 className="chart-title">Yaş Dağılımı</h3>
-              <p className="chart-desc">Hikayeleri oluşturan kullanıcıların yaş gruplarına göre dağılımı</p>
+              <h3 className="chart-title">⏳ Süre Dağılımı</h3>
+              <p className="chart-desc">Hikayelerin okuma süresine göre dağılımı</p>
             </div>
-            {ageData.length > 0 ? (
+            {durationData.length > 0 ? (
               <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={ageData} margin={{ top: 16, right: 8, bottom: 8, left: -10 }}>
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--clr-ink-muted)' }} />
-                  <YAxis tick={{ fontSize: 11, fill: 'var(--clr-ink-muted)' }} allowDecimals={false}
-                    label={{ value: 'Kullanıcı Sayısı', angle: -90, position: 'insideLeft', offset: 10, style: { fontSize: 10, fill: 'var(--clr-ink-muted)' } }} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="count" name="Hikaye" radius={[6, 6, 0, 0]} maxBarSize={28}>
-                    {ageData.map((_, i) => (
-                      <Cell key={i} fill={COLORS_AGE[i % COLORS_AGE.length]} />
+                <PieChart>
+                  <Pie data={durationData} cx="50%" cy="50%"
+                    outerRadius={80} innerRadius={40} dataKey="value" label={false} labelLine={false}>
+                    {durationData.map((_, i) => (
+                      <Cell key={i} fill={COLORS_DUR[i % COLORS_DUR.length]} />
                     ))}
-                  </Bar>
-                </BarChart>
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend formatter={v => <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{v}</span>} />
+                </PieChart>
               </ResponsiveContainer>
             ) : <div className="chart-empty">Henüz veri yok</div>}
           </div>
 
-          {/* Süre Dağılımı — Pie */}
+          {/* En Çok Seçilen Karakterler */}
           <div className="chart-card animate-fadeIn">
             <div className="chart-card-header">
-              <h3 className="chart-title">Süre Dağılımı</h3>
-              <p className="chart-desc">Hikayelerin okuma süresine göre dağılımı</p>
+              <h3 className="chart-title">👧👦 En Çok Seçilen Karakterler</h3>
+              <p className="chart-desc">En sık hikayeye dahil edilen çocuk karakterler</p>
             </div>
-            {durationData.length > 0 ? (
-              <div style={{ position: 'relative' }}>
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie
-                      data={durationData} cx="50%" cy="45%"
-                      outerRadius={85} innerRadius={42}
-                      dataKey="value"
-                      label={false}
-                      labelLine={false}
-                    >
-                      {durationData.map((_, i) => (
-                        <Cell key={i} fill={COLORS_DUR[i % COLORS_DUR.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend
-                      formatter={(value) => <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{value}</span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                {/* Ortada saat ikonu */}
-                <div style={{
-                  position: 'absolute',
-                  top: '50%', left: '50%',
-                  transform: 'translate(-50%, -62%)',
-                  pointerEvents: 'none',
-                }}>
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="16" cy="16" r="13" stroke="rgba(150,130,200,0.5)" strokeWidth="2" fill="none"/>
-                    <line x1="16" y1="8" x2="16" y2="16" stroke="rgba(150,130,200,0.8)" strokeWidth="2.2" strokeLinecap="round"/>
-                    <line x1="16" y1="16" x2="21" y2="19" stroke="rgba(150,130,200,0.8)" strokeWidth="2.2" strokeLinecap="round"/>
-                    <circle cx="16" cy="16" r="1.8" fill="rgba(150,130,200,0.9)"/>
-                    <line x1="16" y1="4" x2="16" y2="6" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="16" y1="26" x2="16" y2="28" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="4" y1="16" x2="6" y2="16" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="26" y1="16" x2="28" y2="16" stroke="rgba(150,130,200,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                </div>
+            {topHumans.length > 0 ? (
+              <div className="top-list">
+                {topHumans.map((item, i) => (
+                  <TopItem key={i} index={i}
+                    imagePath={item._id.imagePath}
+                    name={item._id.name}
+                    count={item.count}
+                  />
+                ))}
+              </div>
+            ) : <div className="chart-empty">Henüz veri yok</div>}
+          </div>
+
+          {/* En Çok Seçilen Hayvanlar */}
+          <div className="chart-card animate-fadeIn">
+            <div className="chart-card-header">
+              <h3 className="chart-title">🐾 En Çok Seçilen Hayvanlar</h3>
+              <p className="chart-desc">En sık hikayeye dahil edilen hayvan karakterler</p>
+            </div>
+            {topAnimals.length > 0 ? (
+              <div className="top-list">
+                {topAnimals.map((item, i) => (
+                  <TopItem key={i} index={i}
+                    imagePath={item._id.imagePath}
+                    name={item._id.name}
+                    count={item.count}
+                  />
+                ))}
+              </div>
+            ) : <div className="chart-empty">Henüz veri yok</div>}
+          </div>
+
+          {/* En Çok Seçilen Mekanlar */}
+          <div className="chart-card animate-fadeIn" style={{ gridColumn: 'span 2' }}>
+            <div className="chart-card-header">
+              <h3 className="chart-title">🗺️ En Çok Seçilen Mekanlar</h3>
+              <p className="chart-desc">Hikayelerde en sık kullanılan mekanlar</p>
+            </div>
+            {topLocations.length > 0 ? (
+              <div className="top-locations-grid">
+                {topLocations.map((item, i) => {
+                  const file = item._id.imagePath?.split('/').pop() || '';
+                  return (
+                    <div key={i} className="top-loc-card" style={{ animationDelay: `${i * 0.08}s` }}>
+                      {file && (
+                        <div className="top-loc-img"
+                          style={{ backgroundImage: `url('/assets/locations/${file}')` }} />
+                      )}
+                      <div className="top-loc-overlay">
+                        <span className="top-loc-name">{item._id.name}</span>
+                        <span className="top-loc-count">{item.count} hikaye</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             ) : <div className="chart-empty">Henüz veri yok</div>}
           </div>

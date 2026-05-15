@@ -4,32 +4,18 @@ import { useLang } from '../context/LangContext';
 import api from '../services/api';
 import './MyStories.css';
 
-function StarRating({ value, onChange }) {
-  const [hover, setHover] = useState(0);
-  return (
-    <div className="star-rating">
-      {[1, 2, 3, 4, 5].map(star => (
-        <button key={star} type="button"
-          className={`star ${star <= (hover || value) ? 'filled' : ''}`}
-          onMouseEnter={() => setHover(star)}
-          onMouseLeave={() => setHover(0)}
-          onClick={() => onChange(star)}>★</button>
-      ))}
-    </div>
-  );
-}
+// Favorileri localStorage'dan al/kaydet
+const getFavorites = () => {
+  try { return JSON.parse(localStorage.getItem('ms_favorites') || '[]'); } catch { return []; }
+};
+const saveFavorites = (favs) => {
+  localStorage.setItem('ms_favorites', JSON.stringify(favs));
+};
 
-function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
-  const [rating, setRating]       = useState(story.rating || 0);
-  const [isPublic, setIsPublic]   = useState(story.isPublic);
+function StoryCard({ story, onTogglePublish, onRead, onToggleFavorite, isFavorite, lang }) {
+  const [isPublic, setIsPublic]     = useState(story.isPublic);
   const [publishing, setPublishing] = useState(false);
-  const [ratingLoading, setRatingLoading] = useState(false);
-
-  const handleRate = async (val) => {
-    setRating(val); setRatingLoading(true);
-    await onRate(story._id, val);
-    setRatingLoading(false);
-  };
+  const [fav, setFav]               = useState(isFavorite);
 
   const handlePublish = async () => {
     setPublishing(true);
@@ -37,21 +23,29 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
     setIsPublic(newVal); setPublishing(false);
   };
 
-  const chars    = story.options?.characters || [];
-  const location = story.options?.location;
-  const date     = new Date(story.createdAt).toLocaleDateString(
+  const handleFav = () => {
+    const newFav = !fav;
+    setFav(newFav);
+    onToggleFavorite(story._id, newFav);
+  };
+
+  const cleanMd = (text = '') =>
+    text.replace(/^#{1,6}\s*/gm, '').replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1').replace(/_{1,2}(.*?)_{1,2}/g, '$1').trim();
+
+  const chars        = story.options?.characters || [];
+  const location     = story.options?.location;
+  const locationFile = location?.imagePath?.split('/').pop() || '';
+  const date         = new Date(story.createdAt).toLocaleDateString(
     lang === 'tr' ? 'tr-TR' : 'en-US',
     { day: 'numeric', month: 'long', year: 'numeric' }
   );
 
-  const locationFile = location?.imagePath?.split('/').pop() || '';
-
   return (
     <div className="sc-card animate-fadeIn">
 
-      {/* ── SOL — mekan arka plan + karakterler boydan ── */}
+      {/* ── GÖRSEL ── */}
       <div className="sc-visual">
-        {/* Mekan arka planı */}
         {locationFile && (
           <div className="sc-visual-bg"
             style={{ backgroundImage: `url('/assets/locations/${locationFile}')` }} />
@@ -61,6 +55,7 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
         <span className={`sc-badge sc-badge--tl ${isPublic ? 'public' : 'private'}`}>
           {isPublic ? (lang === 'tr' ? '🌍 Herkese Açık' : '🌍 Public') : (lang === 'tr' ? '🔒 Gizli' : '🔒 Private')}
         </span>
+
         {/* Sağ üst — dil rozeti */}
         {story.options?.storyLanguage && (
           <span className="sc-badge sc-badge--tr lang">
@@ -68,37 +63,32 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
           </span>
         )}
 
-        {/* Karakterler boydan */}
+        {/* Favori yıldızı — sol alt */}
+        <button className={`sc-fav-btn ${fav ? 'sc-fav-btn--active' : ''}`} onClick={handleFav}
+          title={fav ? (lang === 'tr' ? 'Favorilerden çıkar' : 'Remove from favorites') : (lang === 'tr' ? 'Favorilere ekle' : 'Add to favorites')}>
+          {fav ? '⭐' : '☆'}
+        </button>
+
+        {/* Karakterler */}
         <div className="sc-chars-row" style={{ '--char-count': chars.length || 1 }}>
           {chars.map((c, i) => {
             const file = c.imagePath?.split('/').pop() || '';
             return (
               <div key={i} className="sc-char-col">
-                <img
-                  src={`/assets/characters/${file}`}
-                  alt={c.name || ''}
-                  onError={e => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-                <span className="sc-char-emoji" style={{ display: 'none' }}>
-                  {c.emoji || '👤'}
-                </span>
+                <img src={`/assets/characters/${file}`} alt={c.name || ''}
+                  onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                <span className="sc-char-emoji" style={{ display: 'none' }}>{c.emoji || '👤'}</span>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* ── SAĞ — hikaye detayları ── */}
+      {/* ── BİLGİ ── */}
       <div className="sc-info">
 
-        {/* Tarih */}
         <div className="sc-date">📅 {date}</div>
-
-        {/* Başlık */}
-        <h3 className="sc-title">{story.title}</h3>
+        <h3 className="sc-title">{cleanMd(story.title)}</h3>
 
         {/* Karakter chipleri */}
         {chars.length > 0 && (
@@ -126,29 +116,24 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
           </div>
         )}
 
-        {/* Meta bilgiler */}
+        <div className="sc-spacer" />
+
+        {/* Meta */}
         <div className="sc-meta-row">
           {story.options?.childAge && (
-            <span className="sc-meta">{story.options.childAge <= 4 ? '🍼' : story.options.childAge <= 7 ? '🧒' : '👦'} {lang === 'tr' ? story.options.childAge + ' yaş' : 'Age ' + story.options.childAge}</span>
+            <span className="sc-meta">
+              {story.options.childAge <= 4 ? '🍼' : story.options.childAge <= 7 ? '🧒' : '👦'}{' '}
+              {lang === 'tr' ? story.options.childAge + ' yaş' : 'Age ' + story.options.childAge}
+            </span>
           )}
           {story.options?.duration && (
             <span className="sc-meta">
-              {story.options.duration === 'short' ? (lang === 'tr' ? '⏳ Kısa' : '⏳ Short') : story.options.duration === 'medium' ? (lang === 'tr' ? '⏳ Orta' : '⏳ Medium') : (lang === 'tr' ? '⏳ Uzun' : '⏳ Long')}
+              {story.options.duration === 'short' ? (lang === 'tr' ? '⏳ Kısa' : '⏳ Short')
+                : story.options.duration === 'medium' ? (lang === 'tr' ? '⏳ Orta' : '⏳ Medium')
+                : (lang === 'tr' ? '⏳ Uzun' : '⏳ Long')}
             </span>
           )}
-          {story.viewCount > 0 && (
-            <span className="sc-meta">👁 {story.viewCount}</span>
-          )}
-        </div>
-
-        {/* Puanlama */}
-        <div className="sc-rating-block">
-          <div className="sc-rating-label">
-            {rating
-              ? <><span className="sc-rating-score">{rating}/5</span></>
-              : <span className="sc-rating-hint">{lang === 'tr' ? 'Puanla' : 'Rate'}</span>}
-          </div>
-          <StarRating value={rating} onChange={handleRate} />
+          {story.viewCount > 0 && <span className="sc-meta">👁 {story.viewCount}</span>}
         </div>
 
         {/* Aksiyonlar */}
@@ -159,7 +144,9 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
           <button
             className={`sc-btn ${isPublic ? 'sc-btn--outline' : 'sc-btn--ghost'}`}
             onClick={handlePublish} disabled={publishing}>
-            {publishing ? '⏳' : isPublic ? (lang === 'tr' ? '🔒 Gizle' : '🔒 Hide') : (lang === 'tr' ? '🌍 Paylaş' : '🌍 Share')}
+            {publishing ? '⏳' : isPublic
+              ? (lang === 'tr' ? '🔒 Gizle' : '🔒 Hide')
+              : (lang === 'tr' ? '🌍 Paylaş' : '🌍 Share')}
           </button>
         </div>
       </div>
@@ -170,11 +157,14 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
 export default function MyStories() {
   const { t, lang } = useLang();
   const navigate    = useNavigate();
+
   const [stories, setStories]       = useState([]);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState('');
   const [page, setPage]             = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [activeTab, setActiveTab]   = useState('all'); // 'all' | 'favorites'
+  const [favorites, setFavorites]   = useState(getFavorites);
 
   const fetchStories = useCallback(async (p = 1) => {
     setLoading(true);
@@ -188,10 +178,6 @@ export default function MyStories() {
 
   useEffect(() => { fetchStories(page); }, [page, fetchStories]);
 
-  const handleRate = async (id, rating) => {
-    try { await api.patch(`/stories/${id}/rating`, { rating }); } catch (e) {}
-  };
-
   const handleTogglePublish = async (id, isPublic) => {
     try {
       const res = await api.patch(`/stories/${id}/publish`, { isPublic });
@@ -199,40 +185,81 @@ export default function MyStories() {
     } catch { return !isPublic; }
   };
 
+  const handleToggleFavorite = (id, isFav) => {
+    setFavorites(prev => {
+      const next = isFav ? [...prev, id] : prev.filter(f => f !== id);
+      saveFavorites(next);
+      return next;
+    });
+  };
+
+  const displayedStories = activeTab === 'favorites'
+    ? stories.filter(s => favorites.includes(s._id))
+    : stories;
+
   return (
     <div className="my-stories-page">
       <div className="container">
+
         <div className="ms-header animate-fadeIn">
           <h1 className="ms-title">{t.myStories.title}</h1>
           <p className="ms-subtitle">{t.myStories.subtitle}</p>
         </div>
 
+        {/* Tab bar */}
+        <div className="ms-tabs animate-fadeIn">
+          <button
+            className={`ms-tab ${activeTab === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveTab('all')}>
+            ⊞ {lang === 'tr' ? 'Tümü' : 'All'}
+            <span className="ms-tab-count">{stories.length}</span>
+          </button>
+          <button
+            className={`ms-tab ${activeTab === 'favorites' ? 'active' : ''}`}
+            onClick={() => setActiveTab('favorites')}>
+            ⭐ {lang === 'tr' ? 'Favoriler' : 'Favorites'}
+            <span className="ms-tab-count">{favorites.filter(f => stories.some(s => s._id === f)).length}</span>
+          </button>
+        </div>
+
         {loading && <div className="ms-loading"><div className="spinner" /></div>}
         {error && !loading && <div className="ms-error">{error}</div>}
 
-        {!loading && !error && stories.length === 0 && (
+        {!loading && !error && displayedStories.length === 0 && (
           <div className="ms-empty animate-fadeIn">
-            <div className="ms-empty-icon">📭</div>
-            <h3>{t.myStories.empty}</h3>
-            <button className="btn btn-primary" onClick={() => navigate('/')}>
-              ✨ {t.myStories.emptyBtn}
-            </button>
+            <div className="ms-empty-icon">{activeTab === 'favorites' ? '⭐' : '📭'}</div>
+            <h3>
+              {activeTab === 'favorites'
+                ? (lang === 'tr' ? 'Henüz favori yok' : 'No favorites yet')
+                : t.myStories.empty}
+            </h3>
+            {activeTab === 'all' && (
+              <button className="btn btn-primary" onClick={() => navigate('/')}>
+                ✨ {t.myStories.emptyBtn}
+              </button>
+            )}
+            {activeTab === 'favorites' && (
+              <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem' }}>
+                {lang === 'tr' ? 'Hikaye kartlarındaki ☆ yıldıza basarak favorine ekle!' : 'Tap the ☆ star on any story card to add it here!'}
+              </p>
+            )}
           </div>
         )}
 
-        {!loading && stories.length > 0 && (
+        {!loading && displayedStories.length > 0 && (
           <div className="ms-grid">
-            {stories.map(story => (
+            {displayedStories.map(story => (
               <StoryCard key={story._id} story={story} lang={lang}
-                onRate={handleRate}
                 onTogglePublish={handleTogglePublish}
                 onRead={(id) => navigate(`/story/${id}`)}
+                onToggleFavorite={handleToggleFavorite}
+                isFavorite={favorites.includes(story._id)}
               />
             ))}
           </div>
         )}
 
-        {totalPages > 1 && (
+        {totalPages > 1 && activeTab === 'all' && (
           <div className="ms-pagination">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <button key={p}

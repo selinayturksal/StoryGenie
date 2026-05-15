@@ -6,14 +6,22 @@ import api from '../services/api';
 import './Explore.css';
 
 function CommunityStoryCard({ story, onRate, onLike, lang }) {
-  const [liked, setLiked]         = useState(false);
-  const [likeCount, setLikeCount] = useState(story.communityRatings?.length || 0);
+  const [liked, setLiked]         = useState(story.isLikedByMe || false);
+  const [likeCount, setLikeCount] = useState(story.likeCount || story.communityRatings?.length || 0);
   const [userRating, setUserRating] = useState(0);
   const [rated, setRated]         = useState(false);
 
   const chars       = story.options?.characters || [];
   const location    = story.options?.location;
   const locationFile = location?.imagePath?.split('/').pop() || '';
+
+  const cleanMd = (text = '') =>
+    text
+      .replace(/^#{1,6}\s*/gm, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/_{1,2}(.*?)_{1,2}/g, '$1')
+      .trim();
 
   const timeAgo = (dateStr) => {
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -40,7 +48,8 @@ function CommunityStoryCard({ story, onRate, onLike, lang }) {
     if (liked) return;
     setLiked(true);
     setLikeCount(c => c + 1);
-    await onLike(story._id);
+    const result = await onLike(story._id);
+    if (result?.likeCount !== undefined) setLikeCount(result.likeCount);
   };
 
   const handleRate = async (val) => {
@@ -92,7 +101,10 @@ function CommunityStoryCard({ story, onRate, onLike, lang }) {
           <span className="ec-time">{timeAgo(story.createdAt)}</span>
         </div>
 
-        <h3 className="ec-title">{story.title}</h3>
+        <h3 className="ec-title">{cleanMd(story.title)}</h3>
+
+        {/* Spacer — meta + footer her zaman altta */}
+        <div className="ec-spacer" />
 
         <div className="ec-meta-row">
           {story.options?.childAge && (
@@ -169,7 +181,10 @@ export default function Explore() {
 
   const handleLike = async (id) => {
     if (!user) { navigate('/login'); return; }
-    try { await api.post(`/stories/${id}/community-rating`, { rating: 5 }); } catch (e) {}
+    try {
+      const res = await api.post(`/stories/${id}/like`);
+      return res.data;
+    } catch (e) { return null; }
   };
 
   // sortBy 'all' iken sıralama yok
