@@ -5,19 +5,15 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import './Explore.css';
 
-function CommunityStoryCard({ story, onRate, lang }) {
-  const [liked, setLiked]       = useState(false);
+function CommunityStoryCard({ story, onRate, onLike, lang }) {
+  const [liked, setLiked]         = useState(false);
+  const [likeCount, setLikeCount] = useState(story.communityRatings?.length || 0);
   const [userRating, setUserRating] = useState(0);
-  const [rated, setRated]       = useState(false);
+  const [rated, setRated]         = useState(false);
 
-  const chars    = story.options?.characters || [];
-  const location = story.options?.location;
+  const chars       = story.options?.characters || [];
+  const location    = story.options?.location;
   const locationFile = location?.imagePath?.split('/').pop() || '';
-
-  // Görsel: önce ilk karakter, yoksa mekan
-  const firstCharFile = chars[0]?.imagePath?.split('/').pop() || '';
-
-  const likeCount = story.communityRatings?.length || 0;
 
   const timeAgo = (dateStr) => {
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -32,14 +28,20 @@ function CommunityStoryCard({ story, onRate, lang }) {
 
   const getBadge = () => {
     const days = Math.floor((Date.now() - new Date(story.createdAt).getTime()) / 86400000);
-    if (days <= 3) return { label: '⭐ Yeni', cls: 'badge--new' };
-    if (story.viewCount > 200) return { label: '📖 Çok Okunan', cls: 'badge--read' };
-    if (story.communityAverageRating >= 4) return { label: '🏆 Editör Seçkisi', cls: 'badge--editor' };
-    if (likeCount > 30) return { label: '🔥 Popüler', cls: 'badge--popular' };
+    if (days <= 3)                           return { label: lang === 'tr' ? '⭐ Yeni' : '⭐ New', cls: 'badge--new' };
+    if (story.viewCount > 200)               return { label: lang === 'tr' ? '📖 Çok Okunan' : '📖 Popular', cls: 'badge--read' };
+    if (story.communityAverageRating >= 4)   return { label: lang === 'tr' ? '🏆 Editör Seçkisi' : '🏆 Editor Pick', cls: 'badge--editor' };
+    if (likeCount > 30)                      return { label: lang === 'tr' ? '🔥 Popüler' : '🔥 Trending', cls: 'badge--popular' };
     return null;
   };
-
   const badge = getBadge();
+
+  const handleLike = async () => {
+    if (liked) return;
+    setLiked(true);
+    setLikeCount(c => c + 1);
+    await onLike(story._id);
+  };
 
   const handleRate = async (val) => {
     setUserRating(val); setRated(true);
@@ -47,22 +49,18 @@ function CommunityStoryCard({ story, onRate, lang }) {
   };
 
   const durationLabel = (d) => {
-    if (d === 'short') return lang === 'tr' ? 'Kolay' : 'Short';
-    if (d === 'long')  return lang === 'tr' ? 'Zor'   : 'Long';
+    if (d === 'short') return lang === 'tr' ? 'Kısa' : 'Short';
+    if (d === 'long')  return lang === 'tr' ? 'Uzun' : 'Long';
     return lang === 'tr' ? 'Orta' : 'Medium';
   };
 
   return (
     <div className="ec-card animate-fadeIn">
-
-      {/* ── GÖRSEL ── */}
       <div className="ec-cover">
-        {/* Mekan arka plan */}
         {locationFile && (
           <div className="ec-cover-bg"
             style={{ backgroundImage: `url('/assets/locations/${locationFile}')` }} />
         )}
-        {/* Karakterler */}
         <div className="ec-cover-chars" style={{ '--char-count': chars.length || 1 }}>
           {chars.map((c, i) => {
             const file = c.imagePath?.split('/').pop() || '';
@@ -74,21 +72,14 @@ function CommunityStoryCard({ story, onRate, lang }) {
             );
           })}
         </div>
-
-        {/* Sol üst badge */}
         {badge && <span className={`ec-badge ${badge.cls}`}>{badge.label}</span>}
-
-        {/* Sağ üst beğeni */}
-        <button className="ec-like-btn" onClick={() => setLiked(l => !l)}>
+        <button className="ec-like-btn" onClick={handleLike}>
           <span>{liked ? '❤️' : '🤍'}</span>
-          <span>{likeCount + (liked ? 1 : 0)}</span>
+          <span>{likeCount}</span>
         </button>
       </div>
 
-      {/* ── BİLGİ ── */}
       <div className="ec-body">
-
-        {/* Yazar + zaman */}
         <div className="ec-author-row">
           <div className="ec-avatar" style={{ background: story.author?.avatarBg || 'rgb(10,15,60)' }}>
             {story.author?.avatar && story.author.avatar.length > 0
@@ -101,34 +92,24 @@ function CommunityStoryCard({ story, onRate, lang }) {
           <span className="ec-time">{timeAgo(story.createdAt)}</span>
         </div>
 
-        {/* Başlık */}
         <h3 className="ec-title">{story.title}</h3>
 
-        {/* Kısa açıklama — hikayenin ilk cümlesi */}
-        {story.fullText && (
-          <p className="ec-excerpt">
-            {story.fullText.split('.')[0].slice(0, 80)}{story.fullText.length > 80 ? '...' : ''}
-          </p>
-        )}
-
-        {/* Meta */}
         <div className="ec-meta-row">
           {story.options?.childAge && (
-            <span className="ec-meta">😊 {story.options.childAge} yaş</span>
+            <span className="ec-meta">{story.options.childAge <= 4 ? '🍼' : story.options.childAge <= 7 ? '🧒' : '👦'} {lang === 'tr' ? story.options.childAge + ' yaş' : 'Age ' + story.options.childAge}</span>
           )}
           {story.options?.duration && (
-            <span className="ec-meta">📖 {durationLabel(story.options.duration)}</span>
+            <span className="ec-meta">⏳ {durationLabel(story.options.duration)}</span>
           )}
           {story.viewCount > 0 && (
             <span className="ec-meta">👁 {story.viewCount}</span>
           )}
         </div>
 
-        {/* Alt aksiyon */}
         <div className="ec-footer">
-          <button className="ec-heart-btn" onClick={() => setLiked(l => !l)}>
+          <button className="ec-heart-btn" onClick={handleLike}>
             <span>{liked ? '❤️' : '🤍'}</span>
-            <span>{likeCount + (liked ? 1 : 0)}</span>
+            <span>{likeCount}</span>
           </button>
           <button className="ec-read-btn" onClick={() => onRate(story._id, 0, true)}>
             {lang === 'tr' ? 'Oku' : 'Read'}
@@ -149,24 +130,34 @@ export default function Explore() {
   const [error, setError]           = useState('');
   const [page, setPage]             = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filterTab, setFilterTab]   = useState('all'); // all | new | mostRead | topRated
+
+  // Sıralama + Filtreler
+  const [sortBy, setSortBy]         = useState('new');      // new | liked | mostRead
+  const [filterAge, setFilterAge]   = useState('');
+  const [filterLang, setFilterLang] = useState('');
+  const [showFilters, setShowFilters]     = useState(false);
+  const [showSort, setShowSort]           = useState(false);
+  const [filterDuration, setFilterDuration] = useState('');
 
   const fetchStories = useCallback(async (p = 1) => {
     setLoading(true);
     try {
       let url = `/stories/explore?page=${p}&limit=12`;
+      if (filterAge)  url += `&ageGroup=${filterAge}`;
+      if (filterLang) url += `&language=${filterLang}`;
       const res = await api.get(url);
       let data = res.data.stories;
 
-      if (filterTab === 'new')      data = [...data].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-      if (filterTab === 'mostRead') data = [...data].sort((a,b) => (b.viewCount||0) - (a.viewCount||0));
-      if (filterTab === 'topRated') data = [...data].sort((a,b) => (b.communityAverageRating||0) - (a.communityAverageRating||0));
+      if (sortBy === 'new')      data = [...data].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      if (sortBy === 'liked')    data = [...data].sort((a,b) => (b.communityRatings?.length||0) - (a.communityRatings?.length||0));
+      if (sortBy === 'mostRead') data = [...data].sort((a,b) => (b.viewCount||0) - (a.viewCount||0));
+      if (filterDuration)        data = data.filter(s => s.options?.duration === filterDuration);
 
       setStories(data);
       setTotalPages(res.data.pagination.totalPages);
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
-  }, [filterTab]);
+  }, [sortBy, filterAge, filterLang, filterDuration]);
 
   useEffect(() => { fetchStories(page); }, [page, fetchStories]);
 
@@ -176,34 +167,114 @@ export default function Explore() {
     try { await api.post(`/stories/${id}/community-rating`, { rating }); } catch (e) {}
   };
 
-  const tabs = [
-    { key: 'all',      icon: '⊞', label: lang === 'tr' ? 'Tümü'          : 'All'        },
-    { key: 'new',      icon: '🕐', label: lang === 'tr' ? 'En Yeni'       : 'Newest'     },
-    { key: 'mostRead', icon: '👁', label: lang === 'tr' ? 'En Çok Okunan' : 'Most Read'  },
-    { key: 'topRated', icon: '❤️', label: lang === 'tr' ? 'En Çok Beğenilen' : 'Top Rated' },
+  const handleLike = async (id) => {
+    if (!user) { navigate('/login'); return; }
+    try { await api.post(`/stories/${id}/community-rating`, { rating: 5 }); } catch (e) {}
+  };
+
+  // sortBy 'all' iken sıralama yok
+  const sortOptions = [
+    { key: 'new',      label: lang === 'tr' ? 'En Yeni' : 'Newest' },
+    { key: 'liked',    label: lang === 'tr' ? 'En Beğenilen' : 'Most Liked' },
+    { key: 'mostRead', label: lang === 'tr' ? 'En Çok Okunan' : 'Most Read' },
   ];
 
   return (
     <div className="explore-page">
       <div className="container">
 
-        {/* Header */}
         <div className="exp-header animate-fadeIn">
-          <h1 className="exp-title">{t.explore?.title || 'Keşfet'}</h1>
+          <h1 className="exp-title">{t.explore?.title || 'Paylaşılan Hikayeler'}</h1>
           <p className="exp-subtitle">{t.explore?.subtitle || 'Topluluktan hikayeler'}</p>
         </div>
 
-        {/* Tab filtreler + paylaş butonu */}
+        {/* Toolbar */}
         <div className="exp-toolbar animate-fadeIn">
-          <div className="exp-tabs">
-            {tabs.map(tab => (
-              <button key={tab.key}
-                className={`exp-tab ${filterTab === tab.key ? 'active' : ''}`}
-                onClick={() => { setFilterTab(tab.key); setPage(1); }}>
-                <span>{tab.icon}</span> {tab.label}
+          <div className="exp-toolbar-left">
+            {/* Tümü */}
+            <button className={`exp-tab ${sortBy === 'all' ? 'active' : ''}`}
+              onClick={() => { setSortBy('all'); setPage(1); }}>
+              ⊞ {lang === 'tr' ? 'Tümü' : 'All'}
+            </button>
+
+            {/* Sırala */}
+            <div className="exp-dropdown-wrap">
+              <button className={`exp-tab ${['new','liked','mostRead'].includes(sortBy) ? 'active' : ''}`}
+                onClick={() => { setShowSort(s => !s); setShowFilters(false); }}>
+                ↕ {lang === 'tr' ? 'Sırala' : 'Sort'}
+                {['new','liked','mostRead'].includes(sortBy) && (
+                  <span className="exp-active-label"> · {sortOptions.find(o => o.key === sortBy)?.label}</span>
+                )}
               </button>
-            ))}
+              {showSort && (
+                <div className="exp-dropdown exp-dropdown--right">
+                  {sortOptions.map(opt => (
+                    <button key={opt.key}
+                      className={`exp-dropdown-item ${sortBy === opt.key ? 'active' : ''}`}
+                      onClick={() => { setSortBy(opt.key); setShowSort(false); setPage(1); }}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Filtrele */}
+            <div className="exp-dropdown-wrap">
+              <button className={`exp-tab ${showFilters ? 'active' : ''}`}
+                onClick={() => { setShowFilters(s => !s); setShowSort(false); }}>
+                🎛 {lang === 'tr' ? 'Filtrele' : 'Filter'}
+                {(filterAge || filterLang || filterDuration) && <span className="exp-filter-dot" />}
+              </button>
+              {showFilters && (
+                <div className="exp-dropdown exp-dropdown--filter exp-dropdown--right">
+                  {/* Yaş */}
+                  <div className="exp-dropdown-group">
+                    <span className="exp-dropdown-label">{lang === 'tr' ? 'Yaş' : 'Age'}</span>
+                    <div className="exp-dropdown-row">
+                      {['2-3','4-5','6-7','8-9','10+'].map((l,i) => {
+                        const vals = ['3','5','7','9','11'];
+                        return (
+                          <button key={l} className={`exp-filter-btn ${filterAge===vals[i]?'active':''}`}
+                            onClick={()=>{setFilterAge(filterAge===vals[i]?'':vals[i]);setPage(1);}}>
+                            {l}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {/* Süre */}
+                  <div className="exp-dropdown-group">
+                    <span className="exp-dropdown-label">{lang === 'tr' ? 'Süre' : 'Duration'}</span>
+                    <div className="exp-dropdown-row">
+                      {[
+                        {v:'short', l:lang==='tr'?'Kısa':'Short'},
+                        {v:'medium',l:lang==='tr'?'Orta':'Medium'},
+                        {v:'long',  l:lang==='tr'?'Uzun':'Long'},
+                      ].map(({v,l})=>(
+                        <button key={v} className={`exp-filter-btn ${filterDuration===v?'active':''}`}
+                          onClick={()=>{setFilterDuration(filterDuration===v?'':v);setPage(1);}}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Dil */}
+                  <div className="exp-dropdown-group">
+                    <span className="exp-dropdown-label">{lang === 'tr' ? 'Dil' : 'Language'}</span>
+                    <div className="exp-dropdown-row">
+                      <button className={`exp-filter-btn ${filterLang==='tr'?'active':''}`}
+                        onClick={()=>{setFilterLang(filterLang==='tr'?'':'tr');setPage(1);}}>🇹🇷 TR</button>
+                      <button className={`exp-filter-btn ${filterLang==='en'?'active':''}`}
+                        onClick={()=>{setFilterLang(filterLang==='en'?'':'en');setPage(1);}}>🇬🇧 EN</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Hikaye Paylaş — sağda */}
           {user && (
             <button className="exp-share-btn" onClick={() => navigate('/')}>
               + {lang === 'tr' ? 'Hikaye Paylaş' : 'Share Story'}
@@ -218,10 +289,10 @@ export default function Explore() {
           <div className="exp-empty animate-fadeIn">
             <div className="exp-empty-icon">🌟</div>
             <h3>{t.explore?.empty || 'Henüz hikaye yok'}</h3>
-            <p>Henüz paylaşılan hikaye yok. İlk paylaşan sen ol!</p>
+            <p>{lang === 'tr' ? 'Henüz paylaşılan hikaye yok. İlk paylaşan sen ol!' : 'No shared stories yet. Be the first!'}</p>
             {user && (
               <button className="btn btn-primary" onClick={() => navigate('/')}>
-                ✨ Hikaye Oluştur
+                ✨ {lang === 'tr' ? 'Hikaye Oluştur' : 'Create Story'}
               </button>
             )}
           </div>
@@ -232,7 +303,9 @@ export default function Explore() {
             {stories.map(story => (
               <CommunityStoryCard
                 key={story._id} story={story}
-                onRate={handleRate} lang={lang}
+                onRate={handleRate}
+                onLike={handleLike}
+                lang={lang}
               />
             ))}
           </div>

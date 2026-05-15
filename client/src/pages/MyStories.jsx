@@ -57,17 +57,16 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
             style={{ backgroundImage: `url('/assets/locations/${locationFile}')` }} />
         )}
 
-        {/* Durum ve dil rozetleri */}
-        <div className="sc-visual-badges">
-          <span className={`sc-badge ${isPublic ? 'public' : 'private'}`}>
-            {isPublic ? '🌍 Herkese Açık' : '🔒 Gizli'}
+        {/* Sol üst — durum rozeti */}
+        <span className={`sc-badge sc-badge--tl ${isPublic ? 'public' : 'private'}`}>
+          {isPublic ? (lang === 'tr' ? '🌍 Herkese Açık' : '🌍 Public') : (lang === 'tr' ? '🔒 Gizli' : '🔒 Private')}
+        </span>
+        {/* Sağ üst — dil rozeti */}
+        {story.options?.storyLanguage && (
+          <span className="sc-badge sc-badge--tr lang">
+            {story.options.storyLanguage === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN'}
           </span>
-          {story.options?.storyLanguage && (
-            <span className="sc-badge lang">
-              {story.options.storyLanguage === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN'}
-            </span>
-          )}
-        </div>
+        )}
 
         {/* Karakterler boydan */}
         <div className="sc-chars-row" style={{ '--char-count': chars.length || 1 }}>
@@ -86,7 +85,6 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
                 <span className="sc-char-emoji" style={{ display: 'none' }}>
                   {c.emoji || '👤'}
                 </span>
-                <span className="sc-char-name">{c.name || ''}</span>
               </div>
             );
           })}
@@ -131,12 +129,11 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
         {/* Meta bilgiler */}
         <div className="sc-meta-row">
           {story.options?.childAge && (
-            <span className="sc-meta">🍼 {story.options.childAge} yaş</span>
+            <span className="sc-meta">{story.options.childAge <= 4 ? '🍼' : story.options.childAge <= 7 ? '🧒' : '👦'} {lang === 'tr' ? story.options.childAge + ' yaş' : 'Age ' + story.options.childAge}</span>
           )}
           {story.options?.duration && (
             <span className="sc-meta">
-              {story.options.duration === 'short' ? '📖 Kısa'
-                : story.options.duration === 'medium' ? '📖 Orta' : '📚 Uzun'}
+              {story.options.duration === 'short' ? (lang === 'tr' ? '⏳ Kısa' : '⏳ Short') : story.options.duration === 'medium' ? (lang === 'tr' ? '⏳ Orta' : '⏳ Medium') : (lang === 'tr' ? '⏳ Uzun' : '⏳ Long')}
             </span>
           )}
           {story.viewCount > 0 && (
@@ -162,7 +159,7 @@ function StoryCard({ story, onRate, onTogglePublish, onRead, lang }) {
           <button
             className={`sc-btn ${isPublic ? 'sc-btn--outline' : 'sc-btn--ghost'}`}
             onClick={handlePublish} disabled={publishing}>
-            {publishing ? '⏳' : isPublic ? '🔒 Gizle' : '🌍 Paylaş'}
+            {publishing ? '⏳' : isPublic ? (lang === 'tr' ? '🔒 Gizle' : '🔒 Hide') : (lang === 'tr' ? '🌍 Paylaş' : '🌍 Share')}
           </button>
         </div>
       </div>
