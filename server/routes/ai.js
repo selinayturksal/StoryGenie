@@ -81,8 +81,17 @@ router.post('/generate', protect, async (req, res) => {
       : `Short title for this story. Max 6 words. Title only:\n\n${storyText.slice(0, 200)}`;
 
     const rawTitle = await callBedrock(titlePrompt, apiKey);
-    const title    = rawTitle.replace(/[*"]/g, '').trim() || (isTurkish ? 'Bugünün Hikayesi' : "Today's Story");
-    const pages    = splitIntoPages(storyText);
+    const title    = rawTitle.replace(/[#*"]/g, '').trim() || (isTurkish ? 'Bugünün Hikayesi' : "Today's Story");
+
+    // Hikaye metnindeki markdown kalıntılarını temizle
+    const cleanText = storyText
+      .replace(/^#{1,6}\s*/gm, '')        // # ## ### başlıkları
+      .replace(/\*\*(.*?)\*\*/g, '$1')    // **bold**
+      .replace(/\*(.*?)\*/g, '$1')        // *italic*
+      .replace(/_{1,2}(.*?)_{1,2}/g, '$1') // _italic_ __bold__
+      .trim();
+
+    const pages    = splitIntoPages(cleanText);
 
     const normalizedChars = characters.map(c => ({
       id:        String(c.id        || ''),
@@ -103,7 +112,7 @@ router.post('/generate', protect, async (req, res) => {
       savedStory = await Story.create({
         author:   req.user._id,
         title,
-        fullText: storyText,
+        fullText: cleanText,
         pages,
         options: {
           characters:    normalizedChars,
@@ -124,7 +133,7 @@ router.post('/generate', protect, async (req, res) => {
     res.json({
       _id:       savedStory?._id || null,
       title,
-      fullText:  storyText,
+      fullText:  cleanText,
       pages,
       wordCount: storyText.split(' ').length,
       pageCount: pages.length,

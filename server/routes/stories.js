@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { body, validationResult, query } = require('express-validator');
 const Story = require('../models/Story');
 const User  = require('../models/User');
@@ -94,7 +95,27 @@ router.get('/explore', async (req, res) => {
       Story.countDocuments(filter),
     ]);
 
-    res.json({ stories, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
+    // Kullanıcı giriş yapmışsa hangi hikayeleri beğendiğini ekle
+    let userId = null;
+    try {
+      const authHeader = req.headers.authorization;
+      if (authHeader?.startsWith('Bearer ')) {
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+        userId = decoded.id;
+      }
+    } catch (_) {}
+
+    const storiesWithLike = stories.map(s => {
+      const obj = s.toObject();
+      obj.likeCount = s.communityRatings?.length || 0;
+      obj.isLikedByMe = userId
+        ? s.communityRatings?.some(r => r.user.toString() === userId.toString())
+        : false;
+      return obj;
+    });
+
+    res.json({ stories: storiesWithLike, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
   } catch (err) {
     res.status(500).json({ error: 'Hikayeler alınamadı.' });
   }
@@ -103,28 +124,58 @@ router.get('/explore', async (req, res) => {
 // GET /api/stories/dashboard
 router.get('/dashboard', protect, async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userIdObj = new mongoose.Types.ObjectId(String(req.user._id));
+
     const last7Days = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
       const nd = new Date(d); nd.setDate(nd.getDate() + 1);
-      const count = await Story.countDocuments({ author: userId, createdAt: { $gte: d, $lt: nd } });
+      const count = await Story.countDocuments({ author: userIdObj, createdAt: { $gte: d, $lt: nd } });
       last7Days.push({ date: d.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' }), count });
     }
-    const [totalStories, publicStories, ratedStories, languageDist, ageDist, durationDist] = await Promise.all([
-      Story.countDocuments({ author: userId }),
-      Story.countDocuments({ author: userId, isPublic: true }),
-      Story.find({ author: userId, rating: { $ne: null } }),
-      Story.aggregate([{ $match: { author: userId } }, { $group: { _id: '$options.storyLanguage', count: { $sum: 1 } } }]),
-      Story.aggregate([{ $match: { author: userId } }, { $group: { _id: '$options.childAge', count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
-      Story.aggregate([{ $match: { author: userId } }, { $group: { _id: '$options.duration', count: { $sum: 1 } } }]),
+
+    const match = { $match: { author: userIdObj } };
+
+    const [
+      totalStories, publicStories,
+      languageDist, ageDist, durationDist,
+      topCharacters, topLocations,
+    ] = await Promise.all([
+      Story.countDocuments({ author: userIdObj }),
+      Story.countDocuments({ author: userIdObj, isPublic: true }),
+      Story.aggregate([match, { $group: { _id: '$options.storyLanguage', count: { $sum: 1 } } }]),
+      Story.aggregate([match, { $group: { _id: '$options.childAge', count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
+      Story.aggregate([match, { $group: { _id: '$options.duration', count: { $sum: 1 } } }]),
+      Story.aggregate([
+        match,
+        { $unwind: '$options.characters' },
+        { $group: { _id: { name: '$options.characters.name', type: '$options.characters.type', imagePath: '$options.characters.imagePath' }, count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+      ]),
+      Story.aggregate([
+        match,
+        { $match: { 'options.location.name': { $exists: true, $ne: '' } } },
+        { $group: { _id: { name: '$options.location.name', imagePath: '$options.location.imagePath' }, count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 5 },
+      ]),
     ]);
-    const avgRating = ratedStories.length > 0
-      ? (ratedStories.reduce((a, s) => a + s.rating, 0) / ratedStories.length).toFixed(1) : 0;
+
+    const topHumans  = topCharacters.filter(c => c._id.type !== 'animal').slice(0, 5);
+    const topAnimals = topCharacters.filter(c => c._id.type === 'animal').slice(0, 5);
 
     res.json({
-      summary: { totalStories, publicStories, avgRating },
-      charts: { storiesPerDay: last7Days, languageDistribution: languageDist, ageDistribution: ageDist, durationDistribution: durationDist },
+      summary: { totalStories, publicStories },
+      charts: {
+        storiesPerDay:        last7Days,
+        languageDistribution: languageDist,
+        ageDistribution:      ageDist,
+        durationDistribution: durationDist,
+        topHumans,
+        topAnimals,
+        topLocations,
+      },
     });
   } catch (err) {
     console.error('Dashboard error:', err);
@@ -212,6 +263,30 @@ router.patch('/:id/publish', protect, async (req, res) => {
     res.json({ story, message: story.isPublic ? 'Hikaye herkese açık.' : 'Hikaye gizlendi.' });
   } catch (err) {
     res.status(500).json({ error: 'Hikaye güncellenemedi.' });
+  }
+});
+
+// POST /api/stories/:id/like
+router.post('/:id/like', protect, async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id);
+    if (!story || !story.isPublic) return res.status(404).json({ error: 'Hikaye bulunamadı.' });
+
+    const userId = req.user._id.toString();
+    const alreadyLiked = story.communityRatings.some(r => r.user.toString() === userId);
+
+    if (!alreadyLiked) {
+      story.communityRatings.push({ user: req.user._id, rating: 5 });
+      story.recalculateCommunityRating();
+      await story.save();
+    }
+
+    res.json({
+      liked: true,
+      likeCount: story.communityRatings.length,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Beğeni kaydedilemedi.' });
   }
 });
 

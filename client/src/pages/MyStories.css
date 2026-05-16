@@ -194,6 +194,11 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+
+/* Meta + Aksiyonlar her zaman en altta */
+.sc-spacer {
+  flex: 1;
+}
 .sc-chip {
   display: flex;
   align-items: center;
@@ -273,7 +278,6 @@
 .sc-actions {
   display: flex;
   gap: 8px;
-  margin-top: auto;
   padding-top: 4px;
 }
 .sc-actions .sc-btn {
@@ -326,3 +330,71 @@
 }
 .page-btn:hover  { background: rgba(99,102,241,0.1); }
 .page-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+/* ── Tab bar ── */
+.ms-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.ms-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 50px;
+  border: 2px solid rgba(200,185,255,0.2);
+  background: transparent;
+  color: var(--ink-soft, #888);
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ms-tab:hover {
+  border-color: rgb(10,15,60);
+  color: rgb(10,15,60);
+  background: rgba(10,15,60,0.06);
+}
+.ms-tab.active {
+  background: rgb(10,15,60);
+  border-color: rgb(10,15,60);
+  color: #fff;
+}
+[data-theme="light"] .ms-tab { border-color: rgba(117,70,104,0.2); color: #555; }
+[data-theme="light"] .ms-tab.active { background: rgb(10,15,60); color: #fff; }
+
+.ms-tab-count {
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.ms-tab.active .ms-tab-count { background: rgba(255,255,255,0.2); }
+.ms-tab:not(.active) .ms-tab-count {
+  background: rgba(0,0,0,0.07);
+  color: var(--ink-soft, #888);
+}
+
+/* ── Favori yıldız butonu ── */
+.sc-fav-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 4;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.sc-fav-btn:hover { transform: scale(1.15); }
+.sc-fav-btn--active { background: rgba(255,220,50,0.95); }
