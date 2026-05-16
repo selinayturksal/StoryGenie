@@ -25,7 +25,13 @@ export const ALL_CHARACTERS = [
   { id: 'animal_9', name: { tr: 'Şen Ördek', en: 'Happy Duck' },        file: 'duck.png',     emoji: '🦆' },
   { id: 'animal_10', name: { tr: 'Tatlı Kirpi', en: 'Sweet Hedgehog' }, file: 'hedgehog.png', emoji: '🦔' },
   { id: 'animal_11', name: { tr: 'Zarif Geyik',   en: 'Gentle Deer'    }, file: 'deer.png',     emoji: '🦌' },
-  { id: 'animal_12', name: { tr: 'Sevimli Panda', en: 'Cute Panda'     }, file: 'animal6.png',  emoji: '🐼' },
+   { id: 'animal_16', name: { tr: 'Yeşil Timsah',  en: 'Green Croc'      }, file: 'crocodile.png',  emoji: '🐊' },
+  { id: 'animal_12', name: { tr: 'Sevimli Zürafa', en: 'Cute Giraffe'     }, file: 'animal6.png',  emoji: '🐼' },
+  { id: 'animal_13', name: { tr: 'Cesur Aslan',   en: 'Brave Leo'       }, file: 'lion.png',       emoji: '🦁' },
+  { id: 'animal_14', name: { tr: 'Şen Penguen',   en: 'Happy Penguin'   }, file: 'penguin.png',    emoji: '🐧' },
+  { id: 'animal_15', name: { tr: 'Maymun Coco',   en: 'Monkey Coco'     }, file: 'monkey.png',     emoji: '🐒' },
+  { id: 'animal_17', name: { tr: 'Minik Kaplumbağa', en: 'Little Turtle' }, file: 'turtle.png',    emoji: '🐢' },
+  { id: 'animal_18', name: { tr: 'Utangaç Flamingo', en: 'Shy Flamingo' }, file: 'flamingo.png',    emoji: '🦩' },
 ];
 
 // Geriye dönük uyumluluk için (BookViewer vs)
@@ -54,6 +60,6 @@ export const DURATION_OPTIONS = [
 ];
 
 export const STORY_LANGUAGES = [
-  { value: 'tr', label: '🇹🇷 Türkçe' },
-  { value: 'en', label: '🇬🇧 English' },
+  { value: 'tr', label: '🇹 Türkçe' },
+  { value: 'en', label: '🇬 English' },
 ];
