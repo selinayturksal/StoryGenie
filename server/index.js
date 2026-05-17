@@ -4,15 +4,18 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const authRoutes = require('./routes/auth');
+const authRoutes  = require('./routes/auth');
 const storyRoutes = require('./routes/stories');
-const aiRoutes = require('./routes/ai');
+const aiRoutes    = require('./routes/ai');
+const userRoutes      = require('./routes/users');
+const favoritesRoutes = require('./routes/favorites');
+const { seedAnonymousUser } = require('./seeds/anonymousUser');
 
 const app = express();
 
 app.set('trust proxy', 1);
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
+// ─── Ara Katman (Middleware) ──────────────────────────────────────────────────
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true,
@@ -28,7 +31,7 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
-// AI endpoint için daha sıkı limit (OpenAI maliyeti)
+// AI endpoint için daha sıkı limit (Bedrock API maliyeti)
 const aiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 saat
   max: 20,
@@ -36,12 +39,14 @@ const aiLimiter = rateLimit({
 });
 app.use('/api/ai/', aiLimiter);
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── Rotalar ──────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/favorites', favoritesRoutes);
 
-// Health check
+// Sağlık kontrolü
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -50,12 +55,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 handler
+// 404 - Bulunamadı işleyicisi
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Global error handler
+// Global hata işleyicisi
 app.use((err, req, res, next) => {
   console.error('Global Error:', err.stack);
   res.status(err.status || 500).json({
@@ -63,13 +68,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ─── MongoDB + Server Start ───────────────────────────────────────────────────
+// ─── MongoDB Bağlantısı ve Sunucu Başlatma ────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log('✅ MongoDB connected');
+    await seedAnonymousUser();
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });

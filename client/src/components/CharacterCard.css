@@ -56,8 +56,8 @@ border: 2px solid rgba(255, 255, 255, 0.4);
   position: relative;
   z-index: 1;
   width: 100%;
-  /* Sabit yükseklik — tüm çocuklar aynı hizada */
-  height: 250px;
+  /* Sabit yükseklik — farklı PNG boyutlarından bağımsız, tüm karakterler aynı hizada */
+  height: 240px;
   background: transparent;
   display: flex;
   align-items: flex-end;
@@ -90,9 +90,8 @@ border: 2px solid rgba(255, 255, 255, 0.4);
 .char-visual img {
   position: relative;
   z-index: 1;
-  width: auto;
+  width: 100%;
   height: 100%;
-  max-width: 100%;
   object-fit: contain;
   object-position: center bottom;
   display: block;
@@ -117,22 +116,21 @@ border: 2px solid rgba(255, 255, 255, 0.4);
   filter: drop-shadow(0 10px 20px rgba(155,89,182,0.4));
 }
 
-/* ── Hayvan görselleri — biraz daha küçük ── */
+/* ── Hayvan görselleri — insan karakterlerle aynı boyut ── */
 .char-card--animal .char-visual img {
-  transform: scale(0.88);
   transform-origin: bottom center;
   mix-blend-mode: lighten;
 }
 
 .char-card--animal:hover:not(.disabled) .char-visual img {
   filter: drop-shadow(0 14px 24px rgba(26,26,46,0.25));
-  transform: scale(0.95) translateY(-4px);
+  transform: translateY(-4px);
   transform-origin: bottom center;
 }
 
 .char-card--animal.selected .char-visual img {
   filter: drop-shadow(0 10px 20px rgba(155,89,182,0.4));
-  transform: scale(0.92);
+  transform: none;
   transform-origin: bottom center;
 }
 

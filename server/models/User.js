@@ -44,6 +44,29 @@ const userSchema = new mongoose.Schema(
       totalRatings: { type: Number, default: 0 },
       averageRating: { type: Number, default: 0 },
     },
+
+    // Şifre sıfırlama token'ı (1 saatlik geçerlilik)
+    passwordResetToken:   { type: String, select: false },
+    passwordResetExpires: { type: Date,   select: false },
+
+    // Şifre değişikliği onay bekleyen alan (1 saatlik geçerlilik)
+    pendingPasswordHash:    { type: String, select: false },
+    pendingPasswordToken:   { type: String, select: false },
+    pendingPasswordExpires: { type: Date,   select: false },
+
+    // Sistem hesabı işareti — anonim kullanıcı gibi özel kayıtlar için
+    isSystemAccount: { type: Boolean, default: false, select: false },
+
+    // Kullanıcının favori hikayeleri
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Story' }],
+
+    // Mail bildirim tercihleri
+    notifications: {
+      notifyOnLike:    { type: Boolean, default: true  },
+      notifyOnComment: { type: Boolean, default: true  },
+      notifyOnFollow:  { type: Boolean, default: true  },
+      notifyMarketing: { type: Boolean, default: false },
+    },
   },
   {
     timestamps: true,
@@ -63,7 +86,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Güvenli kullanıcı objesi (şifresiz)
+// Güvenli kullanıcı objesi (şifresiz, reset token'sız)
 userSchema.methods.toPublicJSON = function () {
   return {
     id: this._id,
@@ -73,6 +96,8 @@ userSchema.methods.toPublicJSON = function () {
     avatarBg: this.avatarBg,
     preferredLanguage: this.preferredLanguage,
     stats: this.stats,
+    notifications: this.notifications,
+    favorites: this.favorites,
     createdAt: this.createdAt,
   };
 };

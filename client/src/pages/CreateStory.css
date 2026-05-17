@@ -83,12 +83,15 @@
   border-radius: var(--r-full);
 }
 
-/* ── Karakter grid — geniş, çerçevesiz ── */
+/* ── Karakter grid — 6 sütunlu, eşit hizalı ── */
 .char-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 8px 12px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
   padding: 8px 0 16px;
+  align-items: end;
 }
 
 .char-grid--humans {
@@ -415,7 +418,10 @@
 
 /* ── Büyük buton ── */
 .generate-btn {
-  align-self: center;
+  position: fixed;
+  bottom: 32px;
+  right: 40px;
+  z-index: 200;
   padding: 20px 72px;
   font-size: 1.25rem; font-weight: 900;
   font-family: var(--font-display);
@@ -471,23 +477,25 @@
 
 /* ── Responsive ── */
 @media (max-width: 1200px) {
-  .char-grid { grid-template-columns: repeat(5, 1fr); }
+  .char-grid { grid-template-columns: repeat(6, 1fr); }
 }
 @media (max-width: 900px) {
   .options-grid { grid-template-columns: 1fr 1fr; }
+  .char-grid          { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .char-grid--animals { grid-template-columns: repeat(4, 1fr); }
 }
 @media (max-width: 768px) {
   .create-container { padding: 0 16px; }
   .create-title { font-size: 2rem; }
-  .char-grid          { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .char-grid--animals { grid-template-columns: repeat(4, 1fr); }
+  .char-grid          { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .char-grid--animals { grid-template-columns: repeat(3, 1fr); }
   .loc-grid { grid-template-columns: repeat(3, 1fr); }
   .options-grid { grid-template-columns: 1fr; }
   .generate-btn { padding: 16px 40px; font-size: 1.05rem; }
   .create-panel { gap: 36px; }
 }
 @media (max-width: 480px) {
-  .char-grid { grid-template-columns: repeat(3, 1fr); }
+  .char-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .loc-grid  { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -799,18 +807,24 @@
 /* ── Adım 3 Alt Sahne ── */
 .step3-scene {
   position: relative;
-  background-size: cover, cover;
-  background-position: center bottom, center bottom;
   min-height: 420px;
-  padding: 40px 0 0;
+  padding: 30px 0 100px;
   display: flex;
-  align-items: flex-end;
-  margin-top: -6px;
-  justify-content: flex-start; 
   align-items: flex-start;
-  padding-top: 30px;  /* azalt/artır */
+  margin-top: -6px;
+  overflow: hidden;
 }
 
+/* Arka plan görseli — ayrı div'de, mask sadece buna uygulanır */
+.step3-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover, cover;
+  background-position: center bottom, center bottom;
+  z-index: 0;
+}
+
+/* Karanlık tema: üstte koyu gradient overlay */
 .step3-scene::before {
   content: '';
   position: absolute;
@@ -818,16 +832,22 @@
   height: 42%;
   background: linear-gradient(to bottom, rgb(8, 8, 24) 0%, transparent 100%);
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
+/* Açık tema: arka plan görseline mask ile düzgün geçiş */
 [data-theme="light"] .step3-scene::before {
-  background: linear-gradient(to bottom, #eef6ff 0%, transparent 100%);
+  display: none;
+}
+
+[data-theme="light"] .step3-bg {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 100%);
 }
 
 .step3-layout {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: 100%;
   display: flex;
   align-items: flex-end;
@@ -904,11 +924,7 @@
   left: 40px;
 }
 
-.generate-btn {
-  position: fixed;
-  bottom: 32px;
-  right: 40px;
-}
+/* generate-btn sabit konumu üstteki ana kuralla tanımlıdır (Portal ile body'de render edilir) */
 [data-theme="light"] .step3-back {
   background: rgba(255, 255, 255, 0.72) !important;
   border-color: rgba(117, 70, 104, 0.22) !important;
@@ -940,5 +956,5 @@
   .step3-layout { flex-direction: column; align-items: stretch; }
   .step3-left { max-width: 100%; }
   .step3-right { justify-content: flex-start; }
-  .generate-btn { width: 100%; justify-content: center; }
+  .generate-btn { position: fixed; right: 16px; bottom: 16px; padding: 14px 32px; font-size: 1rem; }
 }

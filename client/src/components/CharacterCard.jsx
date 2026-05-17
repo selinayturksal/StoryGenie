@@ -20,6 +20,10 @@ export default function CharacterCard({ character, selected, onToggle, lang, dis
         <img
           src={`/assets/characters/${character.file}`}
           alt={name}
+          style={character.scale ? {
+            transform: `scale(${character.scale})`,
+            transformOrigin: 'center bottom',
+          } : undefined}
           onError={(e) => {
             e.target.style.display = 'none';
             e.target.nextSibling.style.display = 'flex';

@@ -2,14 +2,22 @@ const express = require('express');
 const multer  = require('multer');
 const path    = require('path');
 const fs      = require('fs');
+const crypto  = require('crypto');
+const bcrypt  = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const User    = require('../models/User');
 const Story   = require('../models/Story');
 const { protect, signToken } = require('../middleware/auth');
+const {
+  sendWelcomeMail,
+  sendPasswordChangedMail,
+  sendPasswordResetMail,
+  sendConfirmPasswordChangeMail,
+} = require('../services/mailService');
 
 const router = express.Router();
 
-// ── Multer avatar upload ──
+// ── Multer ile avatar dosyası yükleme ──
 const uploadDir = path.join(__dirname, '../public/uploads/avatars');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -59,6 +67,8 @@ router.post('/register', registerValidation, async (req, res) => {
     }
     const user  = await User.create({ username, email, password, preferredLanguage: preferredLanguage || 'tr' });
     const token = signToken(user._id);
+    // Hoş geldin maili — await yok, kullanıcı akışını bloklamaz
+    sendWelcomeMail(user);
     res.status(201).json({ message: 'Registration successful!', token, user: user.toPublicJSON() });
   } catch (err) {
     console.error('Register error:', err);
@@ -89,7 +99,6 @@ router.post('/login', loginValidation, async (req, res) => {
 // GET /api/auth/me
 router.get('/me', protect, async (req, res) => {
   try {
-    const Story = require('../models/Story');
     const publicStories = await Story.countDocuments({ author: req.user._id, isPublic: true });
     const userData = req.user.toPublicJSON();
     userData.stats = { ...userData.stats, publicStories };
@@ -120,7 +129,7 @@ router.put('/profile', protect, [
   }
 });
 
-// PUT /api/auth/change-password
+// PUT /api/auth/change-password — yeni şifreyi onay mailinden sonra uygular
 router.put('/change-password', protect, [
   body('currentPassword').notEmpty().withMessage('Current password is required'),
   body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
@@ -129,16 +138,53 @@ router.put('/change-password', protect, [
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
   try {
     const { currentPassword, newPassword } = req.body;
-    const user    = await User.findById(req.user._id).select('+password');
+    const user = await User.findById(req.user._id).select('+password');
     if (!user) return res.status(404).json({ error: 'User not found.' });
     const isMatch = await user.comparePassword(currentPassword);
     if (!isMatch) return res.status(401).json({ error: 'Current password is incorrect.' });
-    user.password = newPassword;
-    await user.save();
-    res.json({ message: 'Password changed successfully.' });
+
+    // Yeni şifreyi hash'le ve pending alanlara kaydet
+    const salt          = await bcrypt.genSalt(12);
+    const pendingHash   = await bcrypt.hash(newPassword, salt);
+    const rawToken      = crypto.randomBytes(32).toString('hex');
+    const hashToken     = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    await User.findByIdAndUpdate(req.user._id, {
+      pendingPasswordHash:    pendingHash,
+      pendingPasswordToken:   hashToken,
+      pendingPasswordExpires: Date.now() + 60 * 60 * 1000, // 1 saat
+    });
+
+    sendConfirmPasswordChangeMail(user.email, user.username, rawToken);
+    res.json({ message: 'Onay maili gönderildi. E-postanı kontrol et.' });
   } catch (err) {
     console.error('Change password error:', err);
     res.status(500).json({ error: 'Server error changing password.' });
+  }
+});
+
+// GET /api/auth/confirm-password-change/:token — mail onayından sonra şifreyi uygular
+router.get('/confirm-password-change/:token', async (req, res) => {
+  try {
+    const hashToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    const user = await User.findOne({
+      pendingPasswordToken:   hashToken,
+      pendingPasswordExpires: { $gt: Date.now() },
+    }).select('+pendingPasswordHash +pendingPasswordToken +pendingPasswordExpires');
+
+    if (!user) return res.status(400).json({ error: 'Geçersiz veya süresi dolmuş onay linki.' });
+
+    // pre-save hook'u atlatmak için findByIdAndUpdate kullan (hash zaten hazır)
+    await User.findByIdAndUpdate(user._id, {
+      $set:   { password: user.pendingPasswordHash },
+      $unset: { pendingPasswordHash: 1, pendingPasswordToken: 1, pendingPasswordExpires: 1 },
+    });
+
+    sendPasswordChangedMail(user.email, user.username);
+    res.json({ message: 'Şifreniz başarıyla değiştirildi.' });
+  } catch (err) {
+    console.error('Confirm password change hatası:', err);
+    res.status(500).json({ error: 'Sunucu hatası.' });
   }
 });
 
@@ -185,7 +231,58 @@ router.delete('/account', protect, async (req, res) => {
 router.post('/forgot-password', [
   body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
 ], async (req, res) => {
-  res.json({ message: 'If that email is registered, a reset link has been sent.' });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    // Enumeration saldırısını önlemek için kullanıcı bulunsun ya da bulunmasın aynı yanıt
+    if (user) {
+      const rawToken  = crypto.randomBytes(32).toString('hex');
+      const hashToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+      user.passwordResetToken   = hashToken;
+      user.passwordResetExpires = Date.now() + 60 * 60 * 1000; // 1 saat
+      await user.save({ validateBeforeSave: false });
+      sendPasswordResetMail(user.email, user.username, rawToken);
+    }
+    res.json({ message: 'If that email is registered, a reset link has been sent.' });
+  } catch (err) {
+    console.error('Forgot-password hatası:', err);
+    res.status(500).json({ error: 'Sunucu hatası.' });
+  }
+});
+
+// POST /api/auth/reset-password/:token
+router.post('/reset-password/:token', [
+  body('password').isLength({ min: 8 }).withMessage('Şifre en az 8 karakter olmalıdır.')
+    .matches(/[A-Z]/).withMessage('En az bir büyük harf gereklidir.')
+    .matches(/[a-z]/).withMessage('En az bir küçük harf gereklidir.')
+    .matches(/\d/).withMessage('En az bir rakam gereklidir.'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  try {
+    const hashToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    const user = await User.findOne({
+      passwordResetToken:   hashToken,
+      passwordResetExpires: { $gt: Date.now() },
+    }).select('+passwordResetToken +passwordResetExpires');
+
+    if (!user) return res.status(400).json({ error: 'Geçersiz veya süresi dolmuş sıfırlama linki.' });
+
+    user.password             = req.body.password;
+    user.passwordResetToken   = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    // Güvenlik bildirimi — her zaman gönderilir
+    sendPasswordChangedMail(user.email, user.username);
+
+    const token = signToken(user._id);
+    res.json({ message: 'Şifre başarıyla sıfırlandı.', token, user: user.toPublicJSON() });
+  } catch (err) {
+    console.error('Reset-password hatası:', err);
+    res.status(500).json({ error: 'Sunucu hatası.' });
+  }
 });
 
 // POST /api/auth/logout

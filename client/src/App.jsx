@@ -7,10 +7,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 
-// Lazy load pages
+// Sayfalar gecikmeli yüklenir
 const Login          = React.lazy(() => import('./pages/Login'));
 const Register       = React.lazy(() => import('./pages/Register'));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword  = React.lazy(() => import('./pages/ResetPassword'));
 const CreateStory    = React.lazy(() => import('./pages/CreateStory'));
 const MyStories      = React.lazy(() => import('./pages/MyStories'));
 const Explore        = React.lazy(() => import('./pages/Explore'));
@@ -19,6 +20,8 @@ const StoryView      = React.lazy(() => import('./pages/StoryView'));
 const StoryReader    = React.lazy(() => import('./pages/StoryReader'));
 const Settings       = React.lazy(() => import('./pages/Settings'));
 const Profile        = React.lazy(() => import('./pages/Profile'));
+const Favorites               = React.lazy(() => import('./pages/Favorites'));
+const ConfirmPasswordChange   = React.lazy(() => import('./pages/ConfirmPasswordChange'));
 
 const Spinner = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
@@ -26,7 +29,7 @@ const Spinner = () => (
   </div>
 );
 
-/* Show LandingPage for guests, CreateStory for authenticated users */
+/* Giriş yapmamış kullanıcılara LandingPage, giriş yapmışlara CreateStory göster */
 function HomeRoute() {
   const { user, loading } = useAuth();
   if (loading) return <Spinner />;
@@ -50,8 +53,10 @@ function AppShell() {
           {/* Public routes */}
           <Route path="/login"           element={<Login />} />
           <Route path="/register"        element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/explore"         element={<Explore />} />
+          <Route path="/forgot-password"        element={<ForgotPassword />} />
+          <Route path="/reset-password/:token"          element={<ResetPassword />} />
+          <Route path="/confirm-password-change/:token" element={<ConfirmPasswordChange />} />
+          <Route path="/explore"               element={<Explore />} />
 
           {/* Protected routes */}
           <Route path="/my-stories" element={
@@ -71,6 +76,9 @@ function AppShell() {
           } />
           <Route path="/profile" element={
             <ProtectedRoute><Profile /></ProtectedRoute>
+          } />
+          <Route path="/favorites" element={
+            <ProtectedRoute><Favorites /></ProtectedRoute>
           } />
 
           {/* Fallback */}

@@ -8,7 +8,7 @@ function validate(identifier, password, t) {
   const errors = {};
   if (!identifier) errors.identifier = t.auth.errors.identifierRequired;
   if (!password)   errors.password   = t.auth.errors.passwordRequired;
-  // Never enforce strength rules on login — user may have an older password
+  // Girişte şifre gücü kuralı uygulanmaz — kullanıcının eski şifresi olabilir
   return errors;
 }
 

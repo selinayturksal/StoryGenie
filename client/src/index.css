@@ -36,6 +36,9 @@
   --sg-plum-soft:  #d4a8e8;
   --sg-lime:       #7bc67e;
 
+  /* ── Navbar ile body arasında tutarlı zemin rengi ── */
+  --bg-main:    var(--night-deep);
+
   /* ── Active palette vars (default = dark) ── */
   --bg:         var(--night-deep);
   --bg-warm:    var(--night-mid);
@@ -88,6 +91,7 @@
 
 /* ── Light mode (StoryGenie açık tema) ── */
 [data-theme="light"] {
+  --bg-main:    #eef6ff;
   --bg:         var(--light-bg);          /* #f0f7ff */
   --bg-warm:    #fff9ee;
   --surface:    var(--light-surface);
@@ -127,6 +131,8 @@ body {
     radial-gradient(ellipse 60% 55% at 100% 20%,  rgba(55, 38, 120, 0.28)  0%, transparent 55%),
     radial-gradient(ellipse 50% 60% at 50%  100%, rgba(84, 151, 167, 0.14)  0%, transparent 58%),
     radial-gradient(ellipse 40% 40% at 80%  80%,  rgba(117, 70, 104, 0.15) 0%, transparent 52%);
+  /* fixed: gradient viewport'a kilitli kalır, sticky navbar ile kayma olmaz */
+  background-attachment: fixed;
   transition: background-color 0.4s ease;
 }
 
@@ -138,6 +144,7 @@ body {
     radial-gradient(ellipse at 90%  5%,  rgba(0,  201, 167, 0.15)  0%, transparent 40%),
     radial-gradient(ellipse at 50% 90%,  rgba(155,  89, 182, 0.12) 0%, transparent 50%),
     radial-gradient(ellipse at 85% 80%,  rgba(255, 123,  92, 0.12) 0%, transparent 40%);
+  background-attachment: fixed;
 }
 
 h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; }

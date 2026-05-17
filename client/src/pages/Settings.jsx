@@ -21,13 +21,13 @@ export default function Settings() {
   const { t, lang } = useLang();
   const [tab, setTab] = useState('profile');
 
-  // Profile tab state
+  // Profil sekmesi state
   const [username, setUsername] = useState(user?.username || '');
-  const [profileError, setProfileError]   = useState('');
+  const [profileError, setProfileError]     = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileLoading, setProfileLoading] = useState(false);
 
-  // Password tab state
+  // Güvenlik sekmesi state
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
   const [pwErrors, setPwErrors]   = useState({});
   const [pwSuccess, setPwSuccess] = useState('');
@@ -83,7 +83,7 @@ export default function Settings() {
       <div className="settings-container container">
         <h1 className="settings-title">{t.settings.title}</h1>
 
-        {/* Tabs */}
+        {/* Sekmeler */}
         <div className="settings-tabs">
           <button
             className={`settings-tab ${tab === 'profile' ? 'active' : ''}`}
@@ -99,7 +99,7 @@ export default function Settings() {
           </button>
         </div>
 
-        {/* Profile Tab */}
+        {/* Profil Sekmesi */}
         {tab === 'profile' && (
           <div className="settings-card">
             <form onSubmit={handleSaveProfile} noValidate>
@@ -112,7 +112,7 @@ export default function Settings() {
                   className={`input-field ${profileError ? 'error' : ''}`}
                   autoComplete="username"
                 />
-                {profileError   && <span className="error-text">{profileError}</span>}
+                {profileError && <span className="error-text">{profileError}</span>}
               </div>
 
               <div className="form-group">
@@ -135,7 +135,7 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Security Tab */}
+        {/* Güvenlik Sekmesi */}
         {tab === 'security' && (
           <div className="settings-card">
             <form onSubmit={handleChangePassword} noValidate>
@@ -184,6 +184,7 @@ export default function Settings() {
             </form>
           </div>
         )}
+
       </div>
     </div>
   );

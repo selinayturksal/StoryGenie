@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Howl } from 'howler';
 import './BookViewer.css';
+
+const pageFlipSound = new Howl({
+  src: ['/assets/page-flip.wav'],
+  volume: 0.8,
+  preload: true,
+  onloaderror: (_id, err) => console.error('[Howl] Yüklenemedi:', err),
+  onplayerror: (_id, err) => console.error('[Howl] Çalınamadı:', err),
+});
 
 export default function BookViewer({ pages, title, characters, location, lang, t, onSave, saving, saved }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -68,24 +77,7 @@ export default function BookViewer({ pages, title, characters, location, lang, t
   }, [speaking, pages, speakText, stopSpeech]);
 
   const playPageFlipSound = useCallback(() => {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const dur = 0.18, rate = ctx.sampleRate;
-      const buf = ctx.createBuffer(1, rate * dur, rate);
-      const d = buf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) {
-        const t = i / rate;
-        d[i] = (Math.random() * 2 - 1) * Math.exp(-t * 22) * (1 - Math.exp(-t * 180)) * 0.55;
-      }
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2800; bp.Q.value = 0.7;
-      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 800;
-      const g = ctx.createGain(); g.gain.setValueAtTime(0.7, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-      src.connect(hp); hp.connect(bp); bp.connect(g); g.connect(ctx.destination);
-      src.start(); src.stop(ctx.currentTime + dur);
-      src.onended = () => ctx.close();
-    } catch (e) {}
+    pageFlipSound.play();
   }, []);
 
   const goTo = (dir) => {

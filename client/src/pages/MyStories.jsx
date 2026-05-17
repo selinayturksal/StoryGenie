@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
 import api from '../services/api';
@@ -166,6 +166,26 @@ export default function MyStories() {
   const [activeTab, setActiveTab]   = useState('all'); // 'all' | 'favorites'
   const [favorites, setFavorites]   = useState(getFavorites);
 
+  // Sıralama + Filtreler
+  const [sortBy, setSortBy]               = useState('new');
+  const [filterAge, setFilterAge]         = useState('');
+  const [filterLang, setFilterLang]       = useState('');
+  const [filterDuration, setFilterDuration] = useState('');
+  const [showSort, setShowSort]           = useState(false);
+  const [showFilters, setShowFilters]     = useState(false);
+  const sortRef   = useRef(null);
+  const filterRef = useRef(null);
+
+  // Dropdown dışına tıklanınca kapat
+  useEffect(() => {
+    const handler = (e) => {
+      if (sortRef.current   && !sortRef.current.contains(e.target))   setShowSort(false);
+      if (filterRef.current && !filterRef.current.contains(e.target)) setShowFilters(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const fetchStories = useCallback(async (p = 1) => {
     setLoading(true);
     try {
@@ -193,9 +213,34 @@ export default function MyStories() {
     });
   };
 
-  const displayedStories = activeTab === 'favorites'
-    ? stories.filter(s => favorites.includes(s._id))
-    : stories;
+  // Sıralama seçenekleri
+  const sortOptions = [
+    { key: 'new', label: lang === 'tr' ? 'En Yeni'        : 'Newest'    },
+    { key: 'old', label: lang === 'tr' ? 'En Eski'        : 'Oldest'    },
+    { key: 'az',  label: lang === 'tr' ? 'Ada Göre (A-Z)' : 'Name A-Z'  },
+    { key: 'za',  label: lang === 'tr' ? 'Ada Göre (Z-A)' : 'Name Z-A'  },
+  ];
+
+  const activeFilterCount = [filterAge, filterLang, filterDuration].filter(Boolean).length;
+
+  const displayedStories = useMemo(() => {
+    let data = activeTab === 'favorites'
+      ? stories.filter(s => favorites.includes(s._id))
+      : [...stories];
+
+    // Filtrele (client-side)
+    if (filterAge)      data = data.filter(s => String(s.options?.childAge) === filterAge);
+    if (filterLang)     data = data.filter(s => s.options?.storyLanguage === filterLang);
+    if (filterDuration) data = data.filter(s => s.options?.duration === filterDuration);
+
+    // Sırala
+    if (sortBy === 'new') data = [...data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (sortBy === 'old') data = [...data].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    if (sortBy === 'az')  data = [...data].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    if (sortBy === 'za')  data = [...data].sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+
+    return data;
+  }, [stories, favorites, activeTab, sortBy, filterAge, filterLang, filterDuration]);
 
   return (
     <div className="my-stories-page">
@@ -206,20 +251,98 @@ export default function MyStories() {
           <p className="ms-subtitle">{t.myStories.subtitle}</p>
         </div>
 
-        {/* Tab bar */}
-        <div className="ms-tabs animate-fadeIn">
-          <button
-            className={`ms-tab ${activeTab === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveTab('all')}>
-            ⊞ {lang === 'tr' ? 'Tümü' : 'All'}
-            <span className="ms-tab-count">{stories.length}</span>
-          </button>
-          <button
-            className={`ms-tab ${activeTab === 'favorites' ? 'active' : ''}`}
-            onClick={() => setActiveTab('favorites')}>
-            ⭐ {lang === 'tr' ? 'Favoriler' : 'Favorites'}
-            <span className="ms-tab-count">{favorites.filter(f => stories.some(s => s._id === f)).length}</span>
-          </button>
+        {/* Toolbar: tab + sırala + filtrele */}
+        <div className="ms-toolbar animate-fadeIn">
+          <div className="ms-toolbar-left">
+
+            {/* Tümü */}
+            <button className={`ms-tab ${activeTab === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveTab('all')}>
+              {lang === 'tr' ? 'Tümü' : 'All'}
+              <span className="ms-tab-count">{stories.length}</span>
+            </button>
+
+            {/* Favoriler */}
+            <button className={`ms-tab ${activeTab === 'favorites' ? 'active' : ''}`}
+              onClick={() => setActiveTab('favorites')}>
+              ⭐ {lang === 'tr' ? 'Favoriler' : 'Favorites'}
+              <span className="ms-tab-count">{favorites.filter(f => stories.some(s => s._id === f)).length}</span>
+            </button>
+
+            {/* Sırala dropdown */}
+            <div className="ms-dropdown-wrap" ref={sortRef}>
+              <button className={`ms-tab ${sortBy !== 'new' ? 'active' : ''}`}
+                onClick={() => { setShowSort(s => !s); setShowFilters(false); }}>
+                ↕ {lang === 'tr' ? 'Sırala' : 'Sort'}
+                <span className="ms-active-label"> · {sortOptions.find(o => o.key === sortBy)?.label}</span>
+              </button>
+              {showSort && (
+                <div className="ms-dropdown">
+                  {sortOptions.map(opt => (
+                    <button key={opt.key}
+                      className={`ms-dropdown-item ${sortBy === opt.key ? 'active' : ''}`}
+                      onClick={() => { setSortBy(opt.key); setShowSort(false); }}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Filtrele dropdown */}
+            <div className="ms-dropdown-wrap" ref={filterRef}>
+              <button className={`ms-tab ${activeFilterCount > 0 ? 'active' : ''}`}
+                onClick={() => { setShowFilters(s => !s); setShowSort(false); }}>
+                {lang === 'tr' ? 'Filtrele' : 'Filter'}
+                {activeFilterCount > 0 && <span className="ms-filter-dot" />}
+              </button>
+              {showFilters && (
+                <div className="ms-dropdown ms-filter-panel">
+                  {/* Yaş */}
+                  <div className="ms-filter-group">
+                    <span className="ms-filter-label">{lang === 'tr' ? 'Yaş' : 'Age'}</span>
+                    <div className="ms-filter-row">
+                      {[['2-3','3'],['4-5','5'],['6-7','7'],['8-9','9'],['10+','11']].map(([l, v]) => (
+                        <button key={v} className={`ms-filter-btn ${filterAge === v ? 'active' : ''}`}
+                          onClick={() => setFilterAge(filterAge === v ? '' : v)}>{l}</button>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Süre */}
+                  <div className="ms-filter-group">
+                    <span className="ms-filter-label">{lang === 'tr' ? 'Süre' : 'Duration'}</span>
+                    <div className="ms-filter-row">
+                      {[['Kısa','short'],['Orta','medium'],['Uzun','long']].map(([l, v]) => (
+                        <button key={v} className={`ms-filter-btn ${filterDuration === v ? 'active' : ''}`}
+                          onClick={() => setFilterDuration(filterDuration === v ? '' : v)}>{l}</button>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Dil */}
+                  <div className="ms-filter-group">
+                    <span className="ms-filter-label">{lang === 'tr' ? 'Dil' : 'Language'}</span>
+                    <div className="ms-filter-row">
+                      <button className={`ms-filter-btn ${filterLang === 'tr' ? 'active' : ''}`}
+                        onClick={() => setFilterLang(filterLang === 'tr' ? '' : 'tr')}>🇹🇷 TR</button>
+                      <button className={`ms-filter-btn ${filterLang === 'en' ? 'active' : ''}`}
+                        onClick={() => setFilterLang(filterLang === 'en' ? '' : 'en')}>🇬🇧 EN</button>
+                    </div>
+                  </div>
+                  {/* Temizle */}
+                  {activeFilterCount > 0 && (
+                    <div className="ms-filter-group">
+                      <button className="ms-dropdown-item"
+                        style={{ color: '#f59e0b', textAlign: 'center' }}
+                        onClick={() => { setFilterAge(''); setFilterLang(''); setFilterDuration(''); }}>
+                        ✕ {lang === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+          </div>
         </div>
 
         {loading && <div className="ms-loading"><div className="spinner" /></div>}

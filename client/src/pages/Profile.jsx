@@ -32,13 +32,40 @@ export default function Profile() {
   const [pwMsg, setPwMsg]       = useState({ text: '', ok: true });
   const [pwLoading, setPwLoading] = useState(false);
   const [showPw, setShowPw]     = useState({ current: false, next: false, confirm: false });
-  const [showPwForm, setShowPwForm] = useState(false);
+  const [showPwModal, setShowPwModal] = useState(false);
 
-  const [deletePass, setDeletePass]       = useState('');
-  const [deleteConfirm, setDeleteConfirm] = useState('');
-  const [deleteMsg, setDeleteMsg]         = useState('');
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteStep, setDeleteStep]           = useState(1);   // 1: hikaye tercihi, 2: final onay
+  const [storyAction, setStoryAction]         = useState('delete');
+  const [publicStoryCount, setPublicStoryCount] = useState(0);
+  const [deletePass, setDeletePass]           = useState('');
+  const [deleteConfirm, setDeleteConfirm]     = useState('');
+  const [deleteMsg, setDeleteMsg]             = useState('');
+  const [deleteLoading, setDeleteLoading]     = useState(false);
+
+  // Bildirim tercihleri state
+  const [notif, setNotif] = useState({
+    notifyOnLike:    user?.notifications?.notifyOnLike    ?? true,
+    notifyOnComment: user?.notifications?.notifyOnComment ?? true,
+    notifyOnFollow:  user?.notifications?.notifyOnFollow  ?? true,
+    notifyMarketing: user?.notifications?.notifyMarketing ?? false,
+  });
+  const [notifToast, setNotifToast] = useState(false);
+
+  const handleNotifToggle = async (key) => {
+    const prev    = notif;
+    const newVal  = !notif[key];
+    const updated = { ...notif, [key]: newVal };
+    setNotif(updated);
+    try {
+      await api.put('/users/preferences', { [key]: newVal });
+      setNotifToast(true);
+      setTimeout(() => setNotifToast(false), 2000);
+    } catch {
+      // Hata durumunda önceki değere geri dön
+      setNotif(prev);
+    }
+  };
 
   const handleSaveAvatar = async (emoji) => {
     setAvatar(emoji);
@@ -84,22 +111,46 @@ export default function Profile() {
       await api.put('/auth/change-password', { currentPassword: pw.current, newPassword: pw.next });
       setPwMsg({ text: tr ? 'Sifre guncellendi!' : 'Password updated!', ok: true });
       setPw({ current: '', next: '', confirm: '' });
-      setTimeout(() => setShowPwForm(false), 1500);
+      setTimeout(() => { setShowPwModal(false); setPwMsg({ text: '', ok: true }); }, 1500);
     } catch (err) {
       setPwMsg({ text: err.message, ok: false });
     } finally { setPwLoading(false); }
   };
 
+  const openDeleteModal = async () => {
+    try {
+      const res = await api.get('/users/me/public-story-count');
+      const count = res.data.count || 0;
+      setPublicStoryCount(count);
+      // Herkese açık hikaye yoksa hikaye tercihi adımını atla
+      setDeleteStep(count > 0 ? 1 : 2);
+      setStoryAction('delete');
+    } catch {
+      setDeleteStep(2);
+    }
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteStep(1);
+    setStoryAction('delete');
+    setDeletePass('');
+    setDeleteConfirm('');
+    setDeleteMsg('');
+  };
+
   const handleDeleteAccount = async () => {
-    if (deleteConfirm !== 'SIL' && deleteConfirm !== 'DELETE') {
-      setDeleteMsg(tr ? '"SIL" yazin.' : 'Type "DELETE".'); return;
+    if (deleteConfirm !== 'HESABIMI SİL' && deleteConfirm !== 'DELETE ACCOUNT') {
+      setDeleteMsg(tr ? '"HESABIMI SİL" yazın.' : 'Type "DELETE ACCOUNT".'); return;
     }
     setDeleteLoading(true);
     try {
-      await api.delete('/auth/account', { data: { password: deletePass } });
+      await api.delete('/users/me', { data: { password: deletePass, storyAction } });
       logout(); navigate('/');
     } catch (err) {
-      setDeleteMsg(err.message); setDeleteLoading(false);
+      setDeleteMsg(err.response?.data?.error || err.message);
+      setDeleteLoading(false);
     }
   };
 
@@ -168,7 +219,7 @@ export default function Profile() {
               <div className="prof-bg-section">
                 <span className="prof-emoji-label" style={{display:'block',marginBottom:'8px'}}>{tr ? 'ARKA PLAN RENGİ' : 'BACKGROUND COLOR'}</span>
                 <div className="prof-bg-grid">
-                  {['#0a0f3c','#6366f1','#7c3aed','#0d9488','#dc2626','#ea580c','#ca8a04','#16a34a','#db2777','#0284c7'].map(color => (
+                  {['#a7a3a3ff','#6366f1','#7c3aed','#0d9488','#dc2626','#ea580c','#ca8a04','#16a34a','#db2777','#0284c7'].map(color => (
                     <button key={color} className={`prof-bg-option ${bgColor === color ? 'selected' : ''}`}
                       style={{ background: color }}
                       onClick={() => handleSaveBg(color)} />
@@ -178,9 +229,7 @@ export default function Profile() {
 
               {/* Kendini ifade et */}
               <div className="prof-tip-box">
-                <span>🛡</span>
                 <div>
-                  <strong>{tr ? 'Sana en çok benzeyen hangisi? 🤔' : 'Which one looks like you? 🤔'}</strong>
                   <small>{tr ? 'Seçtiğin avatar hikaye kartlarında görünecek.' : 'Your avatar will appear on story cards.'}</small>
                 </div>
               </div>
@@ -212,45 +261,11 @@ export default function Profile() {
                 </button>
               </form>
 
-              {/* Şifre değiştir */}
+              {/* Şifre değiştir — modal açar */}
               <div className="prof-pw-section">
-                <button className="prof-pw-toggle" onClick={() => setShowPwForm(s => !s)}>
+                <button className="prof-pw-toggle" onClick={() => setShowPwModal(true)}>
                   🔒 {tr ? 'Sifre Degistir' : 'Change Password'}
-                  <span>{showPwForm ? '▲' : '▼'}</span>
                 </button>
-                {showPwForm && (
-                  <form onSubmit={handleChangePassword} className="prof-form prof-pw-form">
-                    {['current', 'next', 'confirm'].map(field => (
-                      <div className="prof-field" key={field}>
-                        <label>
-                          {field === 'current' ? (tr ? 'Mevcut Sifre' : 'Current Password')
-                           : field === 'next'  ? (tr ? 'Yeni Sifre'   : 'New Password')
-                                               : (tr ? 'Sifre Tekrar'  : 'Confirm')}
-                        </label>
-                        <div className="prof-input-wrap">
-                          <input
-                            type={showPw[field] ? 'text' : 'password'}
-                            value={pw[field]}
-                            onChange={e => setPw(p => ({ ...p, [field]: e.target.value }))}
-                            className="prof-input"
-                          />
-                          <button type="button" className="prof-eye"
-                            onClick={() => setShowPw(s => ({ ...s, [field]: !s[field] }))}>
-                            {showPw[field] ? '🙈' : '👁'}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    {pwMsg.text && <p className={`prof-msg ${pwMsg.ok ? 'ok' : 'err'}`}>{pwMsg.text}</p>}
-                    <button type="submit" className="prof-btn prof-btn--primary" disabled={pwLoading}>
-                      {pwLoading ? '⏳' : (tr ? 'Guncelle' : 'Update')}
-                    </button>
-                    <button type="button" className="prof-forgot-btn"
-                      onClick={() => navigate('/forgot-password')}>
-                      {tr ? 'Şifremi unuttum' : 'Forgot password?'}
-                    </button>
-                  </form>
-                )}
               </div>
             </div>
 
@@ -264,43 +279,180 @@ export default function Profile() {
               <h3>{tr ? 'Hesabı Yonet' : 'Manage Account'}</h3>
               <p>{tr ? 'Hesabınla ilgili diger islemleri yonet.' : 'Manage other account actions.'}</p>
             </div>
-            <button className="prof-btn prof-btn--danger-outline" onClick={() => setShowDeleteModal(true)}>
+            <button className="prof-btn prof-btn--danger-outline" onClick={openDeleteModal}>
               🗑 {tr ? 'Hesabımı Sil' : 'Delete Account'}
             </button>
           </div>
         </div>
+
+        {/* BİLDİRİM TERCİHLERİ — tam genişlik altta */}
+        <div className="prof-card prof-notif-card" style={{ marginTop: '16px' }}>
+          <div className="prof-card-header">
+            <h3>🔔 {tr ? 'Bildirim Tercihleri' : 'Notification Preferences'}</h3>
+            <p>{tr ? 'Mail ile hangi bildirimleri alacağını buradan yönet.' : 'Manage which email notifications you receive.'}</p>
+          </div>
+
+          <div className="prof-notif-list">
+            {[
+              { key: 'notifyOnLike',    label: tr ? 'Hikayelerime beğeni geldiğinde mail al'   : 'Email when my stories get liked',    desc: tr ? 'Biri masalını beğendiğinde haberdar ol.' : 'Get notified when someone likes your story.' },
+              { key: 'notifyOnComment', label: tr ? 'Hikayelerime yorum geldiğinde mail al'    : 'Email when my stories get comments',  desc: tr ? 'Yorum özelliği yakında eklenecek.'      : 'Comment feature coming soon.' },
+              { key: 'notifyOnFollow',  label: tr ? 'Beni takip eden olduğunda mail al'        : 'Email when someone follows me',       desc: tr ? 'Takip özelliği yakında eklenecek.'      : 'Follow feature coming soon.' },
+              { key: 'notifyMarketing', label: tr ? 'MasalMatik haberleri ve duyuruları'       : 'MasalMatik news and announcements',   desc: tr ? 'Yeni özellikler ve özel içerikler.'     : 'New features and special content.' },
+            ].map(({ key, label, desc }) => (
+              <div key={key} className="prof-notif-row">
+                <div className="prof-notif-text">
+                  <span className="prof-notif-label">{label}</span>
+                  <span className="prof-notif-desc">{desc}</span>
+                </div>
+                <label className="prof-notif-toggle">
+                  <input
+                    type="checkbox"
+                    checked={notif[key]}
+                    onChange={() => handleNotifToggle(key)}
+                  />
+                  <span className="prof-notif-slider" />
+                </label>
+              </div>
+            ))}
+          </div>
+
+          <p className="prof-notif-security-note">
+            🔒 {tr ? 'Güvenlik mailleri (şifre değişikliği vb.) bildirim tercihlerinden bağımsız olarak her zaman gönderilir.' : 'Security emails are always sent regardless of preferences.'}
+          </p>
+
+          {notifToast && (
+            <div className="prof-notif-toast">
+              ✓ {tr ? 'Tercihler güncellendi' : 'Preferences updated'}
+            </div>
+          )}
+        </div>
+
       </div>
 
-      {/* MODAL */}
-      {showDeleteModal && (
-        <div className="prof-modal-overlay" onClick={() => setShowDeleteModal(false)}>
+      {/* ŞİFRE DEĞİŞTİR MODALI */}
+      {showPwModal && (
+        <div className="prof-modal-overlay" onClick={() => { setShowPwModal(false); setPwMsg({ text: '', ok: true }); setPw({ current: '', next: '', confirm: '' }); }}>
           <div className="prof-modal" onClick={e => e.stopPropagation()}>
-            <h3 className="prof-modal-title">⚠️ {tr ? 'Hesabı Sil' : 'Delete Account'}</h3>
-            <p className="prof-modal-desc">
-              {tr ? 'Bu islem geri alinamaz. Tum hikayeleriniz silinecek.' : 'This is irreversible. All your stories will be deleted.'}
-            </p>
-            <div className="prof-field">
-              <label>{tr ? 'Sifreniz' : 'Your Password'}</label>
-              <input type="password" value={deletePass}
-                onChange={e => setDeletePass(e.target.value)}
-                className="prof-input" placeholder="••••••" />
-            </div>
-            <div className="prof-field">
-              <label>{tr ? '"SIL" yazin onaylamak icin' : 'Type "DELETE" to confirm'}</label>
-              <input type="text" value={deleteConfirm}
-                onChange={e => { setDeleteConfirm(e.target.value); setDeleteMsg(''); }}
-                className="prof-input" placeholder={tr ? 'SIL' : 'DELETE'} />
-            </div>
-            {deleteMsg && <p className="prof-msg err">{deleteMsg}</p>}
-            <div className="prof-modal-actions">
-              <button className="prof-btn prof-btn--ghost"
-                onClick={() => { setShowDeleteModal(false); setDeletePass(''); setDeleteConfirm(''); setDeleteMsg(''); }}>
-                {tr ? 'Vazgec' : 'Cancel'}
-              </button>
-              <button className="prof-btn prof-btn--danger" onClick={handleDeleteAccount} disabled={deleteLoading}>
-                {deleteLoading ? '⏳' : (tr ? 'Evet, Sil' : 'Yes, Delete')}
-              </button>
-            </div>
+            <h3 className="prof-modal-title">🔒 {tr ? 'Şifre Değiştir' : 'Change Password'}</h3>
+            <form onSubmit={handleChangePassword} className="prof-form">
+              {['current', 'next', 'confirm'].map(field => (
+                <div className="prof-field" key={field}>
+                  <label>
+                    {field === 'current' ? (tr ? 'Mevcut Şifre'  : 'Current Password')
+                     : field === 'next'  ? (tr ? 'Yeni Şifre'    : 'New Password')
+                                         : (tr ? 'Şifre Tekrar'  : 'Confirm Password')}
+                  </label>
+                  <div className="prof-input-wrap">
+                    <input
+                      type={showPw[field] ? 'text' : 'password'}
+                      value={pw[field]}
+                      onChange={e => setPw(p => ({ ...p, [field]: e.target.value }))}
+                      className="prof-input"
+                    />
+                    <button type="button" className="prof-eye"
+                      onClick={() => setShowPw(s => ({ ...s, [field]: !s[field] }))}>
+                      {showPw[field] ? '🙈' : '👁'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {pwMsg.text && <p className={`prof-msg ${pwMsg.ok ? 'ok' : 'err'}`}>{pwMsg.text}</p>}
+              <div className="prof-modal-actions">
+                <button type="button" className="prof-btn prof-btn--ghost"
+                  onClick={() => navigate('/forgot-password')}>
+                  {tr ? 'Şifremi unuttum' : 'Forgot password?'}
+                </button>
+                <button type="submit" className="prof-btn prof-btn--primary" disabled={pwLoading}>
+                  {pwLoading ? '⏳' : (tr ? 'Güncelle' : 'Update')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* HESAP SİLME MODALI — iki aşamalı */}
+      {showDeleteModal && (
+        <div className="prof-modal-overlay" onClick={closeDeleteModal}>
+          <div className="prof-modal" onClick={e => e.stopPropagation()}>
+
+            {/* AŞAMA 1 — Hikaye tercihi (sadece public hikaye varsa gösterilir) */}
+            {deleteStep === 1 && (
+              <>
+                <h3 className="prof-modal-title">🗂 {tr ? 'Hikayelerine Ne Olsun?' : 'What About Your Stories?'}</h3>
+                <p className="prof-modal-desc">
+                  {tr
+                    ? `Hesabını silmek üzeresin. ${publicStoryCount} herkese açık hikayeniz için ne yapmak istersin?`
+                    : `You're about to delete your account. What should happen to your ${publicStoryCount} public stories?`}
+                </p>
+
+                <div className="prof-delete-choices">
+                  <label className={`prof-delete-choice ${storyAction === 'delete' ? 'selected' : ''}`}>
+                    <input type="radio" name="storyAction" value="delete"
+                      checked={storyAction === 'delete'}
+                      onChange={() => setStoryAction('delete')} />
+                    <div>
+                      <strong>🗑 {tr ? 'Tüm hikayelerimi sil' : 'Delete all my stories'}</strong>
+                      <span>{tr ? 'Paylaştığım hikayeler kalıcı olarak kaldırılsın.' : 'My published stories will be permanently removed.'}</span>
+                    </div>
+                  </label>
+                  <label className={`prof-delete-choice ${storyAction === 'anonymize' ? 'selected' : ''}`}>
+                    <input type="radio" name="storyAction" value="anonymize"
+                      checked={storyAction === 'anonymize'}
+                      onChange={() => setStoryAction('anonymize')} />
+                    <div>
+                      <strong>👤 {tr ? 'Hikayelerim kalsın (anonim)' : 'Keep stories (anonymous)'}</strong>
+                      <span>{tr ? 'Hikayelerim platformda kalsın ama adımla bağlantısı kesilsin.' : 'Stories remain but disconnected from my name.'}</span>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="prof-modal-actions">
+                  <button className="prof-btn prof-btn--ghost" onClick={closeDeleteModal}>
+                    {tr ? 'Vazgeç' : 'Cancel'}
+                  </button>
+                  <button className="prof-btn prof-btn--danger-outline" onClick={() => setDeleteStep(2)}>
+                    {tr ? 'Devam Et →' : 'Continue →'}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* AŞAMA 2 — Final onay */}
+            {deleteStep === 2 && (
+              <>
+                <h3 className="prof-modal-title">⚠️ {tr ? 'Son Onay' : 'Final Confirmation'}</h3>
+                <p className="prof-modal-desc" style={{ color: '#e05070' }}>
+                  {tr ? 'Bu işlem geri alınamaz. Hesabın ve tüm verilerin kalıcı olarak silinecek.' : 'This action is irreversible. Your account and all data will be permanently deleted.'}
+                </p>
+
+                <div className="prof-field">
+                  <label>{tr ? 'Şifreniz' : 'Your Password'}</label>
+                  <input type="password" value={deletePass}
+                    onChange={e => { setDeletePass(e.target.value); setDeleteMsg(''); }}
+                    className="prof-input" placeholder="••••••" autoComplete="current-password" />
+                </div>
+                <div className="prof-field">
+                  <label>{tr ? '"HESABIMI SİL" yazın onaylamak için' : 'Type "DELETE ACCOUNT" to confirm'}</label>
+                  <input type="text" value={deleteConfirm}
+                    onChange={e => { setDeleteConfirm(e.target.value); setDeleteMsg(''); }}
+                    className="prof-input"
+                    placeholder={tr ? 'HESABIMI SİL' : 'DELETE ACCOUNT'} />
+                </div>
+
+                {deleteMsg && <p className="prof-msg err">{deleteMsg}</p>}
+
+                <div className="prof-modal-actions">
+                  <button className="prof-btn prof-btn--ghost" onClick={closeDeleteModal}>
+                    {tr ? 'Vazgeç' : 'Cancel'}
+                  </button>
+                  <button className="prof-btn prof-btn--danger" onClick={handleDeleteAccount} disabled={deleteLoading}>
+                    {deleteLoading ? '⏳' : (tr ? '🗑 Hesabımı Sil' : '🗑 Delete Account')}
+                  </button>
+                </div>
+              </>
+            )}
+
           </div>
         </div>
       )}

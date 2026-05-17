@@ -66,9 +66,9 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
     const ts = [
       setTimeout(() => setPhase('overlay'),   10),
       setTimeout(() => setPhase('book'),     350),
-      // cover starts rotating at 1100ms, takes ~2850ms to fully open
+      // kapak 1100ms'de dönmeye başlar, tam açılması ~2850ms sürer
       setTimeout(() => setPhase('opening'), 1100),
-      // pages start flipping after cover is fully open
+      // kapak tamamen açıldıktan sonra sayfa çevirme başlar
       setTimeout(() => setPhase('flipping'), 4050),
       setTimeout(() => { minDoneRef.current = true; tc.current(); }, MIN_DISPLAY_MS),
     ];

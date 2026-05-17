@@ -7,7 +7,7 @@
   min-height: 100vh;
   background: transparent;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   align-items: center;

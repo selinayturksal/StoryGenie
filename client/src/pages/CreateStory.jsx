@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
 import CharacterCard from '../components/CharacterCard';
@@ -30,6 +31,8 @@ export default function CreateStory() {
   const [storyData, setStoryData]               = useState(null);
   const [genError, setGenError]                 = useState('');
   const [validError, setValidError]             = useState('');
+  const [sceneVisible, setSceneVisible]         = useState(false);
+  const step3SceneRef                           = useRef(null);
   const [isDark, setIsDark] = useState(
     () => document.documentElement.getAttribute('data-theme') !== 'light'
   );
@@ -41,6 +44,18 @@ export default function CreateStory() {
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     return () => obs.disconnect();
   }, []);
+
+  // Step3 sahnesi görünür olduğunda butonu göster, gizlenince gizle
+  useEffect(() => {
+    const el = step3SceneRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setSceneVisible(entry.isIntersecting),
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [step]);
 
   const toggleChar = (char) => {
     setSelectedChars(prev => {
@@ -91,7 +106,7 @@ export default function CreateStory() {
         childAge, duration, storyLanguage: storyLang, customPrompt,
       };
       const res = await api.post('/ai/generate', payload);
-      // Store story — BookOpeningTransition will call handleTransitionComplete when ready
+      // Hikayeyi sakla — BookOpeningTransition hazır olduğunda handleTransitionComplete'i çağırır
       setStoryData({
         ...res.data,
         options: payload,
@@ -108,7 +123,7 @@ export default function CreateStory() {
       });
     } catch (err) {
       setGenError(err.message);
-      setGenerating(false); // only hide overlay on error
+      setGenerating(false); // overlay yalnızca hata durumunda gizlenir
     }
   };
 
@@ -117,7 +132,7 @@ export default function CreateStory() {
   };
 
   return (
-    <div className="create-page">
+    <div className="create-page" data-step={step}>
       <div className="create-container">
 
         {/* ── PROGRESS BAR / GEN STATUS ── */}
@@ -375,9 +390,10 @@ export default function CreateStory() {
           ADIM 3 — Alt sahne (tam genişlik)
       ══════════════════════════════════ */}
       {step === 3 && !generating && (
-        <div className="step3-scene"
-          style={{ backgroundImage: `url('/assets/create/settings-bg.png'), url('/assets/create/${isDark ? 'darkf' : 'dayf'}.png')` }}
-        >
+        <div className="step3-scene" ref={step3SceneRef}>
+          <div className="step3-bg"
+            style={{ backgroundImage: `url('/assets/create/settings-bg.png'), url('/assets/create/${isDark ? 'darkf' : 'dayf'}.png')` }}
+          />
           <div className="create-container">
             <div className="step3-layout">
 
@@ -411,16 +427,18 @@ export default function CreateStory() {
                 </button>
               </div>
 
-              {/* Sağ: şato alanı + oluştur butonu alt köşede */}
-              <div className="step3-right">
-                <button className="generate-btn" onClick={handleGenerate}>
-                  {t.create.generateBtn}
-                </button>
-              </div>
 
             </div>
           </div>
         </div>
+      )}
+
+      {/* Sabit buton — illüstrasyon alanı göründüğünde çıkar, tepedeyken gizlidir */}
+      {step === 3 && !generating && sceneVisible && ReactDOM.createPortal(
+        <button className="generate-btn" onClick={handleGenerate}>
+          {t.create.generateBtn}
+        </button>,
+        document.body
       )}
 
       {/* Cinematic book-opening transition overlay */}

@@ -1,9 +1,11 @@
-const express = require('express');
+const express  = require('express');
 const mongoose = require('mongoose');
-const { body, validationResult, query } = require('express-validator');
+const jwt      = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 const Story = require('../models/Story');
 const User  = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { sendStoryLikedMail } = require('../services/mailService');
 
 const router = express.Router();
 
@@ -100,7 +102,6 @@ router.get('/explore', async (req, res) => {
     try {
       const authHeader = req.headers.authorization;
       if (authHeader?.startsWith('Bearer ')) {
-        const jwt = require('jsonwebtoken');
         const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
         userId = decoded.id;
       }
@@ -271,14 +272,30 @@ router.post('/:id/like', protect, async (req, res) => {
   try {
     const story = await Story.findById(req.params.id);
     if (!story || !story.isPublic) return res.status(404).json({ error: 'Hikaye bulunamadı.' });
+    if (story.isAnonymized) return res.status(403).json({ error: 'Anonim hikayeler beğenilemez.' });
 
-    const userId = req.user._id.toString();
+    const userId      = req.user._id.toString();
+    const ownerId     = story.author.toString();
     const alreadyLiked = story.communityRatings.some(r => r.user.toString() === userId);
 
     if (!alreadyLiked) {
       story.communityRatings.push({ user: req.user._id, rating: 5 });
       story.recalculateCommunityRating();
       await story.save();
+
+      // Hikaye sahibi kendisini beğenemez; bildirim tercihi kontrol edilir
+      if (ownerId !== userId) {
+        const owner = await User.findById(ownerId).select('email username notifications');
+        if (owner?.notifications?.notifyOnLike) {
+          sendStoryLikedMail({
+            ownerEmail:    owner.email,
+            ownerUsername: owner.username,
+            storyTitle:    story.title,
+            storyId:       story._id,
+            likerName:     req.user.username,
+          });
+        }
+      }
     }
 
     res.json({

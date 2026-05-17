@@ -1,0 +1,20 @@
+@import './Explore.css';
+
+.fav-page {
+  padding: 44px 0 80px;
+  min-height: calc(100vh - 68px);
+}
+
+.fav-header { text-align: center; margin-bottom: 32px; }
+.fav-title  { font-family: var(--font-display); font-size: 2.4rem; font-weight: 900; color: var(--ink); margin: 0; }
+.fav-subtitle { margin-top: 8px; color: var(--ink-soft); font-weight: 600; }
+
+.fav-loading { display: flex; justify-content: center; padding: 80px; }
+
+.fav-empty {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; padding: 80px 20px; text-align: center;
+}
+.fav-empty-icon { font-size: 4.5rem; animation: float 3s ease-in-out infinite; }
+.fav-empty h3   { font-size: 1.3rem; color: var(--ink-mid); font-family: var(--font-display); }
+.fav-empty p    { color: var(--ink-soft); }

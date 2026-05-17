@@ -3,17 +3,17 @@
 
 export const ALL_CHARACTERS = [
   { id: 'human_g1',  name: { tr: 'Prenses Elif',    en: 'Princess Emma'   }, file: 'girl1.png',  emoji: '👧' },
-  { id: 'human_g2',  name: { tr: 'Şirin Damla',     en: 'Cute Mia'        }, file: 'girl2.png',  emoji: '👧' },
-  { id: 'human_g3',  name: { tr: 'Minik Neşe',      en: 'Little Lily'     }, file: 'girl3.png',  emoji: '👧' },
-  { id: 'human_g4',  name: { tr: 'Tatlı Deniz',     en: 'Princess Sofia'  }, file: 'girl4.png',  emoji: '👧' },
-  { id: 'human_g5',  name: { tr: 'Çalışkan Rukiye', en: 'Princess Ella'   }, file: 'girl5.png',  emoji: '👧' },
-  { id: 'human_g6',  name: { tr: 'Neşeli Zeynep',   en: 'Cheerful Zoe'    }, file: 'girl6.png',  emoji: '👧' },
-  { id: 'human_g7',  name: { tr: 'Zarif Lian',      en: 'Graceful Lian'   }, file: 'girl7.png',  emoji: '👧' },
-  { id: 'human_g8',  name: { tr: 'Işıltılı Priya',  en: 'Radiant Priya'   }, file: 'girl8.png',  emoji: '👧' },
-  { id: 'human_g9',  name: { tr: 'Sevimli Yuki',    en: 'Cute Yuki'       }, file: 'girl9.png',  emoji: '👧' },
-  { id: 'human_g10', name: { tr: 'Şen Elif',        en: 'Jolly Ella'      }, file: 'girl10.png', emoji: '👧' },
-  { id: 'human_g11', name: { tr: 'Deniz Kızı Su',   en: 'Sunny Belle'     }, file: 'girl11.png', emoji: '🏖️' },
-  { id: 'human_g12', name: { tr: 'Çiçekli Sarı',    en: 'Daisy Lou'       }, file: 'girl12.png', emoji: '👧' },
+  { id: 'human_g2',  name: { tr: 'Şirin Damla',     en: 'Cutie Mia'        }, file: 'girl2.png',  emoji: '👧' },
+  { id: 'human_g3',  name: { tr: 'Çalışkan Rukiye', en: 'Little Lily'     }, file: 'girl3.png',  emoji: '👧' },
+  { id: 'human_g4',  name: { tr: 'Tatlı Deniz',     en: 'Munchkin Sofia'  }, file: 'girl4.png',  emoji: '👧' },
+  { id: 'human_g5',  name: { tr: 'Minik Neşe', en: 'Princess Ella'   }, file: 'girl5.png',  emoji: '👧' },
+  { id: 'human_g6',  name: { tr: 'Neşeli Zeynep',   en: 'Cute Zoe'    }, file: 'girl6.png',  emoji: '👧' },
+  { id: 'human_g7',  name: { tr: 'Zarif Büşra',      en: 'Little Lian'   }, file: 'girl7.png',  emoji: '👧' },
+  { id: 'human_g8',  name: { tr: 'Işıltılı Melek',  en: 'Munchkin Priya'   }, file: 'girl8.png',  emoji: '👧' },
+  { id: 'human_g9',  name: { tr: 'Sevimli Aslı',    en: 'Cute Melissa'       }, file: 'girl9.png',  emoji: '👧' },
+  { id: 'human_g10', name: { tr: 'Prenses Elif',        en: 'Angel Ella'      }, file: 'girl10.png', emoji: '👧' },
+  { id: 'human_g11', name: { tr: 'Minik Su',   en: 'Baby Belle'     }, file: 'girl11.png', emoji: '🏖️' },
+  { id: 'human_g12', name: { tr: 'Şirin Selin',    en: 'Cute Lou'       }, file: 'girl12.png', emoji: '👧' },
 
   { id: 'human_b1',  name: { tr: 'Meraklı Berke',         en: 'Curious Noah'      }, file: 'boy1.png',  emoji: '👦' },
   { id: 'human_b2',  name: { tr: 'Cesur Ali',              en: 'Hero Lucas'        }, file: 'boy2.png',  emoji: '👦' },
@@ -22,11 +22,11 @@ export const ALL_CHARACTERS = [
   { id: 'human_b5',  name: { tr: 'Mutlu Bilge',            en: 'Happy Oliver'      }, file: 'boy5.png',  emoji: '👦' },
   { id: 'human_b6',  name: { tr: 'Akıllı Kerem',           en: 'Smart Ethan'       }, file: 'boy6.png',  emoji: '👦' },
   { id: 'human_b7',  name: { tr: 'Neşeli Tuncay',          en: 'Sunny Jack'        }, file: 'boy7.png',  emoji: '👦' },
-  { id: 'human_b8',  name: { tr: 'Barışçıl Hiro',          en: 'Peaceful Hiro'     }, file: 'boy8.png',  emoji: '👦' },
-  { id: 'human_b9',  name: { tr: 'Yiğit Kartal',           en: 'Brave Eagle'       }, file: 'boy9.png',  emoji: '👦' },
+  { id: 'human_b8',  name: { tr: 'Barışçıl Burak',          en: 'Kiddo Hiro'     }, file: 'boy8.png',  emoji: '👦' },
+  { id: 'human_b9',  name: { tr: 'Güçlü Yiğit',           en: 'Brave Eagle'       }, file: 'boy9.png',  emoji: '👦' },
   { id: 'human_b10', name: { tr: 'Enerjik Kaan',           en: 'Energetic Kyle'    }, file: 'boy10.png', emoji: '👦' },
-  { id: 'human_b11', name: { tr: 'Güçlü Demir',            en: 'Strong Sam'        }, file: 'boy11.png', emoji: '👦' },
-  { id: 'human_b12', name: { tr: 'Dalgıç Mert',            en: 'Diver Max'         }, file: 'boy12.png', emoji: '🏄' },
+  { id: 'human_b11', name: { tr: 'Minik Demir',            en: 'Strong Sam'        }, file: 'boy11.png', emoji: '👦' },
+  { id: 'human_b12', name: { tr: 'Sevimli Mert',            en: 'Cute Max'         }, file: 'boy12.png', emoji: '🏄' },
 
   { id: 'animal_1',  name: { tr: 'Oyuncu Tarçın',   en: 'Playful Max'       }, file: 'animal1.png',   emoji: '🐶' },
   { id: 'animal_2',  name: { tr: 'Meraklı Pati',    en: 'Curious Luna'      }, file: 'animal2.png',   emoji: '🐱' },
@@ -39,13 +39,13 @@ export const ALL_CHARACTERS = [
   { id: 'animal_9',  name: { tr: 'Şen Ördek',        en: 'Happy Duck'        }, file: 'duck.png',      emoji: '🦆' },
   { id: 'animal_10', name: { tr: 'Tatlı Kirpi',      en: 'Sweet Hedgehog'    }, file: 'hedgehog.png',  emoji: '🦔' },
   { id: 'animal_11', name: { tr: 'Zarif Geyik',      en: 'Gentle Deer'       }, file: 'deer.png',      emoji: '🦌' },
-  { id: 'animal_16', name: { tr: 'Yeşil Timsah',     en: 'Green Croc'        }, file: 'crocodile.png', emoji: '🐊' },
+  { id: 'animal_16', name: { tr: 'Yeşil Timsah',     en: 'Green Croc'        }, file: 'crocodile.png', emoji: '🐊', scale: 2 },
   { id: 'animal_12', name: { tr: 'Sevimli Zürafa',   en: 'Cute Giraffe'      }, file: 'animal6.png',   emoji: '🐼' },
-  { id: 'animal_13', name: { tr: 'Cesur Aslan',      en: 'Brave Leo'         }, file: 'lion.png',      emoji: '🦁' },
-  { id: 'animal_14', name: { tr: 'Şen Penguen',      en: 'Happy Penguin'     }, file: 'penguin.png',   emoji: '🐧' },
-  { id: 'animal_15', name: { tr: 'Maymun Coco',      en: 'Monkey Coco'       }, file: 'monkey.png',    emoji: '🐒' },
-  { id: 'animal_17', name: { tr: 'Minik Kaplumbağa', en: 'Little Turtle'     }, file: 'turtle.png',    emoji: '🐢' },
-  { id: 'animal_18', name: { tr: 'Utangaç Flamingo', en: 'Shy Flamingo'      }, file: 'flamingo.png',  emoji: '🦩' },
+  { id: 'animal_13', name: { tr: 'Cesur Aslan',      en: 'Brave Leo'         }, file: 'lion.png',      emoji: '🦁', scale: 2 },
+  { id: 'animal_14', name: { tr: 'Komik Penguen',      en: 'Happy Penguin'     }, file: 'penguin.png',   emoji: '🐧', scale: 2 },
+  { id: 'animal_15', name: { tr: 'Oyuncu Maymun ',      en: 'Monkey Coco'       }, file: 'monkey.png',    emoji: '🐒', scale: 2 },
+  { id: 'animal_17', name: { tr: 'Minik Kaplumbağa', en: 'Little Turtle'     }, file: 'turtle.png',    emoji: '🐢', scale: 2 },
+  { id: 'animal_18', name: { tr: 'Utangaç Flamingo', en: 'Shy Flamingo'      }, file: 'flamingo.png',  emoji: '🦩', scale: 2 },
 ];
 
 // Geriye dönük uyumluluk için (BookViewer vs)
@@ -65,7 +65,7 @@ export const LOCATIONS = [
   { id: 'loc_9',  name: { tr: 'Hayvanat Bahçesi', en: 'Zoo'               }, emoji: '🦁',  file: 'zoo.png'     },
   { id: 'loc_10', name: { tr: 'Sahil',            en: 'Beach'             }, emoji: '🏖️',  file: 'beach.png'   },
   { id: 'loc_11', name: { tr: 'Okul',             en: 'School'            }, emoji: '🏫',  file: 'school.png'  },
-  { id: 'loc_12', name: { tr: 'Kar Diyarı',       en: 'Snow Land'         }, emoji: '⛷️',  file: 'snow.png'    },
+  { id: 'loc_12', name: { tr: 'Kar Tatili',       en: 'Snow Holiday'         }, emoji: '⛷️',  file: 'snow.png'    },
 ];
 
 export const AGE_OPTIONS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];

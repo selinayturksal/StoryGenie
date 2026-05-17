@@ -223,7 +223,7 @@
   padding: 10px 12px; border-radius: 10px;
   background: rgba(99,102,241,0.06);
   border: 1px solid rgba(99,102,241,0.12);
-  margin-top: 4px;
+  margin-top: 15px;
 }
 .prof-tip-box strong { display: block; font-size: 0.8rem; font-weight: 800; color: rgba(200,185,255,0.85); }
 [data-theme="light"] .prof-tip-box strong { color: rgb(40,20,80); }
@@ -400,3 +400,99 @@
   border-color: #fff;
   box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
 }
+
+/* ── Hesap Silme — Hikaye Tercihi ── */
+.prof-delete-choices {
+  display: flex; flex-direction: column; gap: 10px;
+  margin: 16px 0;
+}
+.prof-delete-choice {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: 12px;
+  border: 1.5px solid rgba(200,185,255,0.15);
+  cursor: pointer; transition: all 0.15s;
+  background: rgba(255,255,255,0.03);
+}
+.prof-delete-choice input[type="radio"] { margin-top: 3px; flex-shrink: 0; accent-color: #753246; }
+.prof-delete-choice div { display: flex; flex-direction: column; gap: 3px; }
+.prof-delete-choice strong { font-size: 0.9rem; color: rgba(220,210,255,0.92); }
+.prof-delete-choice span   { font-size: 0.78rem; color: rgba(180,165,230,0.55); }
+.prof-delete-choice.selected {
+  border-color: rgba(220,60,100,0.4);
+  background: rgba(220,60,100,0.07);
+}
+[data-theme="light"] .prof-delete-choice { border-color: rgba(117,70,104,0.15); background: rgba(255,255,255,0.5); }
+[data-theme="light"] .prof-delete-choice strong { color: rgb(40,20,70); }
+[data-theme="light"] .prof-delete-choice span   { color: rgba(60,40,90,0.5); }
+[data-theme="light"] .prof-delete-choice.selected { border-color: rgba(200,50,80,0.35); background: rgba(200,50,80,0.06); }
+
+/* ── Bildirim Tercihleri ── */
+.prof-notif-card .prof-card-header { margin-bottom: 16px; }
+
+.prof-notif-list {
+  border: 1.5px solid rgba(200,185,255,0.1);
+  border-radius: 14px;
+  overflow: hidden;
+}
+[data-theme="light"] .prof-notif-list { border-color: rgba(117,70,104,0.1); }
+
+.prof-notif-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 14px 18px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(200,185,255,0.07);
+  transition: background 0.15s;
+}
+.prof-notif-row:last-child { border-bottom: none; }
+.prof-notif-row:hover { background: rgba(255,255,255,0.06); }
+[data-theme="light"] .prof-notif-row { background: rgba(255,255,255,0.5); border-bottom-color: rgba(117,70,104,0.07); }
+[data-theme="light"] .prof-notif-row:hover { background: rgba(255,255,255,0.8); }
+
+.prof-notif-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.prof-notif-label { font-size: 0.88rem; font-weight: 700; color: rgba(215,205,255,0.9); }
+.prof-notif-desc  { font-size: 0.76rem; color: rgba(180,165,230,0.5); }
+[data-theme="light"] .prof-notif-label { color: rgb(40,20,70); }
+[data-theme="light"] .prof-notif-desc  { color: rgba(60,40,90,0.5); }
+
+/* Toggle switch */
+.prof-notif-toggle {
+  position: relative; display: inline-block;
+  width: 44px; height: 24px; flex-shrink: 0;
+}
+.prof-notif-toggle input { opacity: 0; width: 0; height: 0; }
+.prof-notif-slider {
+  position: absolute; inset: 0;
+  background: rgba(200,185,255,0.15);
+  border-radius: 24px; cursor: pointer;
+  transition: background 0.2s;
+}
+.prof-notif-slider::before {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; left: 3px; top: 3px;
+  background: rgba(200,185,255,0.7); border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+.prof-notif-toggle input:checked + .prof-notif-slider {
+  background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120));
+}
+.prof-notif-toggle input:checked + .prof-notif-slider::before {
+  transform: translateX(20px); background: #fff;
+}
+[data-theme="light"] .prof-notif-slider { background: rgba(117,70,104,0.12); }
+[data-theme="light"] .prof-notif-slider::before { background: rgba(117,70,104,0.45); }
+[data-theme="light"] .prof-notif-toggle input:checked + .prof-notif-slider::before { background: #fff; }
+
+.prof-notif-security-note {
+  margin-top: 14px; font-size: 0.76rem;
+  color: rgba(180,165,230,0.45); line-height: 1.5;
+}
+[data-theme="light"] .prof-notif-security-note { color: rgba(60,40,90,0.42); }
+
+.prof-notif-toast {
+  margin-top: 12px; padding: 10px 16px;
+  background: rgba(84,151,167,0.12);
+  border: 1.5px solid rgba(84,151,167,0.28);
+  border-radius: 10px; font-size: 0.85rem; font-weight: 700;
+  color: rgb(140,200,220);
+}
+[data-theme="light"] .prof-notif-toast { background: rgba(84,151,167,0.09); color: rgb(40,100,120); border-color: rgba(84,151,167,0.25); }

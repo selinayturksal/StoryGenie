@@ -5,11 +5,12 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import './Explore.css';
 
-function CommunityStoryCard({ story, onRate, onLike, lang }) {
+function CommunityStoryCard({ story, onRate, onLike, onFavorite, isFavorited, lang }) {
   const [liked, setLiked]         = useState(story.isLikedByMe || false);
   const [likeCount, setLikeCount] = useState(story.likeCount || story.communityRatings?.length || 0);
   const [userRating, setUserRating] = useState(0);
   const [rated, setRated]         = useState(false);
+  const [favorited, setFavorited] = useState(isFavorited || false);
 
   const chars       = story.options?.characters || [];
   const location    = story.options?.location;
@@ -23,16 +24,10 @@ function CommunityStoryCard({ story, onRate, onLike, lang }) {
       .replace(/_{1,2}(.*?)_{1,2}/g, '$1')
       .trim();
 
-  const timeAgo = (dateStr) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const days = Math.floor(diff / 86400000);
-    if (days === 0) return lang === 'tr' ? 'Bugün' : 'Today';
-    if (days === 1) return lang === 'tr' ? '1 gün önce' : '1 day ago';
-    if (days < 7)  return lang === 'tr' ? `${days} gün önce` : `${days} days ago`;
-    const weeks = Math.floor(days / 7);
-    if (weeks === 1) return lang === 'tr' ? '1 hafta önce' : '1 week ago';
-    return lang === 'tr' ? `${weeks} hafta önce` : `${weeks} weeks ago`;
-  };
+  const date = new Date(story.createdAt).toLocaleDateString(
+    lang === 'tr' ? 'tr-TR' : 'en-US',
+    { day: 'numeric', month: 'long', year: 'numeric' }
+  );
 
   const getBadge = () => {
     const days = Math.floor((Date.now() - new Date(story.createdAt).getTime()) / 86400000);
@@ -45,11 +40,18 @@ function CommunityStoryCard({ story, onRate, onLike, lang }) {
   const badge = getBadge();
 
   const handleLike = async () => {
-    if (liked) return;
+    if (liked || story.isAnonymized) return;
     setLiked(true);
     setLikeCount(c => c + 1);
     const result = await onLike(story._id);
     if (result?.likeCount !== undefined) setLikeCount(result.likeCount);
+  };
+
+  const handleFavorite = async (e) => {
+    e.stopPropagation();
+    const next = !favorited;
+    setFavorited(next);
+    await onFavorite(story._id, next);
   };
 
   const handleRate = async (val) => {
@@ -76,32 +78,71 @@ function CommunityStoryCard({ story, onRate, onLike, lang }) {
             return (
               <div key={i} className="ec-cover-char">
                 <img src={`/assets/characters/${file}`} alt={c.name || ''}
-                  onError={e => { e.target.style.display = 'none'; }} />
+                  onError={e => { e.target.style.display = 'none'; }}
+                  style={{ height: `calc(120px + (4 - ${chars.length || 1}) * 10px)`, maxHeight: '90%' }} />
               </div>
             );
           })}
         </div>
         {badge && <span className={`ec-badge ${badge.cls}`}>{badge.label}</span>}
-        <button className="ec-like-btn" onClick={handleLike}>
+        <button className="ec-like-btn" onClick={handleLike}
+          disabled={story.isAnonymized}
+          title={story.isAnonymized ? 'Anonim hikayeler beğenilemez' : undefined}>
           <span>{liked ? '❤️' : '🤍'}</span>
           <span>{likeCount}</span>
         </button>
+        {onFavorite && (
+          <button className={`ec-fav-btn${favorited ? ' ec-fav-btn--active' : ''}`}
+            onClick={handleFavorite}
+            title={favorited ? 'Favorilerden çıkar' : 'Favorilere ekle'}>
+            {favorited ? '⭐' : '☆'}
+          </button>
+        )}
       </div>
 
       <div className="ec-body">
+        <div className="ec-date">📅 {date}</div>
+
         <div className="ec-author-row">
-          <div className="ec-avatar" style={{ background: story.author?.avatarBg || 'rgb(10,15,60)' }}>
-            {story.author?.avatar && story.author.avatar.length > 0
-              ? story.author.avatar.startsWith('/')
-                ? <img src={story.author.avatar} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}} />
-                : <span style={{fontSize:'1rem',lineHeight:1}}>{story.author.avatar}</span>
-              : <span>{story.author?.username?.[0]?.toUpperCase() || '?'}</span>}
+          <div className="ec-avatar" style={{ background: story.isAnonymized ? '#9b9b9b' : (story.author?.avatarBg || 'rgb(10,15,60)') }}>
+            {story.isAnonymized
+              ? <span style={{fontSize:'1.1rem',lineHeight:1}}>👤</span>
+              : story.author?.avatar && story.author.avatar.length > 0
+                ? story.author.avatar.startsWith('/')
+                  ? <img src={story.author.avatar} alt="" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}} />
+                  : <span style={{fontSize:'1rem',lineHeight:1}}>{story.author.avatar}</span>
+                : <span>{story.author?.username?.[0]?.toUpperCase() || '?'}</span>}
           </div>
-          <span className="ec-username">{story.author?.username}</span>
-          <span className="ec-time">{timeAgo(story.createdAt)}</span>
+          <span className="ec-username">{story.isAnonymized ? 'Anonim' : story.author?.username}</span>
         </div>
 
         <h3 className="ec-title">{cleanMd(story.title)}</h3>
+
+        {/* Karakter chip'leri */}
+        {chars.length > 0 && (
+          <div className="ec-chip-row">
+            {chars.map((c, i) => {
+              const file = c.imagePath?.split('/').pop() || '';
+              return (
+                <div key={i} className="ec-chip">
+                  <img src={`/assets/characters/${file}`} alt={c.name || ''}
+                    onError={e => { e.target.style.display = 'none'; }} />
+                  <span>{c.name}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Mekan chip'i */}
+        {location?.name && (
+          <div className="ec-chip-row">
+            <div className="ec-chip ec-chip--loc">
+              <span>📍</span>
+              <span>{location.name}</span>
+            </div>
+          </div>
+        )}
 
         {/* Spacer — meta + footer her zaman altta */}
         <div className="ec-spacer" />
@@ -119,7 +160,9 @@ function CommunityStoryCard({ story, onRate, onLike, lang }) {
         </div>
 
         <div className="ec-footer">
-          <button className="ec-heart-btn" onClick={handleLike}>
+          <button className="ec-heart-btn" onClick={handleLike}
+            disabled={story.isAnonymized}
+            title={story.isAnonymized ? 'Anonim hikayeler beğenilemez' : undefined}>
             <span>{liked ? '❤️' : '🤍'}</span>
             <span>{likeCount}</span>
           </button>
@@ -142,6 +185,10 @@ export default function Explore() {
   const [error, setError]           = useState('');
   const [page, setPage]             = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [favoriteIds, setFavoriteIds]       = useState(new Set());
+  const [showFavorites, setShowFavorites]   = useState(false);
+  const [favoriteStories, setFavoriteStories] = useState([]);
+  const [favLoading, setFavLoading]         = useState(false);
 
   // Sıralama + Filtreler
   const [sortBy, setSortBy]         = useState('new');      // new | liked | mostRead
@@ -172,6 +219,45 @@ export default function Explore() {
   }, [sortBy, filterAge, filterLang, filterDuration]);
 
   useEffect(() => { fetchStories(page); }, [page, fetchStories]);
+
+  useEffect(() => {
+    if (!user) return;
+    api.get('/favorites?limit=50').then(res => {
+      const ids = new Set(res.data.stories.map(s => s._id));
+      setFavoriteIds(ids);
+    }).catch(() => {});
+  }, [user]);
+
+  const handleFavorite = async (id, add) => {
+    try {
+      if (add) {
+        await api.post(`/favorites/${id}`);
+        setFavoriteIds(prev => new Set([...prev, id]));
+      } else {
+        await api.delete(`/favorites/${id}`);
+        setFavoriteIds(prev => { const next = new Set(prev); next.delete(id); return next; });
+      }
+    } catch (e) {}
+  };
+
+  const handleToggleFavorites = async () => {
+    if (showFavorites) {
+      setShowFavorites(false);
+      return;
+    }
+    setShowFavorites(true);
+    setFavLoading(true);
+    try {
+      const res = await api.get('/favorites?limit=50');
+      setFavoriteStories(res.data.stories);
+      // favoriteIds'i de güncelle
+      setFavoriteIds(new Set(res.data.stories.map(s => s._id)));
+    } catch (e) {
+      setFavoriteStories([]);
+    } finally {
+      setFavLoading(false);
+    }
+  };
 
   const handleRate = async (id, rating, read = false) => {
     if (read) { navigate(`/story/${id}`); return; }
@@ -209,7 +295,8 @@ export default function Explore() {
             {/* Tümü */}
             <button className={`exp-tab ${sortBy === 'all' ? 'active' : ''}`}
               onClick={() => { setSortBy('all'); setPage(1); }}>
-              ⊞ {lang === 'tr' ? 'Tümü' : 'All'}
+              {lang === 'tr' ? 'Tümü' : 'All'}
+              <span className="exp-tab-count">{stories.length}</span>
             </button>
 
             {/* Sırala */}
@@ -238,7 +325,7 @@ export default function Explore() {
             <div className="exp-dropdown-wrap">
               <button className={`exp-tab ${showFilters ? 'active' : ''}`}
                 onClick={() => { setShowFilters(s => !s); setShowSort(false); }}>
-                🎛 {lang === 'tr' ? 'Filtrele' : 'Filter'}
+                 {lang === 'tr' ? 'Filtrele' : 'Filter'}
                 {(filterAge || filterLang || filterDuration) && <span className="exp-filter-dot" />}
               </button>
               {showFilters && (
@@ -287,6 +374,16 @@ export default function Explore() {
                 </div>
               )}
             </div>
+
+            {/* Favorilerim filtre butonu — Filtrele'nin hemen yanında, sadece giriş yapmış kullanıcılara */}
+            {user && (
+              <button
+                className={`exp-tab${showFavorites ? ' active' : ''}`}
+                onClick={handleToggleFavorites}>
+                ⭐ {lang === 'tr' ? 'Favorilerim' : 'My Favorites'}
+                {favoriteIds.size > 0 && <span className="exp-tab-count">{favoriteIds.size}</span>}
+              </button>
+            )}
           </div>
 
           {/* Hikaye Paylaş — sağda */}
@@ -297,10 +394,39 @@ export default function Explore() {
           )}
         </div>
 
-        {loading && <div className="exp-loading"><div className="spinner" /></div>}
-        {error && !loading && <div className="exp-error">{error}</div>}
+        {/* Normal yüklenme / hata */}
+        {(loading || favLoading) && <div className="exp-loading"><div className="spinner" /></div>}
+        {error && !loading && !showFavorites && <div className="exp-error">{error}</div>}
 
-        {!loading && stories.length === 0 && (
+        {/* Favori modu — boş durum */}
+        {showFavorites && !favLoading && favoriteStories.length === 0 && (
+          <div className="exp-empty animate-fadeIn">
+            <div className="exp-empty-icon">☆</div>
+            <h3>{lang === 'tr' ? 'Henüz favori yok' : 'No favorites yet'}</h3>
+            <p>{lang === 'tr'
+              ? 'Henüz başka yazarlardan favoriye eklediğin bir hikaye yok. Hikaye kartlarındaki yıldız ikonuna basarak favorilere ekleyebilirsin.'
+              : "You haven't saved any stories yet. Tap the star icon on a story card to add it to favorites."}</p>
+          </div>
+        )}
+
+        {/* Favori modu — liste */}
+        {showFavorites && !favLoading && favoriteStories.length > 0 && (
+          <div className="exp-grid">
+            {favoriteStories.map(story => (
+              <CommunityStoryCard
+                key={story._id} story={story}
+                onRate={handleRate}
+                onLike={handleLike}
+                onFavorite={handleFavorite}
+                isFavorited={true}
+                lang={lang}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Normal mod — boş durum */}
+        {!showFavorites && !loading && stories.length === 0 && (
           <div className="exp-empty animate-fadeIn">
             <div className="exp-empty-icon">🌟</div>
             <h3>{t.explore?.empty || 'Henüz hikaye yok'}</h3>
@@ -313,20 +439,24 @@ export default function Explore() {
           </div>
         )}
 
-        {!loading && stories.length > 0 && (
+        {/* Normal mod — liste */}
+        {!showFavorites && !loading && stories.length > 0 && (
           <div className="exp-grid">
             {stories.map(story => (
               <CommunityStoryCard
                 key={story._id} story={story}
                 onRate={handleRate}
                 onLike={handleLike}
+                onFavorite={user ? handleFavorite : null}
+                isFavorited={favoriteIds.has(story._id)}
                 lang={lang}
               />
             ))}
           </div>
         )}
 
-        {totalPages > 1 && (
+        {/* Sayfalama — favori modunda gizli */}
+        {!showFavorites && totalPages > 1 && (
           <div className="exp-pagination">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <button key={p}

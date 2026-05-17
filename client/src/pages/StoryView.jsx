@@ -64,7 +64,7 @@ export default function StoryView() {
 
       for (let i = 0; i < d.length; i++) {
         const t = i / rate;
-        // Soft paper rustle: quick rise, slow fade
+        // Yumuşak kağıt hışırtısı: hızlı yükseliş, yavaş sönüş
         const env = Math.exp(-t * 7) * (1 - Math.exp(-t * 80));
         d[i] = (Math.random() * 2 - 1) * env;
       }
@@ -72,13 +72,13 @@ export default function StoryView() {
       const src = ctx.createBufferSource();
       src.buffer = buf;
 
-      // Mid-range bandpass — paper body, not harsh highs
+      // Orta frekans bandpass — kağıt gövdesi, sert tizler değil
       const bp = ctx.createBiquadFilter();
       bp.type = 'bandpass';
       bp.frequency.value = 800;
       bp.Q.value = 0.55;
 
-      // Cut everything above ~2 kHz for softness
+      // ~2 kHz üzerindeki her şeyi kes — yumuşaklık için
       const lp = ctx.createBiquadFilter();
       lp.type = 'lowpass';
       lp.frequency.value = 2000;

@@ -71,7 +71,10 @@ const storySchema = new mongoose.Schema(
       },
     ],
     communityAverageRating: { type: Number, default: 0 },
-    viewCount: { type: Number, default: 0 },
+    viewCount:              { type: Number, default: 0 },
+    // Hesap silme — yazar anonim kullanıcıya aktarıldığında işaretlenir
+    isAnonymized:          { type: Boolean, default: false },
+    originalAuthorDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

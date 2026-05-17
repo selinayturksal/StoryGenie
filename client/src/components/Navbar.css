@@ -55,7 +55,7 @@
 
 .navbar {
   position:sticky; top:0; z-index:9600;
-  background:transparent;
+  background: transparent;
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
   border-bottom:none;
@@ -326,17 +326,6 @@
   background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120)) !important;
   border-color: transparent !important;
   color: #fff !important;
-}
-.nav-auth-btn--primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(117,70,104,0.4);
-}
-
-/* Sign Up butonu öne çıkan */
-.nav-auth-btn--primary {
-  background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120)) !important;
-  color: #fff !important;
-  border-color: transparent !important;
   box-shadow: 0 4px 16px rgba(117,70,104,0.4);
 }
 .nav-auth-btn--primary:hover {
@@ -344,24 +333,3 @@
   box-shadow: 0 8px 24px rgba(117,70,104,0.5) !important;
 }
 
-/* Landing'de navbar transparan */
-.navbar-transparent {
-  background: transparent !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
-  position: fixed !important;
-  top: 0; left: 0; right: 0;
-}
-.navbar-transparent .nav-link      { color: rgba(255,255,255,0.82) !important; }
-.navbar-transparent .nav-link:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
-.navbar-transparent .nav-link.active { background: rgba(255,255,255,0.12) !important; color: #c4b5fd !important; }
-.navbar-transparent .navbar-links   { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.1) !important; }
-.navbar-transparent .lang-switcher  { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.1) !important; }
-.navbar-transparent .lang-btn       { color: rgba(255,255,255,0.6) !important; }
-.navbar-transparent .lang-btn.active { background: rgba(255,255,255,0.15) !important; color: #fff !important; }
-.navbar-transparent .nav-auth-btn   { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.18) !important; color: rgba(255,255,255,0.9) !important; }
-.navbar-transparent .nav-auth-btn--primary { background: linear-gradient(135deg,rgb(117,70,104),rgb(80,38,120)) !important; border-color: transparent !important; color: #fff !important; }
-.navbar-transparent .theme-switcher { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.1) !important; }
-.navbar-transparent .theme-btn      { color: rgba(255,255,255,0.6) !important; }
-.navbar-transparent .theme-btn.active { background: rgba(255,255,255,0.15) !important; }
-.navbar-transparent .logo-img       { filter: brightness(1.2); }

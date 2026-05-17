@@ -27,14 +27,14 @@ function seededStars(count) {
       twinkleDur:  1.8 + rand() * 3.5,
       twinkleDelay: rand() * 5,
       depth,
-      // Some stars get a cross/plus sparkle shape
+      // Bazı yıldızlar çarpı/artı parlaklık şekli alır
       sparkle: rand() > 0.82,
     });
   }
   return stars;
 }
 
-// A handful of "constellation" lines between close stars
+// Yakın yıldızlar arasında birkaç "takımyıldızı" çizgisi
 const CONSTELLATIONS = [
   [2, 7], [7, 15], [15, 22],
   [5, 11], [11, 18],

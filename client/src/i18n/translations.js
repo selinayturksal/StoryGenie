@@ -93,7 +93,7 @@ const translations = {
       },
       success: {
         profile: 'Profil güncellendi! ✓',
-        password: 'Şifre başarıyla değiştirildi! ✓',
+        password: 'Onay maili gönderildi! E-postanı kontrol et. 📧',
       },
     },
 
@@ -329,7 +329,7 @@ const translations = {
       },
       success: {
         profile: 'Profile updated! ✓',
-        password: 'Password changed successfully! ✓',
+        password: 'Confirmation email sent! Check your inbox. 📧',
       },
     },
 

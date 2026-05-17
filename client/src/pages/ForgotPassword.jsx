@@ -20,7 +20,7 @@ export default function ForgotPassword() {
     try {
       await api.post('/auth/forgot-password', { email });
     } catch {
-      // Intentionally swallow — always show success to prevent enumeration
+      // Kasıtlı olarak yutulur — e-posta enumeration saldırısını önlemek için her zaman başarı göster
     } finally {
       setSent(true);
       setLoading(false);
