@@ -1,0 +1,210 @@
+/* ════════════════════════════════════════
+   ContactPage — /iletisim sayfası
+   PrivacyPolicy.css ile tutarlı arka plan ve yapı
+════════════════════════════════════════ */
+
+.cp-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 80px;
+  background: transparent;
+}
+
+.cp-container {
+  flex: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+}
+
+/* Başlık */
+.cp-header {
+  margin-bottom: 48px;
+  padding-bottom: 28px;
+  border-bottom: 1.5px solid rgba(124,58,237,0.12);
+}
+
+[data-theme="dark"] .cp-header { border-color: rgba(167,139,250,0.18); }
+
+.cp-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--ink, #1a1035);
+  margin-bottom: 10px;
+}
+
+[data-theme="dark"] .cp-title { color: #dcd2ff; }
+
+.cp-subtitle {
+  font-size: 1rem;
+  color: var(--ink-mid, #555);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme="dark"] .cp-subtitle { color: rgba(210,200,250,0.75); }
+
+/* İki sütun grid */
+.cp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.7fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Sol — bilgi kartları */
+.cp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.cp-info-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.cp-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cp-info-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-soft, #999);
+  margin-bottom: 4px;
+}
+
+.cp-info-val {
+  font-size: 0.93rem;
+  color: var(--ink-mid, #444);
+  line-height: 1.55;
+  text-decoration: none;
+}
+
+a.cp-info-val:hover {
+  color: var(--plum, #7c3aed);
+  text-decoration: underline;
+}
+
+[data-theme="dark"] .cp-info-val { color: rgba(210,200,250,0.75); }
+
+/* Sağ — form */
+.cp-form {
+  background: rgba(255,255,255,0.65);
+  border: 1.5px solid rgba(124,58,237,0.13);
+  border-radius: 20px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .cp-form {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(167,139,250,0.18);
+}
+
+.cp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cp-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft, #888);
+}
+
+[data-theme="dark"] .cp-field label { color: rgba(200,185,255,0.7); }
+
+.cp-field input,
+.cp-field textarea {
+  background: rgba(255,255,255,0.55);
+  border: 1.5px solid rgba(124,58,237,0.16);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.93rem;
+  color: var(--ink, #1a1035);
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  resize: vertical;
+}
+
+[data-theme="dark"] .cp-field input,
+[data-theme="dark"] .cp-field textarea {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(167,139,250,0.2);
+  color: #dcd2ff;
+}
+
+.cp-field input::placeholder,
+.cp-field textarea::placeholder { color: rgba(100,80,140,0.45); }
+
+[data-theme="dark"] .cp-field input::placeholder,
+[data-theme="dark"] .cp-field textarea::placeholder { color: rgba(200,180,255,0.3); }
+
+.cp-field input:focus,
+.cp-field textarea:focus { border-color: var(--plum, #7c3aed); }
+
+.cp-msg {
+  font-size: 0.88rem;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.cp-msg--ok  { background: rgba(16,185,129,0.12); color: #065f46; }
+.cp-msg--err { background: rgba(220,38,38,0.10);  color: #991b1b; }
+
+[data-theme="dark"] .cp-msg--ok  { color: #6ee7b7; }
+[data-theme="dark"] .cp-msg--err { color: #fca5a5; }
+
+/* Gönder butonu */
+.cp-submit {
+  align-self: flex-end;
+  background: linear-gradient(135deg, rgb(117,70,104), rgb(80,38,120));
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.cp-submit:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.cp-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cp-grid  { grid-template-columns: 1fr; gap: 32px; }
+  .cp-row   { grid-template-columns: 1fr; }
+  .cp-form  { padding: 24px 18px; }
+  .cp-title { font-size: 1.5rem; }
+  .cp-container { padding: 32px 16px 48px; }
+}

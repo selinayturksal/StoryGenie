@@ -34,7 +34,7 @@ export default function Favorites() {
     try {
       await api.delete(`/favorites/${id}`);
       setStories(prev => prev.filter(s => s._id !== id));
-    } catch (e) {}
+    } catch (e) { console.error('[Favorites] Favori kaldırılamadı:', e.message); }
   };
 
   const cleanMd = (text = '') =>

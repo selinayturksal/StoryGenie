@@ -225,7 +225,7 @@ export default function Explore() {
     api.get('/favorites?limit=50').then(res => {
       const ids = new Set(res.data.stories.map(s => s._id));
       setFavoriteIds(ids);
-    }).catch(() => {});
+    }).catch(err => { console.error('[Explore] Favoriler yüklenemedi:', err.message); });
   }, [user]);
 
   const handleFavorite = async (id, add) => {
@@ -237,7 +237,7 @@ export default function Explore() {
         await api.delete(`/favorites/${id}`);
         setFavoriteIds(prev => { const next = new Set(prev); next.delete(id); return next; });
       }
-    } catch (e) {}
+    } catch (e) { console.error('[Explore] Favori güncelleme hatası:', e.message); }
   };
 
   const handleToggleFavorites = async () => {
@@ -262,7 +262,7 @@ export default function Explore() {
   const handleRate = async (id, rating, read = false) => {
     if (read) { navigate(`/story/${id}`); return; }
     if (!user) { navigate('/login'); return; }
-    try { await api.post(`/stories/${id}/community-rating`, { rating }); } catch (e) {}
+    try { await api.post(`/stories/${id}/community-rating`, { rating }); } catch (e) { console.error('[Explore] Puanlama hatası:', e.message); }
   };
 
   const handleLike = async (id) => {
@@ -270,7 +270,7 @@ export default function Explore() {
     try {
       const res = await api.post(`/stories/${id}/like`);
       return res.data;
-    } catch (e) { return null; }
+    } catch (e) { console.error('[Explore] Beğeni hatası:', e.message); return null; }
   };
 
   // sortBy 'all' iken sıralama yok

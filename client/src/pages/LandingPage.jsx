@@ -39,7 +39,7 @@ const HOW_STEPS = [
 ];
 
 export default function LandingPage() {
-  const { t, lang } = useLang();
+  const { lang } = useLang();
   const { scrollYProgress } = useScroll();
   const progressWidth = useTransform(scrollYProgress, [0,1], ['0%','100%']);
 
@@ -249,8 +249,8 @@ export default function LandingPage() {
 
             {/* Kolon 3 — Linkler */}
             <motion.div className="lp-footer-col lp-footer-links-col" variants={fadeUp(0.16)}>
-              <a href="mailto:destek@masalmatik.com" className="lp-footer-link"> {lang==='tr' ? 'İletişim' : 'Contact'}</a>
-              <a href="/privacy" className="lp-footer-link"> {lang==='tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}</a>
+              <Link to="/iletisim" className="lp-footer-link">{lang==='tr' ? 'İletişim' : 'Contact'}</Link>
+              <Link to="/privacy" className="lp-footer-link">{lang==='tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}</Link>
               <span className="lp-footer-copy">© 2026 Masalmatik</span>
             </motion.div>
 

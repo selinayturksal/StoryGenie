@@ -9,6 +9,7 @@ const storyRoutes = require('./routes/stories');
 const aiRoutes    = require('./routes/ai');
 const userRoutes      = require('./routes/users');
 const favoritesRoutes = require('./routes/favorites');
+const contactRoutes   = require('./routes/contact');
 const { seedAnonymousUser } = require('./seeds/anonymousUser');
 
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/favorites', favoritesRoutes);
+app.use('/api/contact',  contactRoutes);
 
 // Sağlık kontrolü
 app.get('/api/health', (req, res) => {

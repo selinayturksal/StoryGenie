@@ -77,7 +77,7 @@ export default function StarField({ className = '' }) {
           style={{ position: 'absolute', inset: 0, y: layerY[depth] }}
         >
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-            {/* Constellation lines — depth 1 only */}
+            {/* Takımyıldızı çizgileri — yalnızca depth 1 */}
             {depth === 1 && CONSTELLATIONS.map(([a, b], idx) => {
               const sa = starsByDepth[1][a % starsByDepth[1].length];
               const sb = starsByDepth[1][b % starsByDepth[1].length];

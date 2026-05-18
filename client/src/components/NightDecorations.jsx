@@ -36,7 +36,7 @@ export default function NightDecorations({ className = '' }) {
       style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}
       aria-hidden="true"
     >
-      {/* ── Soft color halos ── */}
+      {/* ── Yumuşak renk hale halkaları ── */}
       {HALOS.map((h, i) => (
         <div
           key={i}
@@ -54,7 +54,7 @@ export default function NightDecorations({ className = '' }) {
         />
       ))}
 
-      {/* ── Crescent moons ── */}
+      {/* ── Hilal aylar ── */}
       {MOONS.map((m, i) => (
         <motion.div
           key={i}
@@ -66,7 +66,7 @@ export default function NightDecorations({ className = '' }) {
           transition={{ duration: m.dur, delay: m.delay, repeat: Infinity, ease: 'easeInOut' }}
         >
           <svg width={m.size} height={m.size} viewBox="0 0 40 40" fill="none">
-            {/* Crescent: large circle minus offset circle */}
+            {/* Hilal: büyük daire eksi kaydırılmış daire */}
             <path
               d="M30 20 A14 14 0 1 1 30.001 20 Z M36 14 A10 10 0 1 0 36.001 14 Z"
               fill="rgba(200,185,255,0.55)"
@@ -75,7 +75,7 @@ export default function NightDecorations({ className = '' }) {
               d="M20 6 A14 14 0 0 1 34 20 A10 10 0 0 0 22 8 Z"
               fill="rgba(180,160,240,0.7)"
             />
-            {/* simpler crescent */}
+            {/* Sadeleştirilmiş hilal */}
             <path
               d="M28 8 A14 14 0 1 0 28 32 A10 10 0 1 1 28 8 Z"
               fill="rgba(210,195,255,0.6)"
@@ -84,7 +84,7 @@ export default function NightDecorations({ className = '' }) {
         </motion.div>
       ))}
 
-      {/* ── Tiny twinkling stars ── */}
+      {/* ── Küçük titreşen yıldızlar ── */}
       {STARS.map((s, i) => (
         <motion.div
           key={i}
@@ -105,7 +105,7 @@ export default function NightDecorations({ className = '' }) {
         />
       ))}
 
-      {/* ── Soft cloud outline rings (decorative) ── */}
+      {/* ── Dekoratif bulut halkaları ── */}
       <div style={{
         position: 'absolute', bottom: '18%', left: '5%',
         width: 120, height: 36,

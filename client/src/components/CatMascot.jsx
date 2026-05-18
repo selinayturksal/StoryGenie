@@ -2,15 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 /*
- * "Pati" — the MasalMatik mascot.
- * Pure SVG + Framer Motion. No image file required.
+ * "Pati" — MasalMatik maskotu.
+ * Tamamen SVG + Framer Motion. Harici görsel dosyası gerekmez.
  *
  * Props:
- *   size       – base width in px (height = size * 1.22)
- *   withBubble – show a speech bubble above the cat
- *   bubbleText – text in the speech bubble (supports \n)
- *   lightBubble – white-on-cream bubble (for dark sections)
- *   className  – wrapper class
+ *   size        – temel genişlik (px cinsinden; yükseklik = size * 1.22)
+ *   withBubble  – konuşma balonu gösterilsin mi
+ *   bubbleText  – balondaki metin (\n satır atlar)
+ *   lightBubble – koyu bölümler için beyaz/krem balon
+ *   className   – dış sarmalayıcı sınıfı
  */
 export default function CatMascot({
   size        = 220,
@@ -23,7 +23,7 @@ export default function CatMascot({
 
   return (
     <div className={`inline-flex flex-col items-center ${className}`}>
-      {/* ── Speech Bubble ── */}
+      {/* ── Konuşma balonu ── */}
       {withBubble && bubbleText && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5, y: 10 }}
@@ -36,7 +36,7 @@ export default function CatMascot({
         </motion.div>
       )}
 
-      {/* ── Floating cat wrapper ── */}
+      {/* ── Yüzen kedi sarmalayıcısı ── */}
       <motion.div
         animate={{
           y:      [0, -16, -7, 0],
@@ -58,7 +58,7 @@ export default function CatMascot({
           aria-label="Pati the cat"
           style={{ filter: 'drop-shadow(0 14px 36px rgba(117,70,104,0.22))' }}
         >
-          {/* ═════════════════ TAIL (behind body) ════════════════ */}
+          {/* ═════════════════ KUYRUK (gövdenin arkasında) ════════════════ */}
           <motion.path
             d="M152 208 Q182 168 172 130 Q166 112 154 124 Q164 150 157 200 Z"
             fill="#c0ae98"
@@ -67,46 +67,46 @@ export default function CatMascot({
             style={{ transformOrigin: '155px 208px' }}
           />
 
-          {/* ═════════════════ BODY ════════════════ */}
+          {/* ═════════════════ GÖVDE ════════════════ */}
           <ellipse cx="100" cy="203" rx="60" ry="50" fill="#c5b49f"/>
-          {/* Body soft shading */}
+          {/* Gövde yumuşak gölgesi */}
           <ellipse cx="78" cy="196" rx="20" ry="14" fill="#b0a08a" opacity="0.22"/>
           <ellipse cx="118" cy="210" rx="18" ry="12" fill="#b0a08a" opacity="0.14"/>
 
-          {/* ═════════════════ EARS ════════════════ */}
-          {/* Left ear */}
+          {/* ═════════════════ KULAKLAR ════════════════ */}
+          {/* Sol kulak */}
           <polygon points="44,80 36,30 78,75" fill="#c5b49f"/>
           <polygon points="48,74 42,40 72,70" fill="#f0a0b2"/>
-          {/* Right ear */}
+          {/* Sağ kulak */}
           <polygon points="122,75 164,30 156,80" fill="#c5b49f"/>
           <polygon points="128,70 158,40 152,74" fill="#f0a0b2"/>
 
-          {/* ═════════════════ HEAD ════════════════ */}
+          {/* ═════════════════ BAŞ ════════════════ */}
           <circle cx="100" cy="107" r="64" fill="#c5b49f"/>
-          {/* Side shading */}
+          {/* Yan gölgeleme */}
           <ellipse cx="68" cy="107" rx="20" ry="34" fill="#b0a08a" opacity="0.18"/>
           <ellipse cx="132" cy="107" rx="20" ry="34" fill="#b0a08a" opacity="0.18"/>
 
-          {/* ── Forehead stripes ── */}
+          {/* ── Alın çizgileri ── */}
           <path d="M88 52 Q96 41 104 52" stroke="#a89070" strokeWidth="2.6" fill="none" strokeLinecap="round"/>
           <path d="M76 60 Q82 49 89 60"  stroke="#a89070" strokeWidth="2.1" fill="none" strokeLinecap="round"/>
           <path d="M111 60 Q118 49 124 60" stroke="#a89070" strokeWidth="2.1" fill="none" strokeLinecap="round"/>
 
-          {/* ── Muzzle (lighter area) ── */}
+          {/* ── Burun çevresi (açık alan) ── */}
           <ellipse cx="100" cy="123" rx="38" ry="28" fill="#e2d6c4"/>
 
-          {/* ═════════════════ EYES ════════════════ */}
-          {/* Left eye — white */}
+          {/* ═════════════════ GÖZLER ════════════════ */}
+          {/* Sol göz — beyaz */}
           <ellipse cx="79" cy="96" rx="17.5" ry="18.5" fill="white"/>
-          {/* Left eye — teal iris */}
+          {/* Sol göz — yeşil-mavi iris */}
           <ellipse cx="79" cy="97" rx="12.5" ry="13.5" fill="#5497A7"/>
-          {/* Left eye — pupil */}
+          {/* Sol göz — göz bebeği */}
           <ellipse cx="79" cy="97" rx="7.5"  ry="9.5"  fill="#131d24"/>
-          {/* Highlights */}
+          {/* Işık yansımaları */}
           <circle cx="83.5" cy="92" r="4"   fill="white"/>
           <circle cx="74.5" cy="101" r="2"  fill="white" opacity="0.6"/>
 
-          {/* Animated eyelid (blink) */}
+          {/* Animasyonlu göz kapağı (kırpma) */}
           <motion.ellipse
             cx="79" cy="87"
             rx="17.5" ry="0"
@@ -121,17 +121,17 @@ export default function CatMascot({
             }}
           />
 
-          {/* Right eye — white */}
+          {/* Sağ göz — beyaz */}
           <ellipse cx="121" cy="96" rx="17.5" ry="18.5" fill="white"/>
-          {/* Right eye — teal iris */}
+          {/* Sağ göz — yeşil-mavi iris */}
           <ellipse cx="121" cy="97" rx="12.5" ry="13.5" fill="#5497A7"/>
-          {/* Right eye — pupil */}
+          {/* Sağ göz — göz bebeği */}
           <ellipse cx="121" cy="97" rx="7.5"  ry="9.5"  fill="#131d24"/>
-          {/* Highlights */}
+          {/* Işık yansımaları */}
           <circle cx="125.5" cy="92" r="4"   fill="white"/>
           <circle cx="116.5" cy="101" r="2"  fill="white" opacity="0.6"/>
 
-          {/* Animated eyelid (blink) */}
+          {/* Animasyonlu göz kapağı (kırpma) */}
           <motion.ellipse
             cx="121" cy="87"
             rx="17.5" ry="0"
@@ -146,19 +146,19 @@ export default function CatMascot({
             }}
           />
 
-          {/* ═════════════════ NOSE ════════════════ */}
+          {/* ═════════════════ BURUN ════════════════ */}
           <path d="M95 119 L105 119 L100 126 Z" fill="#e87890"/>
           <ellipse cx="98.5" cy="119" rx="2.8" ry="1.6" fill="#f4adc0" opacity="0.8"/>
 
-          {/* ═════════════════ MOUTH ════════════════ */}
+          {/* ═════════════════ AĞIZ ════════════════ */}
           <path d="M100 126 Q93 132 87 129" stroke="#c06878" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
           <path d="M100 126 Q107 132 113 129" stroke="#c06878" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
 
-          {/* ═════════════════ CHEEK BLUSH ════════════════ */}
+          {/* ═════════════════ YANAK PEMBESI ════════════════ */}
           <ellipse cx="66" cy="115" rx="12.5" ry="6.5" fill="#f0a0b0" opacity="0.28"/>
           <ellipse cx="134" cy="115" rx="12.5" ry="6.5" fill="#f0a0b0" opacity="0.28"/>
 
-          {/* ═════════════════ WHISKERS ════════════════ */}
+          {/* ═════════════════ BIYIKLAR ════════════════ */}
           <line x1="22" y1="112" x2="79" y2="118" stroke="#d5cab8" strokeWidth="1.4"/>
           <line x1="22" y1="118" x2="79" y2="119" stroke="#d5cab8" strokeWidth="1.4"/>
           <line x1="22" y1="124" x2="79" y2="121" stroke="#d5cab8" strokeWidth="1.4"/>
@@ -167,12 +167,12 @@ export default function CatMascot({
           <line x1="121" y1="121" x2="178" y2="124" stroke="#d5cab8" strokeWidth="1.4"/>
 
           {/* ═════════════════ BANDANA ════════════════ */}
-          {/* Main bandana shape */}
+          {/* Ana bandana şekli */}
           <path d="M51 153 Q100 170 149 153 Q143 144 100 160 Q57 144 51 153 Z" fill="#5497A7"/>
-          {/* Bow/knot */}
+          {/* Düğüm/fiyonk */}
           <path d="M91 148 L109 148 L106 159 L100 154 L94 159 Z" fill="#3a7a8c"/>
           <circle cx="100" cy="151" r="4.5" fill="#2c6070"/>
-          {/* Paw prints on bandana */}
+          {/* Bandana üzerindeki pati izleri */}
           <circle cx="73" cy="157" r="3.8" fill="#3a7a8c" opacity="0.5"/>
           <circle cx="70" cy="153"  r="1.7" fill="#3a7a8c" opacity="0.4"/>
           <circle cx="74" cy="152"  r="1.7" fill="#3a7a8c" opacity="0.4"/>
@@ -183,15 +183,15 @@ export default function CatMascot({
           <circle cx="128" cy="152"  r="1.7" fill="#3a7a8c" opacity="0.4"/>
           <circle cx="132" cy="153.5" r="1.7" fill="#3a7a8c" opacity="0.4"/>
 
-          {/* ═════════════════ PAWS ════════════════ */}
-          {/* Left paw */}
+          {/* ═════════════════ PATILER ════════════════ */}
+          {/* Sol pati */}
           <ellipse cx="68" cy="234" rx="24" ry="12.5" fill="#c5b49f"/>
           <ellipse cx="68" cy="238" rx="9"  ry="5.5"  fill="#d4c2ac"/>
           <circle cx="58"  cy="229" r="5" fill="#d4c2ac"/>
           <circle cx="68"  cy="226" r="5" fill="#d4c2ac"/>
           <circle cx="78"  cy="229" r="5" fill="#d4c2ac"/>
 
-          {/* Right paw */}
+          {/* Sağ pati */}
           <ellipse cx="132" cy="234" rx="24" ry="12.5" fill="#c5b49f"/>
           <ellipse cx="132" cy="238" rx="9"  ry="5.5"  fill="#d4c2ac"/>
           <circle cx="122" cy="229" r="5" fill="#d4c2ac"/>

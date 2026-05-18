@@ -9,12 +9,13 @@
   justify-content: center;
   padding: 48px 20px;
   position: relative;
-  overflow: hidden;
 }
 
-/* ── Night gradient background ── */
+/* ── Night gradient background ──
+   position:fixed → viewport'un tamamını (navbar dahil) kapsar,
+   overflow:hidden olan parent onu kesmez                        */
 .auth-night-bg {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background:
     radial-gradient(ellipse 75% 55% at 15%  5%,  rgba(117, 70, 104, 0.55) 0%, transparent 55%),
@@ -22,17 +23,13 @@
     radial-gradient(ellipse 50% 65% at 50%  95%, rgba(84, 151, 167, 0.22) 0%, transparent 55%),
     radial-gradient(ellipse 40% 40% at 80%  75%, rgba(117, 70, 104, 0.22) 0%, transparent 50%);
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
 }
 
+/* Light modda body zaten aynı gradient'ı fixed olarak veriyor;
+   auth-page'e tekrar uygulamak navbar ile seam oluşturur — kaldırıldı */
 [data-theme="light"] .auth-page {
-  background-color: transparent;
-  background-image:
-    radial-gradient(ellipse 90% 55% at 8%   8%,   rgba(255, 229, 102, 0.13) 0%, transparent 65%),
-    radial-gradient(ellipse 75% 50% at 92%  4%,   rgba(0,  201, 167, 0.10)  0%, transparent 60%),
-    radial-gradient(ellipse 80% 60% at 50%  52%,  rgba(155,  89, 182, 0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 65% 45% at 88%  88%,  rgba(255, 123,  92, 0.08) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 40% at 12%  92%,  rgba(0,  201, 167, 0.07)  0%, transparent 55%);
+  background: transparent;
 }
 [data-theme="light"] .auth-night-bg { display: none; }
 

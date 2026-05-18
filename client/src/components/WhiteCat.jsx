@@ -2,14 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 /*
- * Mystical White Cat mascot — two poses:
- *   pose="lantern"  upright cat holding a glowing lantern
- *   pose="sleep"    curled cat with Zzz bubbles
+ * Gizemli Beyaz Kedi maskotu — iki poz:
+ *   pose="lantern"  fener tutan dik kedi
+ *   pose="sleep"    uyuyan kıvrık kedi ile Zzz balonları
  *
  * Props:
  *   pose      – "lantern" | "sleep"
- *   size      – base width in px
- *   className – extra wrapper classes
+ *   size      – temel genişlik (px cinsinden)
+ *   className – dış sarmalayıcı sınıfları
  */
 export default function WhiteCat({ pose = 'lantern', size = 220, className = '' }) {
   return pose === 'sleep'
@@ -17,7 +17,7 @@ export default function WhiteCat({ pose = 'lantern', size = 220, className = '' 
     : <LanternCat size={size} className={className} />;
 }
 
-/* ────────────────────────── LANTERN POSE ────────────────────────── */
+/* ────────────────────────── FENER POZ ────────────────────────── */
 function LanternCat({ size, className }) {
   const h = size * 1.35;
 
@@ -36,11 +36,11 @@ function LanternCat({ size, className }) {
           xmlns="http://www.w3.org/2000/svg"
           style={{ filter: 'drop-shadow(0 16px 40px rgba(28,49,68,0.28))' }}
         >
-          {/* ── Lantern glow (ambient) ── */}
+          {/* ── Fener ortam ışıması ── */}
           <ellipse cx="155" cy="148" rx="32" ry="32" fill="rgba(255,200,80,0.18)" />
           <ellipse cx="155" cy="148" rx="20" ry="20" fill="rgba(255,200,80,0.28)" />
 
-          {/* ── Tail ── */}
+          {/* ── Kuyruk ── */}
           <motion.path
             d="M118 228 Q145 200 138 168 Q132 152 122 162 Q130 182 124 222 Z"
             fill="#e8e8e8"
@@ -49,24 +49,24 @@ function LanternCat({ size, className }) {
             style={{ transformOrigin: '120px 228px' }}
           />
 
-          {/* ── Body ── */}
+          {/* ── Gövde ── */}
           <ellipse cx="95" cy="218" rx="56" ry="46" fill="#f0f0f0" />
           <ellipse cx="78" cy="212" rx="18" ry="12" fill="#dcdcdc" opacity="0.4" />
           <ellipse cx="112" cy="226" rx="16" ry="10" fill="#dcdcdc" opacity="0.3" />
 
-          {/* ── Left arm (holding lantern up) ── */}
+          {/* ── Sol kol (feneri yukarı tutuyor) ── */}
           <path d="M138 196 Q148 178 152 158" stroke="#e0e0e0" strokeWidth="10" strokeLinecap="round" fill="none" />
-          {/* Paw at arm end */}
+          {/* Kolun ucundaki pati */}
           <ellipse cx="152" cy="156" rx="9" ry="7" fill="#f0f0f0" />
 
-          {/* ── Lantern ── */}
-          {/* Chain */}
+          {/* ── Fener ── */}
+          {/* Zincir */}
           <line x1="152" y1="150" x2="155" y2="132" stroke="#c8a050" strokeWidth="1.5" />
-          {/* Lantern top cap */}
+          {/* Fener üst kapağı */}
           <rect x="148" y="108" width="14" height="5" rx="2.5" fill="#c8a050" />
-          {/* Lantern body */}
+          {/* Fener gövdesi */}
           <rect x="146" y="113" width="18" height="22" rx="5" fill="rgba(255,220,100,0.25)" stroke="#c8a050" strokeWidth="1.5" />
-          {/* Flame glow */}
+          {/* Alev parlaması */}
           <motion.ellipse
             cx="155" cy="124"
             rx="5" ry="7"
@@ -75,10 +75,10 @@ function LanternCat({ size, className }) {
             transition={{ duration: 1.4, ease: 'easeInOut', repeat: Infinity }}
           />
           <ellipse cx="155" cy="125" rx="3" ry="4.5" fill="rgba(255,240,180,0.9)" />
-          {/* Lantern bottom cap */}
+          {/* Fener alt kapağı */}
           <rect x="148" y="135" width="14" height="4" rx="2" fill="#c8a050" />
 
-          {/* ── Sparkles around lantern ── */}
+          {/* ── Fener çevresindeki kıvılcımlar ── */}
           {[
             { cx: 137, cy: 100, size: 4, delay: 0 },
             { cx: 172, cy: 112, size: 3, delay: 0.5 },
@@ -95,21 +95,21 @@ function LanternCat({ size, className }) {
             />
           ))}
 
-          {/* ── Ears ── */}
+          {/* ── Kulaklar ── */}
           <polygon points="44,82 36,34 78,77" fill="#f0f0f0" />
           <polygon points="48,76 44,42 74,72" fill="#f5c0cc" opacity="0.7" />
           <polygon points="120,77 162,34 154,82" fill="#f0f0f0" />
           <polygon points="126,72 158,42 150,76" fill="#f5c0cc" opacity="0.7" />
 
-          {/* ── Head ── */}
+          {/* ── Baş ── */}
           <circle cx="99" cy="110" r="62" fill="#f5f5f5" />
           <ellipse cx="70" cy="110" rx="18" ry="30" fill="#dcdcdc" opacity="0.2" />
           <ellipse cx="128" cy="110" rx="18" ry="30" fill="#dcdcdc" opacity="0.2" />
 
-          {/* ── Muzzle ── */}
+          {/* ── Burun çevresi ── */}
           <ellipse cx="99" cy="126" rx="35" ry="26" fill="#efefef" />
 
-          {/* ── Eyes (amber/golden) ── */}
+          {/* ── Gözler (kehribar/altın) ── */}
           <ellipse cx="78" cy="100" rx="16" ry="17" fill="white" />
           <ellipse cx="78" cy="101" rx="11.5" ry="12.5" fill="#D4860A" />
           <ellipse cx="78" cy="101" rx="7"    ry="8.5"  fill="#1a1207" />
@@ -132,18 +132,18 @@ function LanternCat({ size, className }) {
             transition={{ duration: 0.28, times: [0, 0.35, 0.65, 1], repeat: Infinity, repeatDelay: 5, ease: 'easeInOut', delay: 0.06 }}
           />
 
-          {/* ── Nose ── */}
+          {/* ── Burun ── */}
           <path d="M94 121 L104 121 L99 128 Z" fill="#f5a0b0" />
 
-          {/* ── Mouth ── */}
+          {/* ── Ağız ── */}
           <path d="M99 128 Q92 134 86 131" stroke="#d08090" strokeWidth="1.6" fill="none" strokeLinecap="round" />
           <path d="M99 128 Q106 134 112 131" stroke="#d08090" strokeWidth="1.6" fill="none" strokeLinecap="round" />
 
-          {/* ── Cheek blush ── */}
+          {/* ── Yanak pembesi ── */}
           <ellipse cx="64" cy="118" rx="11" ry="6" fill="#f5b0c0" opacity="0.25" />
           <ellipse cx="134" cy="118" rx="11" ry="6" fill="#f5b0c0" opacity="0.25" />
 
-          {/* ── Whiskers ── */}
+          {/* ── Bıyıklar ── */}
           <line x1="22" y1="116" x2="74" y2="121" stroke="#c8c8c8" strokeWidth="1.2" />
           <line x1="22" y1="122" x2="74" y2="122" stroke="#c8c8c8" strokeWidth="1.2" />
           <line x1="22" y1="128" x2="74" y2="124" stroke="#c8c8c8" strokeWidth="1.2" />
@@ -151,7 +151,7 @@ function LanternCat({ size, className }) {
           <line x1="124" y1="122" x2="176" y2="122" stroke="#c8c8c8" strokeWidth="1.2" />
           <line x1="124" y1="124" x2="176" y2="128" stroke="#c8c8c8" strokeWidth="1.2" />
 
-          {/* ── Front paws ── */}
+          {/* ── Ön patiler ── */}
           <ellipse cx="70" cy="248" rx="22" ry="11" fill="#f0f0f0" />
           <circle cx="60"  cy="244" r="4.5" fill="#e4e4e4" />
           <circle cx="70"  cy="240" r="4.5" fill="#e4e4e4" />
@@ -167,13 +167,13 @@ function LanternCat({ size, className }) {
   );
 }
 
-/* ────────────────────────── SLEEPING POSE ────────────────────────── */
+/* ────────────────────────── UYUYAN POZ ────────────────────────── */
 function SleepingCat({ size, className }) {
   const h = size * 0.7;
 
   return (
     <div className={`inline-flex flex-col items-center ${className}`}>
-      {/* Zzz bubbles */}
+      {/* Zzz balonları */}
       <div style={{ position: 'relative', height: 40, width: size }}>
         {[
           { size: 10, x: '62%', y: 0,  delay: 0 },
@@ -200,7 +200,7 @@ function SleepingCat({ size, className }) {
         ))}
       </div>
 
-      {/* Sleeping cat body */}
+      {/* Uyuyan kedi gövdesi */}
       <svg
         width={size}
         height={h}
@@ -209,48 +209,48 @@ function SleepingCat({ size, className }) {
         xmlns="http://www.w3.org/2000/svg"
         style={{ filter: 'drop-shadow(0 8px 24px rgba(28,49,68,0.2))' }}
       >
-        {/* Curled body */}
+        {/* Kıvrık gövde */}
         <ellipse cx="110" cy="120" rx="90" ry="38" fill="#f5f5f5" />
         <ellipse cx="80"  cy="110" rx="52" ry="30" fill="#ececec" opacity="0.5" />
 
-        {/* Tail wrapping around */}
+        {/* Etrafı saran kuyruk */}
         <path d="M195 118 Q210 90 200 68 Q192 50 176 62 Q188 76 188 112 Z" fill="#e8e8e8" />
 
-        {/* Head resting */}
+        {/* Dinlenen baş */}
         <circle cx="68" cy="82" r="46" fill="#f5f5f5" />
         <ellipse cx="52" cy="82" rx="14" ry="24" fill="#dcdcdc" opacity="0.22" />
 
-        {/* Ears */}
+        {/* Kulaklar */}
         <polygon points="36,54 28,20 60,50" fill="#f0f0f0" />
         <polygon points="40,50 34,26 56,46" fill="#f5c0cc" opacity="0.6" />
         <polygon points="86,50 108,22 100,54" fill="#f0f0f0" />
         <polygon points="90,46 108,28 98,50" fill="#f5c0cc" opacity="0.6" />
 
-        {/* Muzzle */}
+        {/* Burun çevresi */}
         <ellipse cx="68" cy="96" rx="28" ry="20" fill="#efefef" />
 
-        {/* Closed eyes — curved lines */}
+        {/* Kapalı gözler — kavisli çizgiler */}
         <path d="M51 74 Q57 68 63 74" stroke="#8a7070" strokeWidth="2.2" fill="none" strokeLinecap="round" />
         <path d="M73 74 Q79 68 85 74" stroke="#8a7070" strokeWidth="2.2" fill="none" strokeLinecap="round" />
 
-        {/* Nose */}
+        {/* Burun */}
         <path d="M64 90 L72 90 L68 96 Z" fill="#f5a0b0" />
 
-        {/* Smile */}
+        {/* Gülümseme */}
         <path d="M68 96 Q63 100 59 98" stroke="#d08090" strokeWidth="1.5" fill="none" strokeLinecap="round" />
         <path d="M68 96 Q73 100 77 98" stroke="#d08090" strokeWidth="1.5" fill="none" strokeLinecap="round" />
 
-        {/* Cheeks */}
+        {/* Yanak pembesi */}
         <ellipse cx="44" cy="90" rx="9" ry="5" fill="#f5b0c0" opacity="0.28" />
         <ellipse cx="92" cy="90" rx="9" ry="5" fill="#f5b0c0" opacity="0.28" />
 
-        {/* Whiskers */}
+        {/* Bıyıklar */}
         <line x1="10" y1="87" x2="48" y2="92" stroke="#c8c8c8" strokeWidth="1.1" />
         <line x1="10" y1="93" x2="48" y2="93" stroke="#c8c8c8" strokeWidth="1.1" />
         <line x1="88" y1="92" x2="126" y2="87" stroke="#c8c8c8" strokeWidth="1.1" />
         <line x1="88" y1="93" x2="126" y2="93" stroke="#c8c8c8" strokeWidth="1.1" />
 
-        {/* Front paws tucked */}
+        {/* İçeri çekilmiş ön patiler */}
         <ellipse cx="126" cy="138" rx="28" ry="12" fill="#f0f0f0" />
         <circle cx="110" cy="134" r="5" fill="#e4e4e4" />
         <circle cx="122" cy="130" r="5" fill="#e4e4e4" />

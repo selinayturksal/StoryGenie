@@ -22,6 +22,8 @@ const Settings       = React.lazy(() => import('./pages/Settings'));
 const Profile        = React.lazy(() => import('./pages/Profile'));
 const Favorites               = React.lazy(() => import('./pages/Favorites'));
 const ConfirmPasswordChange   = React.lazy(() => import('./pages/ConfirmPasswordChange'));
+const PrivacyPolicy           = React.lazy(() => import('./pages/PrivacyPolicy'));
+const ContactPage             = React.lazy(() => import('./pages/ContactPage'));
 
 const Spinner = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
@@ -47,18 +49,20 @@ function AppShell() {
       <Navbar />
       <React.Suspense fallback={<Spinner />}>
         <Routes>
-          {/* Home: landing for guests, story creator for users */}
+          {/* Ana sayfa: misafire landing, giriş yapana hikaye oluşturucu */}
           <Route path="/" element={<HomeRoute />} />
 
-          {/* Public routes */}
+          {/* Herkese açık rotalar */}
           <Route path="/login"           element={<Login />} />
           <Route path="/register"        element={<Register />} />
           <Route path="/forgot-password"        element={<ForgotPassword />} />
           <Route path="/reset-password/:token"          element={<ResetPassword />} />
           <Route path="/confirm-password-change/:token" element={<ConfirmPasswordChange />} />
           <Route path="/explore"               element={<Explore />} />
+          <Route path="/privacy"               element={<PrivacyPolicy />} />
+          <Route path="/iletisim"              element={<ContactPage />} />
 
-          {/* Protected routes */}
+          {/* Korumalı rotalar — giriş gerektirir */}
           <Route path="/my-stories" element={
             <ProtectedRoute><MyStories /></ProtectedRoute>
           } />
@@ -81,7 +85,7 @@ function AppShell() {
             <ProtectedRoute><Favorites /></ProtectedRoute>
           } />
 
-          {/* Fallback */}
+          {/* Bilinmeyen rota → ana sayfaya yönlendir */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </React.Suspense>

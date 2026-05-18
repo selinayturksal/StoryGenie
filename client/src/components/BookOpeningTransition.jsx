@@ -95,7 +95,7 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
       aria-label={uiLang === 'tr' ? 'Hikaye oluşturuluyor' : 'Generating story'}
       aria-live="polite"
     >
-      {/* Book + particles + status */}
+      {/* Kitap + parçacıklar + durum */}
       <AnimatePresence>
         {showBook && (
           <motion.div
@@ -113,20 +113,20 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
                 : { type: 'spring', stiffness: 170, damping: 22, delay: 0.06 }
             }
           >
-            {/* Magical glow behind the book */}
+            {/* Kitabın arkasındaki sihirli parlaklık */}
             <div className={`bot-glow${coverOpen ? ' bot-glow--open' : ''}`} aria-hidden="true" />
 
-            {/* 3D Book — shifts right when open so the full spread is centered */}
+            {/* 3D Kitap — açıkken tam açılım ortalansın diye sağa kayar */}
             <div className={`bot-book-wrap${showFlipping ? ' bot-book-wrap--open' : ''}`} aria-hidden="true">
               <div className="bot-book">
 
-                {/* Ground shadow */}
+                {/* Zemin gölgesi */}
                 <div className="bot-shadow" />
 
                 {/*
-                  Left page — appears when the cover opens.
-                  Positioned absolute to the LEFT of bot-book (right: 100%).
-                  Shows "already written" content.
+                  Sol sayfa — kapak açıldığında belirir.
+                  bot-book'un soluna absolute konumlanır (right: 100%).
+                  "Zaten yazılmış" içerik simülasyonu gösterir.
                 */}
                 {showFlipping && (
                   <motion.div
@@ -144,7 +144,7 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
                   </motion.div>
                 )}
 
-                {/* Right page — always visible behind cover */}
+                {/* Sağ sayfa — kapağın arkasında her zaman görünür */}
                 <div className="bot-pages">
                   <AnimatePresence>
                     {coverOpen && (
@@ -164,7 +164,7 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
                   </AnimatePresence>
                 </div>
 
-                {/* Flipping pages — same bounds as right page, rotate around spine */}
+                {/* Çevrilen sayfalar — sağ sayfayla aynı sınırlar, cilt etrafında döner */}
                 {showFlipping && [0, 1, 2].map(fi => (
                   <div
                     key={fi}
@@ -179,12 +179,12 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
                         ))}
                       </div>
                     </div>
-                    {/* Back face transparent — pages "absorb" into book, keeps spread centered */}
+                    {/* Arka yüz şeffaf — sayfalar kitaba "emilir" görünür, açılımı ortada tutar */}
                     <div className="bot-flip-b" />
                   </div>
                 ))}
 
-                {/* Cover — removed from DOM once pages start flipping (prevents 3D z-fighting) */}
+                {/* Kapak — sayfa çevirme başlayınca DOM'dan kaldırılır (3D z-fighting'i önler) */}
                 {!showFlipping && (
                   <div className={`bot-cover${coverOpen ? ' bot-cover--open' : ''}`}>
                     <div className="bot-cover-f">
@@ -207,12 +207,12 @@ export default function BookOpeningTransition({ visible, storyReady, onComplete,
                   </div>
                 )}
 
-                {/* Spine */}
+                {/* Cilt */}
                 <div className="bot-spine" />
               </div>
             </div>
 
-            {/* Floating magic particles */}
+            {/* Uçan sihir parçacıkları */}
             {showFlipping && PARTICLES.map(p => (
               <motion.div
                 key={p.id}

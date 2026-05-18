@@ -23,7 +23,6 @@ export default function Navbar() {
   }, [dark]);
 
   const isActive = (path) => location.pathname === path;
-  const isLanding = location.pathname === '/' && !user;
 
   const scrollToSection = (id) => {
     setMenuOpen(false);
@@ -49,7 +48,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner container">
 
-        {/* Logo */}
+        {/* Marka logosu */}
         <Link to="/" className="navbar-logo">
           <img src="/assets/landing/logo.png" alt="Masalmatik" className="logo-img" />
         </Link>
@@ -69,7 +68,7 @@ export default function Navbar() {
               <button onClick={() => scrollToSection('ozellikler')}  className="nav-link">{lang === 'tr' ? 'Özellikler' : 'Features'}</button>
               <button onClick={() => scrollToSection('nasil-calisir')} className="nav-link">{lang === 'tr' ? 'Nasıl Çalışır?' : 'How It Works'}</button>
               <button onClick={() => scrollToSection('ornek')}       className="nav-link">{lang === 'tr' ? 'Örnek Hikaye' : 'Example'}</button>
-              <button onClick={() => scrollToSection('iletisim')}    className="nav-link">{lang === 'tr' ? 'İletişim' : 'Contact'}</button>
+              <button onClick={() => scrollToSection('iletisim')} className="nav-link">{lang === 'tr' ? 'İletişim' : 'Contact'}</button>
             </>
           )}
         </div>
@@ -77,7 +76,7 @@ export default function Navbar() {
         {/* Sağ */}
         <div className="navbar-right">
 
-          {/* Dark mode */}
+          {/* Karanlık/aydınlık tema geçişi */}
           <div className="theme-switcher">
             <button className={`theme-btn ${dark ? 'active' : ''}`} onClick={() => setDark(true)}>🌙</button>
             <button className={`theme-btn ${!dark ? 'active' : ''}`} onClick={() => setDark(false)}>☀️</button>
@@ -152,7 +151,7 @@ export default function Navbar() {
               <button onClick={() => scrollToSection('ozellikler')}    className="nav-link">{lang === 'tr' ? 'Özellikler' : 'Features'}</button>
               <button onClick={() => scrollToSection('nasil-calisir')} className="nav-link">{lang === 'tr' ? 'Nasıl Çalışır?' : 'How It Works'}</button>
               <button onClick={() => scrollToSection('ornek')}         className="nav-link">{lang === 'tr' ? 'Örnek Hikaye' : 'Example'}</button>
-              <button onClick={() => scrollToSection('iletisim')}      className="nav-link">{lang === 'tr' ? 'İletişim' : 'Contact'}</button>
+              <button onClick={() => scrollToSection('iletisim')} className="nav-link">{lang === 'tr' ? 'İletişim' : 'Contact'}</button>
               <hr className="mobile-divider" />
               <Link to="/login"    onClick={() => setMenuOpen(false)}>{t.nav.login}</Link>
               <Link to="/register" onClick={() => setMenuOpen(false)}>{t.nav.register}</Link>
